@@ -16,7 +16,7 @@ https://github.com/Team-Code/KA_Offline -->
  <script>
     var sketchProc = function(processingInstance) {
      with (processingInstance) {
-        size(600, 600); 
+        size(900, 900); 
         frameRate(55);
 angleMode = "degrees";
 var time = 0;
@@ -565,10 +565,10 @@ var plevel = 0;
 var started = false;
 var scene = "home";
 var btn1 = {
-    x: 300,
-    y: 288,
-    width:180,
-    height:90,
+    x: width/2,
+    y: height * 0.48,
+    width:width * 0.3,
+    height: height * 0.15,
     r: 87, 
     g:6,
     b:158,
@@ -578,10 +578,10 @@ var btn1 = {
     
 };
 var btn2 = {
-    x: 200,
-    y: 400,
-    width:180,
-    height:90,
+    x: width * 1/3,
+    y: height * 2/3,
+    width: width * 0.3,
+    height:height * 0.15,
     r: 87, 
     g:6,
     b:158,
@@ -591,10 +591,10 @@ var btn2 = {
     
 };
 var btn3 = {
-    x: 400,
-    y: 400,
-    width:180,
-    height:90,
+    x: width * 2/3,
+    y: height * 2/3,
+    width:width * 0.3,
+    height: height * 0.15,
     r: 87, 
     g:6,
     b:158,
@@ -604,10 +604,10 @@ var btn3 = {
     
 };
 var btn4 = {
-    x: 535,
-    y: 580,
-    width: 60,
-    height:40,
+    x: width * 0.89166667,
+    y: height * 29/30,
+    width: width/10,
+    height: height/15,
     r: 87, 
     g:6,
     b:158,
@@ -631,9 +631,9 @@ var txt = ["","Use the arrow keys or awsd to move. Once you begin moving you can
 var playerBlock = function(config){
     this.x = -50;
     this.y = -50;
-    this.speed = 3;
+    this.speed = this.w * 0.005;
     this.direction = "left";
-    this.velocity = 0.1;
+    this.velocity = width/4000;
     this.falling = false;
     this.h = height/20;
     this.w = width/20;
@@ -1028,10 +1028,10 @@ movingLava.prototype.draw = function() {
 };
 movingLava.prototype.move = function() {
     if(this.direction === 0){
-        this.x -= 3;
+        this.x -= width/200;
     }
     if(this.direction === 1){
-        this.x += 3;
+        this.x += width/200;
     }
 };
 movingLava.prototype.collide = function() {
@@ -1076,10 +1076,10 @@ verticalMovingLava.prototype.draw = function() {
 };
 verticalMovingLava.prototype.move = function() {
     if(this.direction === 2){
-        this.y -= 3;
+        this.y -= height/200;
     }
     if(this.direction === 3){
-        this.y += 3;
+        this.y += height/200;
     }
 };
 verticalMovingLava.prototype.collide = function() {
@@ -1200,16 +1200,6 @@ for(var column = 0;column < levels[level].length;column++) {
             movingBlocks.push(new movingStone(row* (width/20) + width/40,column * (height /20) + height/40, width/20,height/20, "solid"));
         }
         if(levels[level][column][row] === "@") {
-            if(column < width/40){
-                wEx = 1;
-            } else {
-                wEx = -1;
-            }
-            if(row < height/40){
-                hEx = 1;
-            } else {
-                hEx = -1;
-            }
             player.sx = row * width/20 + player.h/2 + hEx;
             player.sy = column * height/20 + player.h/2 + wEx;
         }
@@ -1287,13 +1277,13 @@ playerBlock.prototype.draw = function() {
     noStroke();
     fill(153, 141, 141);
     rect(this.x,this.y,this.w,this.h);
-    strokeWeight(2);
+    strokeWeight(width/300);
     stroke(156, 9, 9);
-    arc(this.x,this.y + 4,20,10,0,PI);
+    arc(this.x,this.y + this.h/7.5,this.w * 2/3,this.h * 1/3,0,PI);
     stroke(10);
-    strokeWeight(4);
-    ellipse(this.x - 9,this.y-3,0.4,0.4);
-    ellipse(this.x + 9,this.y-3,0.4,0.4);
+    strokeWeight(width/150);
+    ellipse(this.x - this.w * 0.3,this.y-this.h * 0.1,this.w/75,this.h/75);
+    ellipse(this.x + this.w * 0.3,this.y-this.h * 0.1,this.w/75,this.h/75);
 };
 playerBlock.prototype.move = function(){
     if(input.W && this.canMove || input[UP] && this.canMove){
@@ -1368,15 +1358,8 @@ playerBlock.prototype.move = function(){
         this.canMove = true;
     }**/
 };
-playerBlock.prototype.reset = function(){
-    this.x = this.sx;
-    this.y = this.sy;
-    this.moving = "";
-    this.speed = 3;
-    this.canMove = true;
-    loadLevel();
-};
 playerBlock.prototype.collide = function(){
+
     for(var i = 0; i < blocks.length; i++){
         if(collision(this,blocks[i]) === true && blocks[i].name === "upStone"){
             this.moving = "up";
@@ -1499,6 +1482,22 @@ playerBlock.prototype.collide = function(){
         }
     }
 };
+playerBlock.prototype.reset = function(){
+    this.x = this.sx;
+    this.y = this.sy;
+    this.speed = 3;
+    this.canMove = true;
+    loadLevel();
+	player.moving = "up"
+	player.collide();
+	player.moving = "down"
+	player.collide();
+	player.moving = "left"
+	player.collide();
+	player.moving = "right"
+	player.collide();
+	this.moving = "";
+};
 loadLevel();
 player.move();
 player.reset();
@@ -1554,7 +1553,7 @@ var draw = function() {
         textSize(30);
         fill(150, 87, 237);
         textAlign(CENTER,TOP);
-        text(txt[level],20,60,550,500);
+        text(txt[level],width/30,height/10,width - width/60,width * 5/6);
         fill(9, 47, 219);
         textAlign(LEFT,TOP);
         if(level < levels.length && started === true){
@@ -1565,9 +1564,9 @@ var draw = function() {
             time2 += 1;
         }
         if(round(time) < 10){
-            text("Time: "+ time2 + ":0" + round(time),20,567,550,500);
+            text("Time: "+ time2 + ":0" + round(time),width/30,height*0.945,width*55/60,height * 5/6);
         } else {
-            text("Time: "+ time2 + ":" + round(time),20,567,550,500);
+            text("Time: "+ time2 + ":" + round(time),width/30,height * 0.945,width * 55/60,height*5/6);
         }
         if(level >= levels.length){
             scene = "win";
@@ -1588,7 +1587,7 @@ var draw = function() {
         textAlign(CENTER,CENTER);
         textSize(60);
         fill(4, 0, 255);
-        text("Slidey Block",300,120);
+        text("Slidey Block",width/2,height/5);
         playButton.draw();
         playButton.clicked();
         recordButton.draw();
@@ -1610,11 +1609,11 @@ var draw = function() {
         fill(4, 0, 255);
         textSize(70);
         textFont(createFont("Impact"));
-        text("How to",300,70);
+        text("How to",width/2,height*7/60);
         textFont(createFont("arial"));
         textAlign(LEFT,TOP);
         textSize(30);
-        text("  Slidey Block is a one player puzzle game. You can use either the arrow keys or the a, w, s, and  d keys to move. Your goal is to get to the portal to move to the next level. Once you choose a direction to move, the player continues to move in that direction until you collide with something and stop moving. There are many other kinds of blocks that do different things thst are explained in the first level that they are in. Press the B key to go back to the home screen.",50,120,500,700);
+        text("  Slidey Block is a one player puzzle game. You can use either the arrow keys or the a, w, s, and  d keys to move. Your goal is to get to the portal to move to the next level. Once you choose a direction to move, the player continues to move in that direction until you collide with something and stop moving. There are many other kinds of blocks that do different things thst are explained in the first level that they are in. Press the B key to go back to the home screen.",width/12,height/5,width - width * 1/6,height + width * 1/6);
         if(input.B){
             scene = "home";  
         }
@@ -1622,15 +1621,15 @@ var draw = function() {
     if(scene === "lvlselect" || scene === "lvlselect2"){
         if(scene === "lvlselect"){
             levelButtonList = [];
-            var startX = 40;
-            var startY = 40;
+            var startX = width/15;
+            var startY = height/15;
             var locked;
             for(var i = 0; i <= levels.length - 2; i++){
     if(i % 7 === 0){
-        startX = 57.5;
-        startY += 80;
+        startX = width/10.43478261;
+        startY += height/7.5;
     } else {
-        startX += 80;
+        startX += width/7.5;
     }
     if(i + 1 > currentLevel){
         locked = true;
@@ -1640,8 +1639,8 @@ var draw = function() {
     levelButtonList.push(new button({
     x: startX, 
     y: startY,
-    width: 75,
-    height: 75,
+    width: width/8,
+    height: width/8,
     r: 87, 
     g:6,
     b:158,
@@ -1655,14 +1654,14 @@ var draw = function() {
         }
         textSize(70);
         fill(4, 0, 255);
-        text("LEVELS",300,40);
+        text("LEVELS",width/2,height * 1/15);
         for(var i = 0; i < levelButtonList.length; i++){
             levelButtonList[i].draw();   
             levelButtonList[i].clicked(); 
         }
         fill(107, 12, 166);
         textSize(30);
-        text("Press the B key to go back",300,575);
+        text("Press the B key to go back",width/2,height * 23/24);
         if(input.B){
             scene = "home";  
         }
@@ -1676,14 +1675,14 @@ var draw = function() {
             fastestTime = round(time);
             fastestTime2 = time2;
         }
-        text("YOU BEAT ALL OF THE LEVELS!",300,40);
+        text("YOU BEAT ALL OF THE LEVELS!",width/2,height * 1/15);
         textSize(30);
-        text("Your time was " + time2 + " minutes and " + round(time) + " seconds \nfrom level " + startLevel + " to the end!",300,200);
-        text("Now try for a faster time or\ngo in the code and create your own levels!",300,300);
+        text("Your time was " + time2 + " minutes and " + round(time) + " seconds \nfrom level " + startLevel + " to the end!",width/2,height*1/3);
+        text("Now try again for a faster time!",width/2,height/2);
     if(fastestTime < 10){
-        text("Your best time from level 1 to the end is " + fastestTime2 + ": 0" + fastestTime + "!",300,400);
+        text("Your best time from level 1 to the end is " + fastestTime2 + ": 0" + fastestTime + "!",width/2,height * 2/3);
     } else {
-        text("Your best time from level 1 to the end is " + fastestTime2 + ": " + fastestTime + "!",300,400);
+        text("Your best time from level 1 to the end is " + fastestTime2 + ": " + fastestTime + "!",width/2,height * 2/3);
     }
     menuButton.draw();
     menuButton.clicked();
