@@ -1,0 +1,190 @@
+<!-- This is based on DillingerLee's great template here:
+https://github.com/Team-Code/KA_Offline -->
+<html> 
+ <head>
+    <title>Two Player Snake</title> 
+	 <style>
+		 body {
+			 background-color: rgb(0,0,0);
+		 }
+		 h1 {
+			color: rgb(103, 4, 184); 
+		 }
+	 </style>
+</head>
+ <body>
+    <p align="center"> 
+	 <h1>Slidey Block</h1>
+	<!--This draws the Canvas on the webpage -->
+      <canvas id="mycanvas"></canvas> 
+    </p>
+ </body>
+ <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+ 
+ <script>
+    var sketchProc = function(processingInstance) {
+     with (processingInstance) {
+        size(900, 900); 
+        var input = [];
+var zoom = 5;
+var snake1 = {
+    x: 300,
+    y: 300,
+    w: zoom,
+    h: zoom,
+    speed: 1,
+    color: color(150, 232, 106),
+    upKey: UP,
+    downKey: DOWN,
+    leftKey: LEFT,
+    rightKey: RIGHT,
+    length: 1
+};
+var snake2 = {
+    x: 100,
+    y: 100,
+    w: zoom,
+    h: zoom,
+    speed: 1,
+    color: color(106, 168, 230),
+    upKey: "W",
+    downKey: "S",
+    leftKey: "A",
+    rightKey: "D",
+    length: 1
+};
+frameRate(10);
+var keyPressed = function() {
+    input[keyCode] = true;
+    input[key.toString().toUpperCase()] = true;
+};
+var keyReleased = function() {
+    input[keyCode] = false;
+    input[key.toString().toUpperCase()] = false;
+};
+var berry = function(){
+    this.x = zoom * floor(random(1,width/zoom));
+    this.y = zoom * floor(random(1,height/zoom));
+    
+};
+berry.prototype.draw = function() {
+    fill(196, 15, 15);
+    rect(this.x,this.y,zoom,zoom);
+};
+var snake = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.w = config.w;
+    this.h = config.h;
+    this.speed = config.speed;
+    this.color = config.color;
+    this.upKey = config.upKey;
+    this.downKey = config.downKey;
+    this.leftKey = config.leftKey;
+    this.rightKey = config.rightKey;
+    this.dir = "";
+    this.pointList = [[this.x,this.y]];
+    this.length = config.length;
+    this.dead = false;
+};
+snake.prototype.draw = function() {
+    noStroke();
+    rectMode(CENTER);
+    fill(this.color);
+    for(var i = 0; i < this.pointList.length; i++){
+        rect(this.pointList[i][0],this.pointList[i][1],this.w,this.h);
+    }
+};
+snake.prototype.move = function(){
+    if(this.dead !== true){
+    this.pointList.push([this.x,this.y]);
+    if(input[this.upKey] && this.dir !== "down"){
+        this.dir = "up";
+    }
+    if(input[this.downKey] && this.dir !== "up"){
+        this.dir = "down";
+    } 
+    if(input[this.leftKey] && this.dir !== "right"){
+        this.dir = "left";
+    }   
+    if(input[this.rightKey] && this.dir !== "left"){
+        this.dir = "right";    
+    }    
+    if(this.dir === "up"){    
+        this.y -= this.speed * zoom;
+    }
+    if(this.dir === "down"){    
+        this.y += this.speed * zoom;
+    }
+    if(this.dir === "left"){  
+        this.x -= this.speed * zoom;
+    }
+    if(this.dir === "right"){
+        this.x += this.speed * zoom;
+    }
+    }
+};
+snake.prototype.erase = function(){
+    if(this.pointList.length > this.length && this.dead !== true){
+        this.pointList.shift();
+    }
+};
+snake.prototype.collide = function(){
+    for(var i = 0; i < this.pointList.length - 1; i++){
+        if(this.x === this.pointList[i][0] && this.y === this.pointList[i][1] && this.dead !== true){
+            this.dead = true;
+            
+        }
+    }
+};
+snake.prototype.collideWithOther = function(other){
+    for(var i = 0; i < other.pointList.length - 1; i++){
+        if(this.x === other.pointList[i][0] && this.y === other.pointList[i][1] && this.dead !== true){
+            this.dead = true;
+        }
+    }
+    if(this.x === other.x && this.y === other.y){
+        this.dead = true;
+    }
+};
+snake1 = new snake(snake1);
+snake2 = new snake(snake2);
+var berry1 = new berry();
+var draw = function() {
+    background(255);
+    snake1.move();
+    snake1.erase();
+    snake1.draw();
+    snake1.collide();
+    snake1.collideWithOther(snake2);
+    snake2.move();
+    snake2.erase();
+    snake2.draw();
+    snake2.collide();
+    snake2.collideWithOther(snake1);
+    berry1.draw();
+    if(snake1.x === berry1.x && snake1.y === berry1.y){
+        snake1.length += 1;
+        berry1 = new berry();
+    }
+    if(snake2.x === berry1.x && snake2.y === berry1.y){
+        snake2.length += 1;
+        berry1 = new berry();
+    }
+    if(snake1.dead === true){
+        snake2.dead = true;
+    }
+    else if(snake2.dead === true){
+        snake1.dead = true;
+    }
+};
+        }};
+    // Get the canvas that Processing-js will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
+    var processingInstance = new Processing(canvas, sketchProc); 
+ </script>
+<a href="matthewsgames.github.io">Home</a>
+</html>
+
+        
