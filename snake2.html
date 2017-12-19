@@ -28,10 +28,10 @@ https://github.com/Team-Code/KA_Offline -->
      with (processingInstance) {
         size(900, 900); 
         var input = [];
-var zoom = 15;
+var zoom = 30;
 var snake1 = {
-    x: 300,
-    y: 300,
+    x: zoom * 15,
+    y: zoom * 15,
     w: zoom,
     h: zoom,
     speed: 1,
@@ -43,8 +43,8 @@ var snake1 = {
     length: 1
 };
 var snake2 = {
-    x: 100,
-    y: 100,
+    x: zoom * 5,
+    y: zoom * 5,
     w: zoom,
     h: zoom,
     speed: 1,
@@ -180,6 +180,7 @@ var draw = function() {
         snake1.dead = true;
     }
 };
+
         }};
     // Get the canvas that Processing-js will use
     var canvas = document.getElementById("mycanvas"); 
