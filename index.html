@@ -1614,8 +1614,8 @@ var draw = function() {
         textFont(createFont("arial"));
         textAlign(LEFT,TOP);
         textSize(30);
-        text("  Slidey Block is a one player puzzle game. You can use either the arrow keys or the a, w, s, and  d keys to move. Your goal is to get to the portal to move to the next level. Once you choose a direction to move, the player continues to move in that direction until you collide with something and stop moving. There are many other kinds of blocks that do different things thst are explained in the first level that they are in. Press any key to go back to the home screen.",50,120,500,700);
-        if(keyPressed){
+        text("  Slidey Block is a one player puzzle game. You can use either the arrow keys or the a, w, s, and  d keys to move. Your goal is to get to the portal to move to the next level. Once you choose a direction to move, the player continues to move in that direction until you collide with something and stop moving. There are many other kinds of blocks that do different things thst are explained in the first level that they are in. Press the B key to go back to the home screen.",50,120,500,700);
+        if(input.B){
             scene = "home";  
         }
     }
@@ -1662,8 +1662,8 @@ var draw = function() {
         }
         fill(107, 12, 166);
         textSize(30);
-        text("Press any key to go back",300,575);
-        if(keyPressed){
+        text("Press the B key to go back",300,575);
+        if(input.B){
             scene = "home";  
         }
     }
