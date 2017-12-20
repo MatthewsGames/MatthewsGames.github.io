@@ -32,7 +32,8 @@ https://github.com/Team-Code/KA_Offline -->
         size(900, 900); 
         var input = [];
 var zoom = 30;
-var snake1 = {
+var scene = "home";
+var snake11 = {
     x: zoom * 15,
     y: zoom * 15,
     w: zoom,
@@ -45,7 +46,7 @@ var snake1 = {
     rightKey: RIGHT,
     length: 1
 };
-var snake2 = {
+var snake22 = {
     x: zoom * 5,
     y: zoom * 5,
     w: zoom,
@@ -58,6 +59,31 @@ var snake2 = {
     rightKey: "D",
     length: 1
 };
+var btn1 = {
+    x: width/2,
+    y: height*5/6,
+    width:180,
+    height:90,
+    r: 0, 
+    g:200,
+    b:0,
+    goto:"game",
+    txt:"PLAY",
+    locked: false
+};
+var btn2 = {
+    x: width/2,
+    y: height*5/6,
+    width:180,
+    height:90,
+    r: 0, 
+    g:0,
+    b:200,
+    goto:"game",
+    txt:"RETRY",
+    locked: false
+};
+var berry1;
 frameRate(10);
 var keyPressed = function() {
     input[keyCode] = true;
@@ -91,6 +117,7 @@ var snake = function(config){
     this.pointList = [[this.x,this.y]];
     this.length = config.length;
     this.dead = false;
+    this.tied = false;
 };
 snake.prototype.draw = function() {
     noStroke();
@@ -141,6 +168,9 @@ snake.prototype.collide = function(){
             
         }
     }
+    if(this.x > width - zoom * 0.5 || this.x < zoom * 0.5 || this.y > height - zoom * 0.5 || this.y < zoom * 0.5){
+        this.dead = true;
+    }
 };
 snake.prototype.collideWithOther = function(other){
     for(var i = 0; i < other.pointList.length - 1; i++){
@@ -150,39 +180,192 @@ snake.prototype.collideWithOther = function(other){
     }
     if(this.x === other.x && this.y === other.y){
         this.dead = true;
+        this.tied = true;
     }
 };
-snake1 = new snake(snake1);
-snake2 = new snake(snake2);
-var berry1 = new berry();
+snake.prototype.reset = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.dead = false;
+    this.dir = "";
+};
+var clicked;
+mouseClicked = function(){
+    clicked = true;
+};
+var button = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.width = config.width;
+    this.height = config.height;
+    this.r = config.r;
+    this.g = config.g;
+    this.b = config.b;
+    this.goto = config.goto;
+    this.txt = config.txt;
+    this.t = config.t;
+    this.locked = config.locked;
+    this.txts = config.txts || 40;
+};
+var snake3 = new snake(snake11);
+var snake2 = new snake(snake22);
+button.prototype.draw = function() {
+     var o;
+     
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        o = 210;
+        
+        
+    } else {
+        o = 145;
+        
+    }
+    
+     rectMode(CENTER);
+     fill(0,0,0,130);
+     rect(this.x,this.y,this.width,this.height,15);
+     fill(this.r,this.g,this.b,o);
+     rect(this.x,this.y,this.width-10,this.height-10,10);
+     textAlign(CENTER,CENTER);
+     fill(10);
+     textSize(this.txts);
+     if(this.locked === true){
+        textSize(16);
+        this.txt = "LOCKED";
+     }
+     text(this.txt,this.x,this.y);
+};
+button.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && clicked === true && this.locked === false){
+            scene = this.goto;
+            snake3.reset(snake11);
+            snake2.reset(snake22);
+            berry1 = new berry();
+    }
+};
+berry1 = new berry();
+var playButton = new button(btn1);
+var retryButton = new button(btn2);
 var draw = function() {
+    if(scene === "home"){
+        background(255);
+        fill(0);
+        rectMode(LEFT);
+        rect(0,0,width,zoom/2);
+        rect(0,0,zoom/2,height);
+        rect(0,height - zoom/2,width,zoom/2);
+        rect(width - zoom/2,0,zoom/2,height);
+        playButton.draw();
+        playButton.clicked();
+        textSize(70);
+        text("Two Player Snake",width/2,height*1/8);
+        noStroke();
+        fill(150, 232, 106);
+        rect(width/4,height/2,180,30);
+        rect(width/2 - zoom * 1.5,height/2 - zoom,90,30);
+        fill(106, 168, 230);
+        pushMatrix();
+        translate(zoom * 8,zoom * 4);
+        rect(width/4,height/2,180,30);
+        rect(width/2 - zoom * 8.5,height/2 - zoom,90,30);
+        popMatrix();
+    }
+    if(scene === "game"){
     background(255);
-    snake1.move();
-    snake1.erase();
-    snake1.draw();
-    snake1.collide();
-    snake1.collideWithOther(snake2);
+    fill(0);
+    rectMode(LEFT);
+    rect(0,0,width,zoom/2);
+    rect(0,0,zoom/2,height);
+    rect(0,height - zoom/2,width,zoom/2);
+    rect(width - zoom/2,0,zoom/2,height);
+    snake3.move();
+    snake3.erase();
+    snake3.collide();
+    snake3.collideWithOther(snake2);
+    snake3.draw();
     snake2.move();
     snake2.erase();
-    snake2.draw();
     snake2.collide();
-    snake2.collideWithOther(snake1);
+    snake2.collideWithOther(snake3);
+    snake2.draw();
     berry1.draw();
-    if(snake1.x === berry1.x && snake1.y === berry1.y){
-        snake1.length += 1;
+    if(snake3.x === berry1.x && snake3.y === berry1.y){
+        snake3.length += 1;
         berry1 = new berry();
     }
     if(snake2.x === berry1.x && snake2.y === berry1.y){
         snake2.length += 1;
         berry1 = new berry();
     }
-    if(snake1.dead === true){
-        snake2.dead = true;
+    if(snake3.dead && snake2.dead){
+        scene = "deadtie";
+    }
+    else if(snake3.dead === true){
+        scene = "dead1";
     }
     else if(snake2.dead === true){
-        snake1.dead = true;
+        scene = "dead2";
     }
+    }
+    if(scene === "deadtie"){
+        background(255);
+        fill(0);
+        rectMode(LEFT);
+        rect(0,0,width,zoom/2);
+        rect(0,0,zoom/2,height);
+        rect(0,height - zoom/2,width,zoom/2);
+        rect(width - zoom/2,0,zoom/2,height);
+        textSize(50);
+        textAlign(CENTER,CENTER);
+        fill(255, 0, 9);
+        text("It's a tie!",width/2,height/10);
+        snake2.draw();
+        snake3.draw();
+        berry1.draw();
+        retryButton.draw();
+        retryButton.clicked();
+    }
+    if(scene === "dead1"){
+        background(255);
+        fill(0);
+        rectMode(LEFT);
+        rect(0,0,width,zoom/2);
+        rect(0,0,zoom/2,height);
+        rect(0,height - zoom/2,width,zoom/2);
+        rect(width - zoom/2,0,zoom/2,height);
+        snake2.dead = true;
+        textSize(50);
+        textAlign(CENTER,CENTER);
+        fill(0, 47, 255);
+        text("The blue snake wins!",width/2,height/10);
+        snake2.draw();
+        snake3.draw();
+        berry1.draw();
+        retryButton.draw();
+        retryButton.clicked();
+    }
+    if(scene === "dead2"){
+        background(255);
+        fill(0);
+        rectMode(LEFT);
+        rect(0,0,width,zoom/2);
+        rect(0,0,zoom/2,height);
+        rect(0,height - zoom/2,width,zoom/2);
+        rect(width - zoom/2,0,zoom/2,height);
+        snake3.dead = true;
+        textSize(50);
+        textAlign(CENTER,CENTER);
+        fill(9, 255, 0);
+        text("The green snake wins!",width/2,height/10);
+        snake2.draw();
+        snake3.draw();
+        berry1.draw();
+        retryButton.draw();
+        retryButton.clicked();
+    }
+    clicked = false;
 };
+
 
         }};
     // Get the canvas that Processing-js will use
