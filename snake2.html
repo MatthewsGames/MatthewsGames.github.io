@@ -31,7 +31,7 @@ https://github.com/Team-Code/KA_Offline -->
      with (processingInstance) {
         size(900, 900); 
         var input = [];
-angleMode("degrees");
+angleMode = "degrees";
 var zoom = 30;
 var mX = 0;
 var mY = 0;
@@ -257,6 +257,7 @@ var playButton = new button(btn1);
 var retryButton = new button(btn2);
 var draw = function() {
 if(scene === "logo"){
+	angleMode = "degrees";
         //My logo
 textAlign(CENTER,CENTER);
 textSize(116);
