@@ -257,6 +257,7 @@ var playButton = new button(btn1);
 var retryButton = new button(btn2);
 var draw = function() {
 if(scene === "logo"){
+	frameRate(55);
 	angleMode = "degrees";
         //My logo
 textAlign(CENTER,CENTER);
@@ -335,6 +336,10 @@ if(mX <= -150){
     }
 }
     }
+	else {
+		frameRate(10);
+		
+	}
     if(scene === "home"){
         background(255);
         fill(0);
