@@ -87,8 +87,8 @@ var btn2 = {
     r: 0, 
     g:0,
     b:200,
-    goto:"home",
-    txt:"HOME",
+    goto:"game",
+    txt:"RETRY",
     locked: false
 };
 var berry1;
@@ -197,6 +197,7 @@ snake.prototype.reset = function(config){
     this.dead = false;
     this.dir = "";
     this.length = 1;
+    this.pointList = [[this.x,this.y]];
 };
 var clicked;
 mouseClicked = function(){
