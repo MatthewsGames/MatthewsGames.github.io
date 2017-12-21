@@ -1751,6 +1751,9 @@ if(mX <= -150){
 }
         scene = "lvlselect2";
         }
+	    if(input.H && input.A && input.C && input.K){
+		    currentLevel = levels.length - 2;
+	    }
         textSize(70);
         fill(4, 0, 255);
         text("LEVELS",width/2,height * 1/15);
