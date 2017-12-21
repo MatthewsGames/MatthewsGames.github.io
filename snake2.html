@@ -32,7 +32,14 @@ https://github.com/Team-Code/KA_Offline -->
         size(900, 900); 
         var input = [];
 var zoom = 30;
-var scene = "home";
+var mX = 0;
+var mY = 0;
+var wX = 0;
+var wY = 0;
+var moveSpeed = 15;
+var rotateAmt = 5000;
+var tSpeed = 2;
+var scene = "logo";
 var snake11 = {
     x: zoom * 15,
     y: zoom * 15,
@@ -248,6 +255,84 @@ berry1 = new berry();
 var playButton = new button(btn1);
 var retryButton = new button(btn2);
 var draw = function() {
+if(scene === "logo"){
+        //My logo
+textAlign(CENTER,CENTER);
+textSize(116);
+fill(9, 0, 255);
+textFont(createFont("Comic Sans MS"));
+background(255,255,255);
+pushMatrix();
+translate(width/2,width/4);
+rotate(rotateAmt);
+textSize(116);
+fill(255, 0, 0);
+text("M",mX,mY);
+if(rotateAmt <= 20 && mX <=-70){
+    textSize(80);
+    text("a",mX + 70,mY+15);
+}
+if(rotateAmt <= 20 && mX <=-110){
+    textSize(80);
+    text("t",mX + 110,mY+15);
+}
+if(rotateAmt <= 20 && mX <=-145){
+    textSize(80);
+    text("t",mX + 145,mY+15);
+}
+popMatrix();
+pushMatrix();
+translate(width/2,height/4);
+rotate(-rotateAmt);
+textSize(116);
+fill(0, 0, 255);
+text("W",wX,wY);
+if(rotateAmt <= 20 && wX >=70){
+    textSize(80);
+    text("e",wX - 70,wY+15);
+}
+if(rotateAmt <= 20 && wX >=110){
+    textSize(80);
+    text("h",wX - 110,wY+15);
+}
+popMatrix();
+rotateAmt/=1.01;
+if(rotateAmt <= 20 && mX >= -150){
+    mX-=moveSpeed;
+    moveSpeed /= 1.1;
+    
+}
+if(rotateAmt <= 20 && wX <= 140){
+    wX+=moveSpeed;
+   
+}
+if(mX <= -150){
+    for(var rotateAmt1 = 0; rotateAmt1<=360; rotateAmt1++){
+        pushMatrix();
+        fill(255, 255, 255);
+        translate(width/2,height * 0.475);
+        rotate((rotateAmt1-1)*10);
+        text("S",0,0);
+        popMatrix();
+        pushMatrix();
+        translate(width/2,height * 0.475);
+        rotate(rotateAmt1*10);
+        fill(255, 0, 0);
+        text("S",0,0);
+        popMatrix();
+    }
+    fill(8, 242, 226);
+    textSize(48);
+    text("PROGRAMMING",width/2,height/1.6);
+    fill(88, 84, 204);
+    textSize(20);
+    text("click to continue",width/2,height/1.4);
+    if(clicked){
+        scene = "home";
+        clicked = false;
+    }
+}
+    }
     if(scene === "home"){
         background(255);
         fill(0);
