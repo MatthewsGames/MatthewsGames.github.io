@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<!-- This is based on DillingerLee's great template here:
+https://github.com/Team-Code/KA_Offline -->
+<html> 
+ <head>
+    <title>Spin-off of "Processing.JS inside Webpages: Template"</title> 
+</head>
+ <body>
+    <p align="center"> 
+	<!--This draws the Canvas on the webpage -->
+      <canvas id="mycanvas"></canvas> 
+    </p>
+ </body>
+ <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+ 
+ <script>
+    var sketchProc = function(processingInstance) {
+     with (processingInstance) {
+        size(400, 400); 
+        frameRate(30);
+        noStroke();
+var input = [];
+var zoom = 20;
+var clicked = false;
+var moveDirection = "RIGHT";
+var moveDirection2 = "";
+var snake1X = 5*zoom;
+var snake1Y = 10*zoom;
+var snake2X = 15*zoom;
+var snake2Y = 10*zoom;
+var length2 = 1;
+var yPointList=[0];
+var xPointList=[0];
+var yPointList2=[1];
+var xPointList2=[1];
+var unshiftX = 20;
+var unshiftY = 200;
+var unshiftX2 = 20;
+var unshiftY2 = 200;
+var mode = "singleplayer";
+var counter = 1;
+var berryX;
+var berryY;
+var length = 1;
+var highestLength = 0;
+var highestLength2 = 0;
+var paused = false;
+var currentScene = "logo";
+var winner;
+var berryTotal = 0;
+var mX = 0;
+var mY = 0;
+var wX = 0;
+var wY = 0;
+var moveSpeed = 15;
+var rotateAmt = 5000;
+var tSpeed = 2;
+var snakeColor = {
+    r:100,
+    g:194,
+    b:89,
+    stripeR:100,
+    stripeG:194,
+    stripeB:89,
+    txt1: "",
+    txt2: "",
+    txt3: "",
+    random: false,
+    rainbow: false
+};
+var purchased = [1];
+var frameSpeed = 10;
+var keyPressed = function() {
+    input[keyCode] = true;
+    input[key.toString().toUpperCase()] = true;
+};
+var keyReleased = function() {
+    input[keyCode] = false;
+    input[key.toString().toUpperCase()] = false;
+};
+var button = function(x,y,width,text,goto,clr,hover){
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.clr = clr;
+    this.text = text;
+    this.goto = goto;
+    this.hover = hover;
+    
+    
+};
+button.prototype.draw = function() {
+   rectMode(CENTER);
+   textAlign(CENTER,CENTER);
+   fill(this.clr);
+   ellipse(this.x,this.y,this.width,this.width);
+   fill(255, 255, 255);
+   if(this.width < 75){
+       textSize(15);
+       
+   }else{
+   textSize(30);}
+   
+   text(this.text,this.x,this.y);
+   if(dist(this.x,this.y,mouseX,mouseY) <= this.width/1.85){
+       this.hover = true;
+       this.clr = color(31, 63, 191);
+   } else{
+      
+       this.hover = false;
+       this.clr = color(98, 116, 199);
+   
+   }
+   if(this.goto === "pause" && clicked === true && this.hover === true && paused === false){
+      paused = true; 
+      
+ 
+ currentScene = "gamescene";
+   } else {
+paused = false;
+}
+
+};
+button.prototype.go = function() {
+    if(this.hover === true && clicked === true){
+    background(255, 255, 255);
+ length = 1;
+ snake1X = zoom*5;
+ snake1Y = zoom*10;
+ snake2X = zoom*15;
+ snake2Y = zoom*10;
+ yPointList=[0];
+ xPointList=[0];
+ yPointList2=[1];
+ xPointList2=[1];
+ moveDirection1 = "";
+   frameSpeed = 10;
+    background(255,255,255);
+    currentScene = this.goto;
+    background(255,255,255);
+    
+    }
+    
+};
+var retryButton = new button(200,300,75,"retry","gameScene");
+var playButton = new button(200,250,100,"Play","gameScene");
+var homeButton = new button(360,30,50,"Home","homeScene");
+var pauseButton = new button(240,30,50," || ","pause");
+var shopButton = new button(300,30,50,"Shop","shopScene");
+
+var block = function(x,y,r,g,b,s,stripeColorR,stripeColorG,stripeColorB,txt1,txt2,txt3){
+   
+   rectMode(CENTER);
+   fill(r,g,b);
+    if(currentScene === "gameScene"){
+    rect(x,y,zoom,zoom);
+    fill(stripeColorR,stripeColorG,stripeColorB);
+    rect(x-zoom/4,y,zoom/5,zoom);
+    rect(x+zoom/4,y,zoom/5,zoom);
+    
+        
+        
+        
+    
+    }else{
+   fill(r,g,b);
+    rect(x,y,s,s);
+    fill(stripeColorR,stripeColorG,stripeColorB);
+    rect(x-s/4,y,s/5,s);
+    rect(x+s/4,y,s/5,s);
+    }
+fill(0,0,0);
+textSize(s*1/5);
+textAlign(CENTER,CENTER);
+        text(txt1,x,y-s/3);
+        text(txt2,x,y);
+        text(txt3,x,y+s/3);
+
+};
+var rainbowBlock = function(x,y,s,r,g,b,counter){
+    this.counter = 0;
+    
+    
+};
+rainbowBlock.prototype.draw = function() {
+     if(counter === 0){
+         this.r = 255;
+         this.g = 0;
+         this.b = 0;
+         
+     }
+      if(counter === 1){
+         this.r = 255;
+         this.g = 127.5;
+         this.b = 0;
+         
+     }
+      if(counter === 2){
+         this.r = 255;
+         this.g = 255;
+         this.b = 0;
+         
+     }
+      if(counter === 3){
+         this.r = 0;
+         this.g = 255;
+         this.b = 0;
+         
+     }
+      if(counter === 4){
+         this.r = 0;
+         this.g = 0;
+         this.b = 255;
+         
+     }
+      if(counter === 5){
+         this.r = 255;
+         this.g = 0;
+         this.b = 255;
+         
+     }
+     block(this.x,this.y,this.r,this.g,this.b,this.s,this.r,this.g,this.b);
+};
+var shopBlock = new rainbowBlock(350,330,50);
+var colorDisplay = function(x,y,name,r,g,b,s,stripeColorR,stripeColorG,stripeColorB,price,tag,txt1,txt2,txt3,unlocked){
+   for(var i = 0; i < purchased.length; i++){
+      if(tag === purchased[i]){
+           unlocked = true;
+       
+       
+      }
+       
+  }
+   
+   if(dist(mouseX,mouseY,x,y+s/1.5)<=30 && clicked === true && unlocked === true){
+        snakeColor.r = r;
+        snakeColor.g = g;
+        snakeColor.b = b;
+        snakeColor.stripeR = stripeColorR;
+        snakeColor.stripeG = stripeColorG;
+        snakeColor.stripeB = stripeColorB;
+        snakeColor.txt1 = txt1;
+        snakeColor.txt2 = txt2;
+        snakeColor.txt3 = txt3;
+        if(tag === 19){
+            snakeColor.random = true;
+            
+            
+        } else {
+            snakeColor.random = false;
+            
+        }
+  }
+ else if(dist(mouseX,mouseY,x,y+s/1.5)<=30 && clicked === true && berryTotal >= price){
+     
+        snakeColor.r = r;
+        snakeColor.g = g;
+        snakeColor.b = b;
+        snakeColor.stripeR = stripeColorR;
+        snakeColor.stripeG = stripeColorG;
+        snakeColor.stripeB = stripeColorB;
+        snakeColor.txt1 = txt1;
+        snakeColor.txt2 = txt2;
+        snakeColor.txt3 = txt3;
+        if(tag === 19){
+            snakeColor.random = true;
+            
+            
+        } else {
+         snakeColor.random = false;
+        
+        }
+      berryTotal-=price;
+     unlocked = true;
+   purchased.push(tag);
+   
+  }
+   
+  if(dist(mouseX,mouseY,x,y+s/1.5)<=30){
+      
+        rectMode(CENTER);
+       fill(89, 58, 28);
+       rect(x,y+s/1.5,70,70); 
+    }
+     textSize(10);
+    fill(0, 0, 0);
+    textAlign(CENTER,CENTER);
+    text(name + ": " + price,x,y);
+    block(x,y+s/1.5,r,g,b,s,stripeColorR,stripeColorG,stripeColorB,txt1,txt2,txt3);
+    if(unlocked!== true){
+     textAlign(CENTER,CENTER);
+     fill(0, 0, 0);
+     text("LOCKED",x,y+30);
+       
+  }
+
+};
+var shopScene = function(){
+   textAlign(LEFT,CENTER);
+   background(219, 190, 143);
+   currentScene = "shopScene";
+   fill(0,0,0);
+   textSize(20);
+   text("Apples: "+ berryTotal,15,20);
+   textAlign(CENTER,CENTER);
+   fill(0, 0, 0);
+   textSize(30);
+   text("The Shop",200,30);
+   //layer 1
+   colorDisplay(50,60,"Green",100,194,89,50,100,194,89,0,1);
+   colorDisplay(125,60,"Red",148,30,30,50,148,30,30,20,2);
+   colorDisplay(200,60,"Blue",98,116,199,50,98,116,199,20,3);
+   colorDisplay(275,60,"Orange",230,133,7,50,230,133,7,25,4);
+   colorDisplay(350,60,"Yellow",242,238,114,50,242,238,114,25,5);
+   //layer 2
+   colorDisplay(50,150,"Purple",199,88,214,50,199,88,214,25,6);
+   colorDisplay(125,150,"Pink",245,147,238,50,245,147,238,30,7);
+   colorDisplay(200,150,"Aqua",0,255,255,50,0,255,255,30,8);
+   colorDisplay(275,150,"Black",0,0,0,50,0,0,0,30,9);
+   colorDisplay(350,150,"Olive",51,102,0,50,51,102,0,30,10);
+   //layer 3
+   colorDisplay(50,240,"Gray",157,160,165,50,157,160,165,30,11);
+   colorDisplay(125,240,"Pink/Purple",245,147,238,50,199,88,214,40,12);
+   colorDisplay(200,240,"Aqua/Olive",0,255,255,50,51,102,0,40,13);
+   colorDisplay(275,240,"Black/Gray",0,0,0,50,157,160,165,40,14);
+   colorDisplay(350,240,"Orange/Yellow",230,133,7,50,242,238,114,40,15);
+   // layer 4
+   colorDisplay(50,330,"Green/Red",100,194,89,50,148,30,30,40,16);
+   colorDisplay(125,330,"Blue/Green",98,116,199,50,100,194,89,40,17);
+   colorDisplay(200,330,"Matthew",255,255,255,50,255,255,255,45,18,"Matthew","is","cool");
+   colorDisplay(275,330,"Random",random(1,255),random(1,255),random(1,255),50,random(1,255),random(1,255),random(1,255),50,19);
+  shopBlock.draw();
+   homeButton.draw();
+   homeButton.go();
+
+
+};
+var berry = function(randX,randY,x,y){
+
+  
+  
+  
+    if(counter === 1){
+    randX=floor(random(0,(360/zoom)));
+    randY=floor(random(0,(360/zoom)));
+    
+    
+    
+    for(var i = 0; i<zoom;i++){
+        if(randX === i){
+            x=(zoom*i)+zoom;
+             
+            berryX = x;
+       
+        
+        }
+        
+        
+    }
+    for(var i = 0; i<zoom;i++){
+        if(randY === i){
+            y=(zoom*i)+zoom;
+            
+            berryY = y;
+        
+        
+        }
+        
+        
+    }
+    
+}   
+ if(snake1X === berryX && snake1Y === berryY){
+     counter = 0;
+     length+=1;
+     berryTotal+=1;
+     fill(255,255,255);
+rect(100,20,40,20);
+ }
+ if(snake2X === berryX && snake2Y === berryY){
+     counter = 0;
+     length2+=1;
+     berryTotal+=1;
+     
+ }
+    
+    rectMode(CENTER);
+    fill(148, 30, 30);
+    rect(berryX,berryY,zoom/1.176,zoom/1.176);
+    counter+=1;
+  // println(unshiftX);
+    //println(unshiftY);
+   // println(berryX);
+   // println(berryY);
+
+
+};
+var lastBlock = function(x,y){
+    rectMode(CENTER);
+    fill(255,255,255);
+    rect(x,y,20,20);
+    
+   
+};
+var border = function(){
+fill(0, 0, 0);
+rectMode(RIGHT);
+rect(0,0,400,zoom/2);
+rect(0,0,zoom/2,400);
+rect(0,400-zoom/2,400,zoom/2);
+rect(400-zoom/2,0,zoom/2,400);
+
+if(snake1X <= zoom/2){
+  currentScene = "deathScene"; 
+ winner = "Player 2";
+}
+if(snake1X >= 400-zoom/2){
+    currentScene = "deathScene"; 
+winner = "Player 2";
+}
+if(snake1Y >= 400-zoom/2){
+    currentScene = "deathScene"; 
+winner = "Player 2";
+
+}
+if(snake1Y <= zoom/2){
+    currentScene = "deathScene"; 
+winner = "Player 2";
+
+}
+if(snake2X <= zoom/2){
+   currentScene = "deathScene"; 
+winner = "Player 1";
+
+}
+if(snake2Y <= zoom/2){
+    currentScene = "deathScene"; 
+winner = "Player 1";
+
+}
+if(snake2X >= 400-zoom/2){
+     currentScene = "deathScene"; 
+winner = "Player 1";
+
+}
+if(snake2Y >=400-zoom/2){
+    currentScene = "deathScene"; 
+winner = "Player 1";
+
+}
+
+    
+    
+    
+    
+
+
+};
+var snake1 = function(){
+  
+   if(snakeColor.random === true){
+    block(snake1X,snake1Y,random(1,255),random(1,255),random(1,255),20,random(1,255),random(1,255),random(1,255),snakeColor.txt1,snakeColor.txt2,snakeColor.txt3);   
+       
+       
+   } else {
+   block(snake1X,snake1Y,snakeColor.r,snakeColor.g,snakeColor.b,20,snakeColor.stripeR,snakeColor.stripeG,snakeColor.stripeB,snakeColor.txt1,snakeColor.txt2,snakeColor.txt3); }
+   if(input[UP] && moveDirection !== "DOWN"){
+       moveDirection="UP";
+   }
+   if(input[DOWN] && moveDirection !== "UP"){
+        moveDirection="DOWN";
+   }
+   if(input[LEFT] && moveDirection !== "RIGHT"){
+        moveDirection="LEFT";
+   }
+   if(input[RIGHT] && moveDirection !== "LEFT"){
+       moveDirection="RIGHT";
+   }
+//continous movement
+   if(moveDirection==="UP"){
+        xPointList.push(snake1X);
+        yPointList.push(snake1Y);
+        snake1Y-=zoom;
+   }
+   if(moveDirection==="DOWN"){
+       xPointList.push(snake1X);
+       yPointList.push(snake1Y);
+        snake1Y += zoom;
+   }
+   if(moveDirection==="LEFT"){
+        xPointList.push(snake1X);
+        yPointList.push(snake1Y);
+       snake1X-=zoom;
+   }
+   if(moveDirection==="RIGHT"){
+        xPointList.push(snake1X);
+        yPointList.push(snake1Y);
+        snake1X+=zoom;
+  
+   
+   }
+   if(!(snake1X === berryX && snake1Y === berryY)){
+unshiftX = xPointList.shift();
+unshiftY = yPointList.shift();
+}  
+for(var i=0; i <= xPointList.length; i++){
+  if(snake1X === xPointList[i]){
+ 
+     for(var i2 = 0; i2 <= yPointList.length; i2++){
+        if(snake1Y === yPointList[i]){
+            winner = "Player 2";
+            
+            currentScene = "deathScene";
+        }
+    
+    
+     } 
+  }
+
+
+
+
+}
+for(var i=0; i <= xPointList2.length; i++){
+  if(snake1X === xPointList2[i]){
+ 
+     for(var i2 = 0; i2 <= yPointList2.length; i2++){
+        if(snake1Y === yPointList2[i]){
+            winner = "Player 2";
+            currentScene = "deathScene";
+        }
+    
+    
+     } 
+  }
+
+
+
+
+}
+ 
+
+rectMode(CENTER);
+   noStroke();
+    fill(255,255,255);
+    rect(unshiftX,unshiftY,zoom,zoom);
+
+
+
+
+
+};
+var snake2 = function(){
+   frameRate(10);
+   block(snake2X,snake2Y,98,116,199); 
+   if(keyPressed && key.toString() === 'w' && moveDirection2 !== "DOWN"){
+       moveDirection2="UP";
+   }
+   if(keyPressed && key.toString() === 's' && moveDirection2 !== "UP"){
+        moveDirection2="DOWN";
+   }
+   if(keyPressed && key.toString() === 'a' && moveDirection2 !== "RIGHT"){
+        moveDirection2="LEFT";
+   }
+   if(keyPressed && key.toString() === 'd' && moveDirection2 !== "LEFT"){
+       moveDirection2="RIGHT";
+   }
+//continous movement
+   if(moveDirection2==="UP"){
+        xPointList2.push(snake2X);
+        yPointList2.push(snake2Y);
+        snake2Y-=zoom;
+   }
+   if(moveDirection2==="DOWN"){
+       xPointList2.push(snake2X);
+       yPointList2.push(snake2Y);
+        snake2Y += zoom;
+   }
+   if(moveDirection2==="LEFT"){
+        xPointList2.push(snake2X);
+        yPointList2.push(snake2Y);
+       snake2X-=zoom;
+   }
+   if(moveDirection2==="RIGHT"){
+        xPointList2.push(snake2X);
+        yPointList2.push(snake2Y);
+        snake2X+=zoom;
+  
+   
+   }
+   if(!(snake2X === berryX && snake2Y === berryY)){
+unshiftX2 = xPointList2.shift();
+unshiftY2 = yPointList2.shift();
+}  
+for(var i=0; i <= xPointList2.length; i++){
+  if(snake2X === xPointList2[i]){
+ 
+     for(var i2 = 0; i2 <= yPointList2.length; i2++){
+        if(snake2Y === yPointList2[i]){
+            winner = "Player 1";
+            currentScene = "deathScene";
+        }
+    
+    
+     } 
+  }
+
+
+
+
+}
+for(var i=0; i <= xPointList.length; i++){
+  if(snake2X === xPointList[i]){
+ 
+     for(var i2 = 0; i2 <= yPointList.length; i2++){
+        if(snake2Y === yPointList[i]){
+            winner = "Player 1";
+            currentScene = "deathScene";
+        }
+    
+    
+     } 
+  }
+
+
+
+
+}
+ 
+
+rectMode(CENTER);
+   noStroke();
+    fill(255,255,255);
+    rect(unshiftX2,unshiftY2,zoom,zoom);
+
+
+
+
+
+};
+var homeScene = function(){
+textAlign(CENTER,CENTER);
+background(100, 194, 89);
+fill(0, 0, 0);
+textSize(20);
+text("Apples: "+ berryTotal,55,20);
+fill(0, 0, 0);
+textSize(80);
+text("Snake!",200,100);
+playButton.draw();
+playButton.go();
+shopButton.draw();
+shopButton.go();
+homeButton.draw();
+//homeButton.draw();
+//homeButton.go();
+
+
+};
+var gameScene = function(){
+
+currentScene = "gameScene";
+fill(255,255,255);
+textAlign(LEFT,CENTER);
+textSize(20);
+text("Apples: "+ berryTotal,15,20);
+fill(0,0,0);
+textSize(20);
+text("Apples: "+ berryTotal,15,20);
+snake1();
+if(mode === "multiplayer"){
+zoom = 15;
+snake2();
+}else{
+   zoom = 20; 
+    
+}
+berry();
+border();
+//homeButton.draw();
+//homeButton.go();
+// pauseButton.draw();
+//shopButton.draw();
+//shopButton.go();
+ frameRate(frameSpeed);
+frameSpeed += 0.01;
+
+};
+var deathScene = function(){
+textAlign(LEFT,CENTER);
+  fill(255,255,255);
+textSize(20);
+text("Apples: "+ berryTotal,15,20);
+  fill(0, 0, 0);
+  textSize(20);
+  text("Apples: "+ berryTotal,15,20);
+    currentScene = "deathScene";
+     textAlign(CENTER,CENTER);
+    if(length > highestLength){
+     highestLength = length;
+    }
+    if(length2 > highestLength2){
+     highestLength2 = length2;
+    }
+    if(mode ==="singleplayer"){
+    fill(255, 255, 255);
+    textSize(60);
+    text("You Died! ):",200,70);
+    textSize(30);
+    text("Your Length: " + length,200,120);
+    text("Highest Length: " + highestLength,200,160);
+    fill(3, 3, 3);
+    textSize(60);
+    text("You Died! ):",200,70);
+    textSize(30);
+    text("Your Length: " + length,200,120);
+    text("Highest Length: " + highestLength,200,160);
+    }else{
+    fill(255, 255, 255);
+    textSize(60);
+    text(winner + " wins!",25,70);
+    textSize(30);
+    text("Player 1 Length: " + length,80,120);
+    text("Highest Length: " + highestLength,80,160);
+    text("Player 2 Length: " + length2,80,200);
+    text("Highest Length: " + highestLength2,80,240);
+    fill(3, 3, 3);
+    textSize(60);
+    text(winner + " wins!",25,70);
+    textSize(30);
+    text("Player 1 Length: " + length,80,120);
+    text("Highest Length: " + highestLength,80,160);
+    text("Player 2 Length: " + length2,80,200);
+    text("Highest Length: " + highestLength2,80,240);
+
+    }
+
+retryButton.draw();
+retryButton.go();
+homeButton.draw();
+homeButton.go();
+shopButton.draw();
+shopButton.go();
+};
+var draw = function() {
+    if(currentScene === "logo"){
+        if(currentScene === "logo"){
+            frameRate(55)
+        //My logo
+textAlign(CENTER,CENTER);
+textSize(116);
+fill(9, 0, 255);
+textFont(createFont("Comic Sans MS"));
+background(255,255,255);
+pushMatrix();
+translate(width/2,width/4);
+rotate(rotateAmt);
+textSize(116);
+fill(255, 0, 0);
+text("M",mX,mY);
+if(rotateAmt <= 20 && mX <=-70){
+    textSize(80);
+    text("a",mX + 70,mY+15);
+}
+if(rotateAmt <= 20 && mX <=-110){
+    textSize(80);
+    text("t",mX + 110,mY+15);
+}
+if(rotateAmt <= 20 && mX <=-145){
+    textSize(80);
+    text("t",mX + 145,mY+15);
+}
+popMatrix();
+pushMatrix();
+translate(width/2,height/4);
+rotate(-rotateAmt);
+textSize(116);
+fill(0, 0, 255);
+text("W",wX,wY);
+if(rotateAmt <= 20 && wX >=70){
+    textSize(80);
+    text("e",wX - 70,wY+15);
+}
+if(rotateAmt <= 20 && wX >=110){
+    textSize(80);
+    text("h",wX - 110,wY+15);
+}
+popMatrix();
+rotateAmt/=1.01;
+if(rotateAmt <= 20 && mX >= -150){
+    mX-=moveSpeed;
+    moveSpeed /= 1.1;
+    
+}
+if(rotateAmt <= 20 && wX <= 140){
+    wX+=moveSpeed;
+   
+}
+if(mX <= -150){
+    for(var rotateAmt1 = 0; rotateAmt1<=360; rotateAmt1++){
+        pushMatrix();
+        fill(255, 255, 255);
+        translate(width/2,height * 0.475);
+        rotate((rotateAmt1-1)*10);
+        text("S",0,0);
+        popMatrix();
+        pushMatrix();
+        translate(width/2,height * 0.475);
+        rotate(rotateAmt1*10);
+        fill(255, 0, 0);
+        text("S",0,0);
+        popMatrix();
+    }
+    fill(8, 242, 226);
+    textSize(48);
+    text("PROGRAMMING",width/2,height/1.6);
+    fill(88, 84, 204);
+    textSize(20);
+    text("click to continue",width/2,height/1.4);
+    if(clicked){
+        currentScene = "homeScene";
+        clicked = false;
+    }
+}
+    }
+    }
+if(currentScene === "homeScene"){
+ homeScene();
+}
+
+if(currentScene === "gameScene" && paused === false){
+
+ gameScene();
+ 
+}
+if(currentScene === "gameScene"){
+    
+    homeButton.draw();
+homeButton.go();
+// pauseButton.draw();
+shopButton.draw();
+shopButton.go();
+    
+}
+if(currentScene === "deathScene"){
+ deathScene();
+}
+if(currentScene === "shopScene"){
+ shopScene();
+}
+
+clicked = false;
+
+
+
+};
+var mouseClicked = function(){
+    clicked = true;
+    
+    
+};
+
+    }};
+
+    // Get the canvas that Processing-js will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
+    var processingInstance = new Processing(canvas, sketchProc); 
+ </script>
+
+</html>
