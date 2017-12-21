@@ -583,7 +583,7 @@ var clicked;
 var time2 = 0;
 var plevel = 0;
 var started = false;
-var scene = "home";
+var scene = "logo";
 var btn1 = {
     x: width/2,
     y: height * 0.48,
@@ -1593,6 +1593,13 @@ if(mX <= -150){
     fill(8, 242, 226);
     textSize(48);
     text("PROGRAMMING",width/2,height/1.6);
+    fill(88, 84, 204);
+    textSize(20);
+    text("click to continue",width/2,height/1.4);
+    if(clicked){
+        scene = "home";
+        clicked = false;
+    }
 }
     }
     fill(0,0,0,20);
