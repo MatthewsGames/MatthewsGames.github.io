@@ -1,0 +1,1518 @@
+var gravity = 0.02;
+var setPos = true;
+var player1config = {
+    x:200,
+    y:200,
+    up: UP,
+    down: DOWN,
+    left: LEFT,
+    right: RIGHT,
+    speed: 1.2,
+    velocity: 0.01,
+    jumps: 1,
+    jumpHeight: 2,
+    noAbility: "1",
+    jumpAbility: "2",
+    speedAbility: "3",
+    phaseAbility: "4",
+    stealthAbility: "5",
+    color: color(255)
+    
+};
+var currentLevel;
+if(currentLevel === undefined){
+    currentLevel = 0;
+}
+var levelSide = 1;
+var input = [];
+var blocks = [];
+var cannons = [];
+var doors = [];
+var secretDoors = [];
+var keys = [];
+var keys2 = [];
+var phases = [0,0,0,1,0,2,0,0,2,0,0,2,0,0,10,2];
+var fallBlocks = [];
+var fallBlocks2 = [];
+var spikes = [];
+var levels = [
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s         @        s",
+    "s                  s",
+    "s               d  s",
+    "s      sssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s   d              s",
+    "s  sss             s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "ss                 s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s         @        s",
+    "s                  s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s @                s",
+    "s                  s",
+    "sss                s",
+    "s                 ds",
+    "s                sss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s         s        s",
+    "s         s        s",
+    "s         s        s",
+    "s         s        s",
+    "s         s        s",
+    "s         s        s",
+    "s         s        s",
+    "s         s        s",
+    "s  @      s      d s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s      cccccc      s",
+    "s  @             d s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s        k         s",
+    "ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "sss                s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s      @          ds",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s @ ^  k^^  k^^^  ds",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s@                ds",
+    "sffffffffffffffffffs",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s^^^^^^^^^^^^^^^^^^s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssssssssssssssssssssssss",
+    "s                  ss                  s",
+    "s                  ss                  s",
+    "s                  ssss                s",
+    "s                     s                s",
+    "s                     s                s",
+    "s                  ssss                s",
+    "s                  ss                  s",
+    "s                  ss   k              s",
+    "s                  ss   fff            s",
+    "s                  ss              ss  s",
+    "s               sssss             ss   s",
+    "s                  ss            ss    s",
+    "s             c    ss           ss     s",
+    "s                  ss        ssss      s",
+    "s                  ss        s   c c   s",
+    "s          sss     ss       ss   c c   s",
+    "s  @               ss      ss          s",
+    "s                  ss     ss^^^d^^^^^^^s",
+    "ssssssssssssssssssssssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s               f  s",
+    "s    d             s",
+    "s    f             s",
+    "s                  s",
+    "s                 cs",
+    "s                  s",
+    "s               f  s",
+    "s                  s",
+    "scccccccccccccccc  s",
+    "scccccccccccccccc  s",
+    "s   ccccccccccccc  s",
+    "s   ccccccccccccc  s",
+    "s @ ccccccccccccc  s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s     s            s",
+    "s                  s",
+    "s                  s",
+    "sc s               s",
+    "s cs               s",
+    "sc s               s",
+    "s cs               s",
+    "sd^s^^!!!!!!!!     s",
+    "ssssss             s",
+    "s                  s",
+    "s  @               s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssssssssssssssssssssssss",
+    "s                  ss                  s",
+    "s                  ss                  s",
+    "s                  ss                  s",
+    "s     sssssssssss  ss                  s",
+    "s    ss            ss                  s",
+    "s !! s            ^ss                  s",
+    "s    s  sssssssssssss                  s",
+    "s    s  s          ss                  s",
+    "s    s  s   k      ss                  s",
+    "s    s  s          ss                  s",
+    "s    s   ssssssssssss  !               s",
+    "s    ss            ss !    !       !   s",
+    "s     ss           ss!      !     !    s",
+    "s      ssssssssss  ss        !   !     s",
+    "s              sssfss                  s",
+    "s              sssf                    s",
+    "s    @         sssf                    s",
+    "s              sssf                   ds",
+    "ssssssssssssssssssssssssssssssssssssssss"],
+    ["ssssssssssssssssssssssssssssssssssssssss",
+    "s                                      s",
+    "s  @                                   s",
+    "sssssssssfffsssssssssssssssssssssss    s",
+    "s       s^^^s                          s",
+    "s       sssss                          s",
+    "s                   sssffffffffffffffffs",
+    "s c ss          sssss  ^^^^^^^^^^^^^^^^s",
+    "s    ssssssssssss                      s",
+    "s f                                    s",
+    "s                  sssssssss           s",
+    "s   f      ssssssssss      ssssss      s",
+    "s      f           ss                  s",
+    "s                  ss                 fs",
+    "s^^^^^^^^^^^^^^^^^^ss   f       f      s",
+    "sssssssssssssssssssss c c c c c c c c cs",
+    "s                    c c c c c c c c c s",
+    "s                     c c c c c c c c cs",
+    "sd                     ^^^^^^^^^^^^^^^^s",
+    "ssssssssssssssssssssssssssssssssssssssss"],
+    ["ssssssssssssssssssssssssssssssssssssssss",
+    "s              s                       s",
+    "s              s         k             s",
+    "s              s   ss                  s",
+    "s              s                  k    s",
+    "s              s                       s",
+    "s              s                      ds",
+    "s              s                     sss",
+    "s              s                       s",
+    "s              s                       s",
+    "s                                      s",
+    "s@                                     s",
+    "sss                               k    s",
+    "s              ^                 fff   s",
+    "s              s                       s",
+    "s              s                       s",
+    "s              s                       s",
+    "s     b    b   s   b                   s",
+    "s^^^^^s^^^^s^^^s^^^s^^^^^^^^^^^^^^^^^^^s",
+    "ssssssssssssssssssssssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s   s      s   s   s",
+    "s@  s      s   s k s",
+    "s  Ds      s D s D s",
+    "sssss^s   ssssssssss",
+    "s!!!ssssssss ! s   s",
+    "s   sD  s      s   s",
+    "s   ss Ds D D Ds D s",
+    "ssssssssssssssssssss",
+    "s         s        s",
+    "sD D D D Ds D      s",
+    "sssssssssssss!! !!!s",
+    "s   s   s   s      s",
+    "s   s   s   s  k   s",
+    "s D s d s^^^s  D   s",
+    "ssssssssssssssssssss",
+    "s      s   s   s   s",
+    "s k    s   s   s k s",
+    "s   D  s D s D s   s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s     s            s",
+    "s     s          k s",
+    "s     ssssss  ssssss",
+    "s@    s       s    s",
+    "ss    s       s   ds",
+    "s     s      ss   ss",
+    "s     s     ss     s",
+    "s     s            s",
+    "s     s            s",
+    "s     s            s",
+    "s     s            s",
+    "s     s            s",
+    "s     s        f   s",
+    "s     s            s",
+    "s     s            s",
+    "s     s            s",
+    "s  k  s            s",
+    "sbbbbbs^^^^^^^^^^^^s",
+    "ssssssssssssssssssss"],
+    ];
+/**
+ * ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "ssssssssssssssssssss"],
+    **/
+var level = 0;
+var used = 1;
+var scene = "home";
+var clicked ;
+var btn1 = {
+    x: 300,
+    y: 500,
+    width:180,
+    height:90,
+    r: 230, 
+    g:163,
+    b:183,
+    t:"level",
+    goto:0,
+    txt:"PLAY",
+    locked: false
+    
+};
+var btn2 = {
+    x: 100,
+    y: 500,
+    width:180,
+    height:90,
+    r: 230, 
+    g:163,
+    b:183,
+    goto:"howto",
+    txt:"HOW TO",
+    locked: false
+    
+};
+var btn3 = {
+    x: 500,
+    y: 500,
+    width:180,
+    height:90,
+    r: 230, 
+    g:163,
+    b:183,
+    goto:"lvlselect",
+    txt:"LEVELS",
+    locked: false
+    
+};
+var btn4 = {
+    x: 535,
+    y: 580,
+    width: 60,
+    height:40,
+    r: 230, 
+    g:163,
+    b:183,
+    goto:"home",
+    txt:"MENU",
+    txts: 15,
+    locked: false
+    
+};
+var collision = function(obj1,obj2){
+    if(obj1.y + obj1.h >= obj2.y && obj1.y + obj1.h <= obj2.y + obj2.h && obj1.x <= obj2.x + obj2.w - 1 && obj1.x + obj1.w -1 >= obj2.x || obj1.y <= obj2.y + obj2.h && obj1.y >= obj2.y && obj1.x <= obj2.x + obj2.w -1 && obj1.x + obj1.w -1 >= obj2.x){
+        return true;    
+    } else {
+        return false;    
+    }
+};
+var objectPythag = function(obj1,obj2){
+    var slopeX = obj1.x - (obj2.x + obj2.w/2);
+    var slopeY = obj1.y - (obj2.y + obj2.h/2);
+    var slope =  sqrt((slopeX * slopeX) + (slopeY * slopeY));
+    return slope;
+};
+var keyPressed = function() {
+    input[keyCode] = true;
+    input[key.toString().toUpperCase()] = true;
+};
+var keyReleased = function() {
+    input[keyCode] = false;
+    input[key.toString().toUpperCase()] = false;
+};
+mouseClicked = function(){
+    clicked = true;
+};
+var button = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.width = config.width;
+    this.height = config.height;
+    this.r = config.r;
+    this.g = config.g;
+    this.b = config.b;
+    this.goto = config.goto;
+    this.txt = config.txt;
+    this.t = config.t;
+    this.locked = config.locked;
+    this.txts = config.txts || 40;
+};
+var playButton = new button(btn1);
+var howToButton = new button(btn2);
+var recordButton = new button(btn3);
+var menuButton = new button(btn4);
+button.prototype.draw = function() {
+    textFont(createFont("Impact"));
+     var o;
+     stroke(0);
+     if(this.txts === 15){
+        noStroke();
+     }
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        o = 210;
+        
+        
+    } else {
+        o = 145;
+        
+    }
+     rectMode(CENTER);
+     fill(0,0,0,130);
+     rect(this.x,this.y,this.width,this.height,15);
+     fill(this.r,this.g,this.b,o);
+     rect(this.x,this.y,this.width-10,this.height-10,10);
+     textAlign(CENTER,CENTER);
+     fill(10);
+     textSize(this.txts);
+     if(this.locked === true){
+        textSize(16);
+        this.txt = "LOCKED";
+     }
+     text(this.txt,this.x,this.y);
+    textFont(createFont("l"));
+};
+var dustParticle = function(x,y,xSpeed,ySpeed,w,h,o){
+    this.x = x;
+    this.y = y;
+    this.xSpeed = xSpeed;
+    this.ySpeed = ySpeed;
+    this.w = w;
+    this.h = h;
+    this.o = o;
+};
+dustParticle.draw = function() {
+    fill(161, 156, 161,this.o);
+    ellipse(this.x,this.y,this.w,this.h);
+    this.x+=this.xSpeed;
+    this.y+=this.ySpeed;
+    this.o+=1;
+};
+var dustSpew = function(x,y){
+    
+};
+var ghostText = function(text1){
+    textSize(20);
+    fill(139, 217, 214);
+    textAlign(CENTER,TOP);
+    text(text1,60,100,500,600);
+};
+var sensei = function(x,y,s){
+    this.x = x;
+    this.y = y;
+    this.s = s;
+};
+sensei.prototype.draw = function() {
+    angleMode = "radians";
+    smooth();
+    noStroke();
+    rectMode(LEFT);
+    fill(230, 230, 230);
+    rect(this.x,this.y,this.s,this.s,4);
+    fill(230, 213, 159);
+    rectMode(CENTER);
+    rect(this.x + this.s/2,this.y + this.s*3/7.8,this.s,this.s/2);
+    fill(0);
+    ellipse(this.x + this.s/3,this.y + this.s*2/5,this.s/7,this.s/7);
+    ellipse(this.x + this.s*2/3,this.y + this.s*2/5,this.s/7,this.s/7);
+    fill(217, 202, 71);
+    triangle(this.x - this.s/2,this.y + this.s/4,this.x + this.s*1.5,this.y + this.s/4, this.x + this.s/2, this.y - this.s/4);
+    stroke(156, 6, 6);
+    strokeWeight(2);
+    noFill();
+    arc(this.x + this.s/2,this.y + this.s*1.45/3,this.s/2,this.s/4,1,PI - 1);
+    angleMode = "degrees";
+    
+};
+sensei.prototype.talk = function(speech){
+    fill(245, 128, 128);
+    strokeWeight(3);
+    stroke(0);
+    line(this.x + this.s + 3,this.y + this.s/2,this.x + this.s*1.5 + 3,this.y);
+    noStroke();
+    textAlign(LEFT,TOP);
+    textSize(20);
+    text(speech,this.x + this.s*1.5 + 13,this.y - this.s/2 - speech.length/3,200,600);
+};
+var player = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.h = height/20;
+    this.w = width/20;
+    this.up = config.up;
+    this.down = config.down;
+    this.right = config.right;
+    this.left = config.left;
+    this.speed = config.speed;
+    this.gforce = 0;
+    this.velocity = config.velocity;
+    this.past = "";
+    this.origSpeed = config.speed;
+    this.jumps = config.jumps;
+    this.usedJumps = 0;
+    this.jumpHeight = config.jumpHeight;
+    this.jumpAbility = config.jumpAbility;
+    this.speedAbility = config.speedAbility;
+    this.noAbility = config.noAbility;
+    this.phaseAbility = config.phaseAbility;
+    this.stealthAbility = config.stealthAbility;
+    this.ability = "nothing";
+    this.color = config.color;
+    this.onground = false;
+    this. circW = width/20;
+    this.circH = height/60;
+    this.t = "add";
+    this.lives = 3;
+    this.phase = config.phase;
+    this.phases = 0;
+};
+player.prototype.draw = function() {
+    if(this.ability === "jump"){
+        fill(24, 15, 209);
+    }
+    else if(this.ability === "speed"){
+        fill(95, 201, 98);
+    }
+    else if(this.ability === "phase"){
+        fill(88, 232, 227);
+    }
+    else if(this.ability === "stealth"){
+        fill(115,115,115);
+    }
+    else {
+        fill(this.color);
+    }
+    noStroke();
+    rectMode(LEFT);
+    rect(this.x,this.y,this.w,this.h,4);
+    fill(230, 213, 159);
+    rectMode(CENTER);
+    rect(this.x + this.w/2,this.y + this.h*2/5,this.w*9/10,this.h/4,10);
+    fill(0);
+    if(this.speed === this.origSpeed){
+    ellipse(this.x + this.w/3,this.y + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x + this.w*2/3,this.y + this.h*2/5,this.w/7,this.h/7);
+    }
+    else if(this.past === "right"){
+        ellipse(this.x + this.w/3 + this.w/8,this.y + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x + this.w*2/3 + this.w/8,this.y + this.h*2/5,this.w/7,this.h/7);
+    }
+    else if(this.past === "left"){
+        ellipse(this.x + this.w/3 - this.w/8,this.y + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x + this.w*2/3 - this.w/8,this.y + this.h*2/5,this.w/7,this.h/7);
+    }
+    if(this.ability === "jump" && this.onground === false){
+        fill(118, 227, 220);
+        ellipse(this.x + this.w/2,this.y + this.h*1.25,this.circW,this.circH);
+        fill(115,115,115);
+        ellipse(this.x + this.w/2,this.y + this.h*1.25,this.circW/2,this.circH/2);
+            fill(118, 227, 220);
+            if(this.speed === this.origSpeed){
+                ellipse(this.x + this.w/2,this.y + this.h*1.65,this.circW+ 5,this.circH);
+        fill(115,115,115);
+        ellipse(this.x + this.w/2,this.y + this.h*1.65,this.circW/2 + 5,this.circH/2);
+            }
+            else if(this.past === "left"){
+        ellipse(this.x + this.w/2 + this.speed,this.y + this.h*1.65,this.circW+ 5,this.circH);
+        fill(115,115,115);
+        ellipse(this.x + this.w/2 + this.speed,this.y + this.h*1.65,this.circW/2 + 5,this.circH/2);
+            }
+            else if(this.past === "right"){
+                ellipse(this.x + this.w/2 - this.speed,this.y + this.h*1.65,this.circW+ 5,this.circH);
+        fill(115,115,115);
+        ellipse(this.x + this.w/2 - this.speed,this.y + this.h*1.65,this.circW/2 + 5,this.circH/2);
+            }
+    }
+    rectMode(LEFT);
+    if(this.circW <= 20){
+        this.t = "add";
+    }
+    if(this.circW >= 40){
+        this.t = "sub";
+    }
+    if(this.t === "add"){
+        this.circW += 0.5;
+    }
+    else if(this.t === "sub"){
+        this.circW -= 0.5;
+    }
+    if(this.ability === "speed" && this.onGround === true){
+        
+        
+    }
+};
+player.prototype.abilities = function(config){
+    if(input[this.jumpAbility] && this.ability !== "jump" && this.onground === true && this.speed === this.origSpeed){
+        this.jumpHeight = config.jumpHeight*1.5;
+        this.ability = "jump";
+        this.velocity = config.velocity;
+    }
+    if(input[this.speedAbility] && this.ability !== "speed"  && this.onground === true && this.speed === this.origSpeed){
+        this.velocity = config.velocity * 5;
+        this.ability = "speed";
+        this.jumpHeight = config.jumpHeight/2;
+    }
+    if(input[this.noAbility] && this.ability !== "nothing"  && this.onground === true && this.speed === this.origSpeed){
+        this.velocity = config.velocity;
+        this.ability = "nothing";
+        this.jumpHeight = config.jumpHeight;
+    }
+    if(input[this.phaseAbility] && this.ability !== "phase"  && this.onground === true && this.speed === this.origSpeed){
+        this.velocity = config.velocity;
+        this.ability = "phase";
+        this.jumpHeight = config.jumpHeight;
+        
+    }
+    if(input[this.stealthAbility] && this.ability !== "stealth"  && this.onground === true && this.speed === this.origSpeed){
+        this.velocity = config.velocity/4;
+        this.ability = "stealth";
+        this.jumpHeight = config.jumpHeight/4;
+        this.speed = config.speed;
+        
+    }
+};
+player.prototype.move = function(){
+    if(this.ability === "phase"){
+        if(this.phases < phases[level]){
+        if(input[this.left] && this.timer >= 45){
+            this.x -= width/20 * 3;
+            this.timer = 0;
+            this.phases += 1;
+        }
+        if(input[this.right] && this.timer >= 45){
+            this.x += width/20 * 3;
+            this.timer = 0;
+            this.phases += 1;
+        }
+        if(input[this.up] && this.timer >= 45){
+            this.y -= height/20 * 3;
+            this.timer = 0;
+            this.phases += 1;
+        }
+        if(input[this.down] && this.timer >= 45){
+            this.y += height/20 * 3;
+            this.timer = 0;
+            this.phases += 1;
+        }
+        this.timer += 1;
+        }
+    }
+    else{
+        this.timer = 0;
+    if(input[this.up] && this.usedJumps < this.jumps && this.onground === true){
+        this.gforce = -this.jumpHeight;
+        this.usedJumps += 1;
+    }
+    if(input[this.down] && this.onground === false){
+        this.gforce += gravity;
+    }
+    if(input[this.right] && this.past !== "left"){
+        this.x += this.speed;
+        this.speed += this.velocity;
+        this.past = "right";
+        this.gforce += gravity/2;
+    }
+    else if(this.past === "right" && this.speed > this.origSpeed){
+        this.x += this.speed;
+        if(this.onground === true){
+            this.speed -= this.velocity*4;
+        }
+        else{
+            this.speed -= this.velocity*2;
+        }
+        this.past = "right";
+    }
+    else if(this.past === "right"){
+        this.speed = this.origSpeed;
+        this.past = "";
+    }
+    if(input[this.left] && this.past !== "right"){
+        this.x -= this.speed;
+        this.speed += this.velocity;
+        this.past = "left";
+        this.gforce += gravity/2;
+    }
+    else if(this.past === "left" && this.speed > this.origSpeed){
+        this.x -= this.speed;
+        if(this.onground === true){
+            this.speed -= this.velocity*4;
+        }
+        else{
+            this.speed -= this.velocity*2;
+        }
+        this.past = "left";
+    }
+    else if(this.past === "left"){
+        this.speed = this.origSpeed;
+        this.past = "";
+    }
+    }
+    this.y += this.gforce;
+    this.gforce += gravity;
+    for(var i = 0; i < (blocks.length - 1); i++){
+        if(collision(this, blocks[i]) && this.past === "right" && this.y >= blocks[i].y || collision(this, blocks[i]) && this.past === "right" && this.onground === false){ 
+            if(this.y >= blocks[i].y || this.onground === false){
+                this.x -= this.speed;
+            }
+            if(this.y >= blocks[i].y){
+                this.speed = this.origSpeed;
+            }
+        }
+        else if(collision(this, blocks[i]) && this.past === "left" && this.y >= blocks[i].y || collision(this, blocks[i]) && this.past === "left" && this.onground === false){ 
+            if(this.y >= blocks[i].y || this.onground === false){
+                this.x += this.speed;
+            }
+            if(this.y >= blocks[i].y){
+                this.speed = this.origSpeed;
+            }
+        }
+    }
+    this.onground = false;
+    for(var i = 0; i < (blocks.length - 1); i++){
+        if(collision(this, blocks[i]) && this.gforce >= 0){ 
+            this.y -= ((this.y + this.h) - blocks[i].y);
+            this.onground = true;
+            this.lastgforce = this.gforce;
+        }
+        if(collision(this, blocks[i]) && this.gforce < 0){ 
+            this.y -= this.gforce;
+            this.gforce = 1;
+        }
+    }
+    if(this.onground === true){
+        this.gforce = 0;
+        this.usedJumps = 0;    
+    }
+};
+player.prototype.reset = function(config){
+    this.gforce = 0;
+    this.past = "";
+    this.usedJumps = 0;
+    this.ability = "nothing";
+    this.onground = false;
+    this.t = "add";
+    this.lives = 3;
+    this.velocity = config.velocity;
+    this.ability = "nothing";
+    this.jumpHeight = config.jumpHeight;
+    this.speed = config.speed;
+    this.phases = 0;
+};
+var player1 = new player(player1config);
+var stoneBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+};
+stoneBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(181, 181, 181);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+var bounceBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+};
+bounceBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(161, 67, 63);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h/6);
+    rect(this.x,this.y + this.h*5/6,this.w,this.h/6);
+    fill(176, 152, 84);
+    triangle(this.x + this.w/7, this.y + this.h * 1/6, this.x + this.w*6/7, this.y + this.h * 1/6, this.x + this.w/2, this.y + this.h*6/7);
+    triangle(this.x + this.w/7, this.y + this.h * 5/6, this.x + this.w*6/7, this.y + this.h * 5/6, this.x + this.w/2, this.y + this.h*1/7);
+    strokeWeight(2);
+    stroke(107, 96, 90);
+    line(this.x + this.w/4, + this.y + this.h*4/6,this.x + this.w*3/4, + this.y + this.h*4/6);
+    line(this.x + this.w/4, + this.y + this.h*2/6,this.x + this.w*3/4, + this.y + this.h*2/6);
+    line(this.x + this.w/3, + this.y + this.h*3/6,this.x + this.w*2/3, + this.y + this.h*3/6);
+    
+    
+};
+var smashBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.startY = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.velocity = 0.15;
+    this.speed = 1;
+    this.smashing = true;
+};
+smashBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(181,181,181);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h * 3/4);
+    fill(189, 151, 151);
+    for(var i = 0; i < 4; i++){
+        triangle(this.x + this.w *i/4,this.y + this.h*3/4,this.x + this.w *(i+1)/4,this.y + this.h*3/4,this.x + this.w*(i+0.5)/4,this.y + this.h);
+    }
+    
+};
+smashBlock.prototype.smash = function(){
+    if(this.smashing === true){
+        this.speed += this.velocity;
+        this.y += this.speed;
+    }
+    if(this.smashing === false){
+        this.speed = 1;
+        this.y -= this.speed;
+    }
+    if(this.y === this.startY){
+        this.smashing = true;
+    }
+    for(var i = 0; i < blocks.length; i++){
+        if(collision(blocks[i],this) && blocks[i].y > this.y && this.smashing === true && blocks[i].t !== "smash"){
+            this.smashing = false;
+            this.y = floor(this.y);
+        }
+    }
+    if(collision(player1,this) && player1.y > this.y + this.h *3/4 && this.smashing === true){
+            player1.lives -= 3;
+        }
+    
+};
+var breakBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.ready = -1;
+};
+breakBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(156, 121, 15);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+breakBlock.prototype.fall = function(){
+    if(collision(this,player1) && this.ready === -1){
+        this.ready = 0;
+    }
+    if(this.ready >= 0){
+        this.ready += 1;
+    }
+    if(this.ready >= 30){
+        this.y += 1;
+    }
+        
+};
+var glassBlock = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+};
+glassBlock.prototype.draw = function() {
+    fill(255,255,255,30);
+    rect(this.x,this.y,this.w,this.h);
+};
+var spike = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.collected = true;
+};
+spike.prototype.draw = function() {
+    fill(171, 133, 133);
+    triangle(this.x, this.y + this.h,this.x + this.w/2,this.y,this.x + this.w, this.y + this.h);
+};
+spike.prototype.collide = function(){
+    if(collision(this,player1)){
+        player1.lives -= 1;
+    }
+    if(collision(this,player1) && player1.onground === false){
+        player1.gforce = -1;
+    }
+    if(collision(this,player1) && player1.past === "right"){
+        player1.past = "left";
+        player1.x -= player1.speed;
+    }
+    else if(collision(this,player1) && player1.past === "left"){
+        player1.past = "right";
+        player1.x += player1.speed;
+    }
+};
+var door = function(x,y,w,h,l){
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.w = w;
+    this.l = l;
+};
+var secretDoor = function(x,y,w,h,l){
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.w = w;
+    this.l = l;
+};
+var fakeDoor = function(x,y,w,h,l){
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.w = w;
+    this.l = l;
+};
+var yellowKey = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.collected = false;
+};
+yellowKey.prototype.draw = function() {
+    if(this.collected === false){
+    fill(224, 216, 98);
+    ellipse(this.x + this.w/5,this.y + this.h/2,this.h,this.w*2/5);
+    fill(115,115,115);
+    ellipse(this.x + this.w/5,this.y + this.h/2,this.h/2,this.w*1/5);
+    fill(224, 216, 98);
+    rect(this.x + this.w*2/5,this.y + this.h/4, this.w * 3/5,this.h/2);
+    rect(this.x + this.w * 7/10,this.y,this.w/10,this.h/4);
+    rect(this.x + this.w * 9/10,this.y,this.w/10,this.h/4);
+    }
+};
+yellowKey.prototype.collide = function(){
+    if(collision(this,player1)){
+        this.collected = true;
+    }
+};
+door.prototype.draw = function() {
+    fill(140, 112, 88);
+    noStroke();
+    rectMode(LEFT);
+    rect(this.x,this.y + this.h/2,this.w,this.h/2);
+    arc(this.x + this.w/2,this.y + this.h/2,this.w,this.h,-180,0);
+    fill(59, 56, 59);
+    ellipse(this.x + this.w/4,this.y + this.h*3/5,5,5);
+};
+secretDoor.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(181, 181, 181);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    fill(59, 56, 59);
+    ellipse(this.x + this.w/4,this.y + this.h*3/5,5,5);
+};
+fakeDoor.prototype.draw = function() {
+    fill(140, 112, 88);
+    noStroke();
+    rectMode(LEFT);
+    rect(this.x,this.y + this.h/2,this.w,this.h/2);
+    arc(this.x + this.w/2,this.y + this.h/2,this.w,this.h,-180,0);
+    fill(59, 56, 59);
+    ellipse(this.x + this.w/4,this.y + this.h*3/5,5,5);
+};
+var cannonBall = function(x,y,xSpeed,ySpeed){
+    this.x = x;
+    this.y = y;
+    this.xSpeed = xSpeed;
+    this.ySpeed = ySpeed;
+    this.hit = false;
+};
+cannonBall.prototype.draw = function() {
+    fill(56, 52, 52);
+    ellipse(this.x,this.y,20,20);
+};
+cannonBall.prototype.collide = function(){
+    if(dist(this.x,this.y,player1.x + player1.w/2,player1.y + player1.h/2) <= 20 + player1.w/2 && this.hit === false){
+        player1.lives -= 1;
+        this.hit = true;
+        this.x = width*2;
+        this.y = height*2;
+    }
+};
+cannonBall.prototype.move = function(){
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+};
+var cannon = function(x,y){
+    this.x = x + width/40;
+    this.y = y + height/40;
+    this.ballList = [];
+    this.p = 0;
+    this.sc = 0;
+};
+cannon.prototype.draw = function() {
+    pushMatrix();
+    fill(94, 88, 88);
+    translate(this.x,this.y);
+    rectMode(CENTER);
+    if(player1.x <= this.x && player1.y >= this.y && player1.ability !== "stealth" || player1.x >= this.x && player1.y <= this.y && player1.ability !== "stealth"){
+    rotate(Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI));
+    this.p = Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI);
+    }
+    else if(player1.ability !== "stealth"){
+        rotate(-Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.h/2)))*(180/PI));
+        this.p = -Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI);
+    }
+    else{
+        rotate(this.p);
+    }
+    rect(0,0,15,40);
+    popMatrix();
+    fill(125, 15, 32);
+    ellipse(this.x,this.y,width/25,height/25);
+    fill(204, 142, 18,70);
+    ellipse(this.x,this.y,width/5,height/5);
+};
+cannon.prototype.shoot = function(){
+    if(dist(this.x,this.y,player1.x,player1.y) <= width/5/2 && player1.ability !== "stealth" && this.sc === 0){    
+        
+        this.ballList.push(new cannonBall(this.x,this.y,-(this.x - (player1.x + player1.w/2))/objectPythag(this,player1),-(this.y - (player1.y + player1.h/2))/objectPythag(this,player1)));
+    }
+    if(dist(this.x,this.y,player1.x,player1.y) <= width/5/2 && player1.ability !== "stealth"){
+        this.sc += 1;
+        if(this.sc === 45){
+            this.sc = 0;
+        }
+    }
+    else{
+        this.sc = 0;
+    }
+    for(var i = 0; i < this.ballList.length; i++){
+        this.ballList[i].draw();
+        this.ballList[i].move();
+        this.ballList[i].collide();
+    }
+};
+var loadLevel = function(){
+blocks = [];
+cannons = [];
+doors = [];
+spikes = [];
+levelSide = 1;
+for(var column = 0;column < 20;column++) {
+        for(var row = 0;row < 20;row++) {
+        if(levels[level][column][row] === "s") {
+            blocks.push(new stoneBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "b") {
+            blocks.push(new bounceBlock(row* (width/20),column * (height /20), width/20,height/20, "bounce"));
+        }
+        if(levels[level][column][row] === "c") {
+            cannons.push(new cannon(row* (width/20),column * (height /20)));
+        }
+        if(levels[level][column][row] === "f") {
+            blocks.push(new breakBlock(row* (width/20),column * (height /20), width/20,height/20, "fall"));
+        }
+        if(levels[level][column][row] === "d") {
+            doors.push(new door(row* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "D") {
+            fallBlocks.push(new fakeDoor(row* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "k" && used === 1) {
+            keys.push(new yellowKey(row* (width/20),column * (height /20), width/20,height/50));
+        }
+        if(levels[level][column][row] === "^") {
+            spikes.push(new spike(row* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "g") {
+            blocks.push(new glassBlock(row* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "!") {
+            blocks.push(new smashBlock(row* (width/20),column * (height /20), width/20,height/20,"smash"));
+        }
+        if(levels[level][column][row] === "@" && setPos === true) {
+            player1.x = row* (width/20);
+            player1.y = column * (height /20);
+        }
+        
+    }
+ }
+ used += 1;
+};
+var loadLevel2 = function(){
+blocks = [];
+cannons = [];
+doors = [];
+spikes = [];
+levelSide = 2;
+for(var column = 0;column < levels[level].length;column++) {
+        for(var row = 20;row < levels[level][column].length;row++) {
+        if(levels[level][column][row] === "s") {
+            blocks.push(new stoneBlock((row - 20)* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "b") {
+            blocks.push(new bounceBlock((row-20)* (width/20),column * (height /20), width/20,height/20, "bounce"));
+        }
+        if(levels[level][column][row] === "c") {
+            cannons.push(new cannon((row - 20)* (width/20),column * (height /20)));
+        }
+        if(levels[level][column][row] === "f") {
+            blocks.push(new breakBlock((row - 20)* (width/20),column * (height /20), width/20,height/20, "fall"));
+        }
+        if(levels[level][column][row] === "d") {
+            doors.push(new door((row - 20)* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "D") {
+            fallBlocks.push(new fakeDoor((row - 20)* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "k" && used === 2) {
+            keys2.push(new yellowKey((row - 20)* (width/20),column * (height /20), width/20,height/50));
+        }
+        if(levels[level][column][row] === "^") {
+            spikes.push(new spike((row - 20)* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "g") {
+            blocks.push(new glassBlock((row - 20)* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "!") {
+            blocks.push(new smashBlock((row - 20)* (width/20),column * (height /20), width/20,height/20,"smash"));
+        }
+    }
+}
+used += 1;
+};
+button.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && clicked === true && this.locked === false){
+        if(this.t === "level"){
+            scene = "game";
+            level = this.goto;
+            setPos = true;
+            keys = [];
+            keys2 = [];
+            used = 1;
+            loadLevel();
+        } else {
+            scene = this.goto;
+            level = 1;
+            player1.reset(player1config);
+        }
+    }
+};
+var playerCamera = function(){
+};
+var dustList = [];    
+    for(var i = 0; i < 10; i++){
+        dustList.push(dustParticle(player1.x,player1.y,random(1,2),random(1,2),random(1,3),random(1,3),0));
+    }
+loadLevel();
+var senseimaster = new sensei(200,200,50);
+var senseimaster2 = new sensei(250,300,100);
+var senseimaster3 = new sensei(275,250,50);
+var keyCount = 0;
+var levelButtonList = [];
+var draw = function() {
+    if(scene === "home"){
+        background(0, 0, 0);
+        playButton.draw();
+        playButton.clicked();
+        howToButton.draw();
+        howToButton.clicked();
+        recordButton.draw();
+        recordButton.clicked();
+        textSize(70);
+        textAlign(CENTER,CENTER);
+        fill(140, 140, 140);
+        textFont(createFont("Impact"));
+        text("N i n j a   S w i t c h ",300,200);
+        senseimaster2.draw();
+        textFont(createFont("l"));
+    }
+    if(scene === "lvlselect" || scene === "lvlselect2"){
+        if(scene === "lvlselect"){
+            levelButtonList = [];
+            var startX = 40;
+            var startY = 40;
+            var locked;
+            for(var i = 0; i <= levels.length - 2; i++){
+    if(i % 7 === 0){
+        startX = 57.5;
+        startY += 80;
+    } else {
+        startX += 80;
+    }
+    if(i > currentLevel){
+        locked = true;
+    } else {
+        locked = false;
+    }
+    levelButtonList.push(new button({
+    x: startX, 
+    y: startY,
+    width: 75,
+    height: 75,
+    r: 230, 
+    g:163,
+    b:183,
+    goto: i,
+    txt: i + 1,
+    t: "level",
+    locked: locked
+    }));
+}
+        scene = "lvlselect2";
+        }
+        background(0);
+        textFont(createFont("Impact"));
+        textSize(70);
+        fill(140, 140, 140);
+        text("LEVELS",300,40);
+        for(var i = 0; i < levelButtonList.length; i++){
+            levelButtonList[i].draw();   
+            levelButtonList[i].clicked(); 
+        }
+        fill(140, 140, 140);
+        textSize(30);
+        menuButton.draw();
+        menuButton.clicked();
+    }
+    if(scene === "game"){
+    background(115, 115, 115);
+    if(level === 0 && player1.y > height){
+        level = 8;    
+        setPos = true;
+        keys = [];
+        keys2 = [];
+        used = 1;
+        loadLevel();
+        player1.reset(player1config);
+    }
+    
+    for(var i = 0;i < doors.length; i++) {
+        doors[i].draw();
+        if(collision(doors[i],player1) && doors[i].l === false){
+            level += 1;
+            used = 1;
+            levelSide = 1;
+            keys = [];
+            keys2 = [];
+            setPos = true;
+            loadLevel();
+            player1.reset(player1config);
+        }
+    } 
+    //stops 
+    if(level > currentLevel){
+        currentLevel = level;
+    }
+    for(var i = 0;i < blocks.length; i++) {
+        blocks[i].draw();
+        if(blocks[i].t === "smash"){
+            blocks[i].smash();
+        }
+        if(blocks[i].t === "fall"){
+            blocks[i].fall();    
+        }
+        if(blocks[i].t === "bounce"){
+            if(collision(blocks[i],player1) && player1.y + player1.h <= blocks[i].y){
+                player1.gforce = -player1.lastgforce - 0.5;
+            }
+        }
+    } 
+    for(var i = 0;i < fallBlocks.length; i++) {
+        fallBlocks[i].draw();
+    } 
+    for(var i = 0;i < spikes.length; i++) {
+        spikes[i].draw();
+        spikes[i].collide();
+    }
+    keyCount = 0;
+    if(levelSide === 1){
+    for(var i = 0;i < keys.length; i++) {
+        keys[i].draw();
+        keys[i].collide();
+    } 
+    }
+    if(levelSide === 2){
+        for(var i = 0;i < keys2.length; i++) {
+            keys2[i].draw();
+            keys2[i].collide();
+        } 
+    }
+    for(var i = 0;i < keys.length; i++) {
+        if(keys[i].collected){
+            keyCount += 1;
+        }
+    } 
+    for(var i = 0;i < keys2.length; i++) {
+        if(keys2[i].collected){
+            keyCount += 1;    
+        }
+    } 
+    if(keyCount === keys.length + keys2.length && doors.length > 0){
+        doors[0].l = false;
+    }
+    player1.draw();
+    player1.move();
+    player1.abilities(player1config);
+    for(var i = 0;i < cannons.length; i++) {
+        cannons[i].draw();
+        cannons[i].shoot();
+    } 
+    if(player1.x + player1.w > width){
+        player1.x = 1;
+        player1.y -= 1;
+        loadLevel2();
+    }
+    
+    if(player1.x < 0){
+        player1.y -= 1;
+        player1.x = width - player1.w - 1;
+        setPos = false;
+        loadLevel();
+    }
+    for(var i = 0; i < player1.lives; i++){
+        image(getImage("space/healthheart"),30*(i+0),width/10000,30,30);
+    }
+    if(keyIsPressed && key.toString() === "r" || player1.lives <= 0){
+        setPos = true;
+        levelSide = 1;
+        keys = [];
+        keys2 = [];
+        used = 1;
+        loadLevel();
+        player1.reset(player1config);
+    }
+    if(level === 0){
+        senseimaster.draw();
+        senseimaster.talk("Hello. I am your sensei. They have trapped you in this castle. The only way to escape Them is to make it through the doors to the next room. Go through the door and I will teach you. Jump off a cliff and you will never learn your true powers (aka skip the tutorial).");
+    }
+    if(level === 1){
+        senseimaster.draw();
+        senseimaster.talk('The first ability you must master is the jump ability. The name pretty much explains it. Press the "2" key to activate the ability. Use it to get to the door at the top of the room.');
+    }
+    if(level === 2){
+        senseimaster.draw();
+        senseimaster.talk('The next ability is speed. This increases your speed and acceleration to a much higher level. Press the "3" key to activate. Press "R" to restart and "1" to return to normal mode.');
+    }
+    if(level === 3){
+        senseimaster.draw();
+        senseimaster.talk('Next you must learn how to get through things that you cannot jump over. The phase ability allows you to teleport two spaces either up, down, left or right. The teal numbers in the top left corner indicate how many times you have and can phase. Press "4" to activate. Be careful using this ability because strange things may happen...');
+    }
+    if(level === 4){
+        senseimaster.draw();
+        senseimaster.talk('Finally you must master the art of stealth. Press the "5" key and watch yourself disapear... almost. In this mode cannons cannot see you and therefore cannot shoot you.');
+    }
+    if(level === 5){
+        senseimaster.draw();
+        senseimaster.talk('Some doors are locked so you must collect the key before you can go through them.');
+    }
+    if(level === 6){
+        senseimaster.draw();
+        senseimaster.talk('You may need to collect multiple keys to unlock one door.');
+    }
+    if(level === 7){
+        senseimaster.draw();
+        senseimaster.talk('RUN FOR YOUR LIFE!!!!!!!');
+    }
+    if(level === 8){
+        senseimaster.draw();
+        senseimaster.talk('Your training is complete. But you may still hear my voice whispering advice to you...');
+    }
+    if(level === 10){
+        ghostText("Smashing blocks can be dangerous, but may also get you where you need to go");
+        
+    }
+    if(level === 13){
+        ghostText("Springs can push you up high. Press the up key while on a spring to go lower.");
+        
+    }
+    if(level === 14){
+        ghostText("Some doors are fake...make sure you choose the right one");
+        
+    }
+    fill(88, 232, 227);
+    textSize(30);
+    textAlign(LEFT,TOP);
+    text(player1.phases + "/" + phases[level],1,25);
+    menuButton.draw();
+    menuButton.clicked();
+    if(level >= levels.length - 1){
+        scene = "win";
+    }
+}
+if(scene === "win"){
+    background(0);
+    fill(140);
+    textSize(40);
+    textAlign(LEFT,TOP);
+    text("You beat all of the levels and              escaped the castle!",40,30,600,600);
+    fill(214, 217, 39);
+    strokeWeight(1);
+    stroke(214, 217, 39);
+    arc(300,300,100,100,0,180);
+    rectMode(CENTER);
+    rect(300,250,100,100);
+    strokeWeight(20);
+    fill(0);
+    arc(350,250,60,60,-90,90);
+    arc(250,250,60,60,90,270);
+    strokeWeight(1);
+    fill(214, 217, 39);
+    rect(300,350,40,100);
+    arc(300,420,80,80,-180,0);
+    senseimaster3.draw();
+    menuButton.draw();
+    menuButton.clicked();
+    
+}
+if(scene === "howto"){
+    background(0);
+        textAlign(CENTER,CENTER);
+        fill(140);
+        textSize(70);
+        textFont(createFont("Impact"));
+        text("How to",300,70);
+        textFont(createFont("arial"));
+        textAlign(LEFT,TOP);
+        textSize(30);
+        text("  Use the arrow keys and 1,2,3,4, and 5 keys to move and change your ability. If you need more information, do the tutorial.",50,120,500,700);
+    menuButton.draw();
+    menuButton.clicked();
+    }
+clicked = false;
+};
