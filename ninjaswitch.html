@@ -1443,7 +1443,7 @@ var draw = function() {
     for(var i = 0; i < player1.lives; i++){
         image(getImage("space/healthheart"),30*(i+0),width/10000,30,30);
     }
-    if(keyIsPressed && key.toString() === "r" || player1.lives <= 0){
+    if(keyPressed && key.toString() === "r" || player1.lives <= 0){
         setPos = true;
         levelSide = 1;
         keys = [];
