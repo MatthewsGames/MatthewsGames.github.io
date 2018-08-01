@@ -3292,7 +3292,7 @@ var draw = function() {
     fill(227, 217, 18);
     textAlign(RIGHT,TOP);
     text("Coins: " + coins,390,0);
-    if(keyIsPressed && key.toString() === "r" || player1.lives <= 0){
+    if(keyPressed && key.toString() === "r" || player1.lives <= 0){
         setPos = true;
         levelSide = 1;
         keys = [];
