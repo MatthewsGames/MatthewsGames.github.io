@@ -1134,11 +1134,11 @@ cannon.prototype.draw = function() {
     translate(this.x,this.y);
     rectMode(CENTER);
     if(player1.x <= this.x && player1.y >= this.y && player1.ability !== "stealth" || player1.x >= this.x && player1.y <= this.y && player1.ability !== "stealth"){
-    rotate(Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI));
+    rotate(radians(Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI)));
     this.p = Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI);
     }
     else if(player1.ability !== "stealth"){
-        rotate(-Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.h/2)))*(180/PI));
+        rotate(radians(-Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.h/2)))*(180/PI)));
         this.p = -Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI);
     }
     else{
