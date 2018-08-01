@@ -3307,7 +3307,7 @@ var draw = function() {
     fill(227, 217, 18);
     textAlign(RIGHT,TOP);
     text("Coins: " + coins,390,0);
-    /**if(input.R || player1.lives <= 0){
+    if(player1.lives <= 0){
         setPos = true;
         levelSide = 1;
         keys = [];
@@ -3316,7 +3316,7 @@ var draw = function() {
         loadLevel();
         player1.reset(player1config);
         level = levels.length - 1;
-    }**/
+    }
     if(level === levels.length - 1 && player1.y > 340){
         setPos = false;
         levelSide = 1;
