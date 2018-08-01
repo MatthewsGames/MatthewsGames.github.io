@@ -497,6 +497,14 @@ var keyReleased = function() {
 mouseClicked = function(){
     clicked = true;
 };
+var heart = function(x,y,w,h){
+    stroke(255, 0, 0);
+    fill(255, 0, 0);
+    ellipse(x,y,w/2,h/2);
+    ellipse(x+w*3/10,y,w/2,h/2);
+    triangle(x-w*3/10,y,x+w*33/200,y+h*9/20,x+w*11/20,y);
+
+};
 var button = function(config){
     this.x = config.x;
     this.y = config.y;
@@ -1442,9 +1450,10 @@ var draw = function() {
         loadLevel();
     }
     for(var i = 0; i < player1.lives; i++){
-        image(getImage("space/healthheart"),30*(i+0),width/10000,30,30);
+        heart(21*(i)+ 7,width/10000 + 7,20,20);
+        noStroke();
     }
-    if(keyPressed && key.toString() === "r" || player1.lives <= 0){
+    if(input.R || player1.lives <= 0){
         setPos = true;
         levelSide = 1;
         keys = [];
