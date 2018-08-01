@@ -830,7 +830,7 @@ player.prototype.move = function(){
     }
     this.y += this.gforce;
     this.gforce += gravity;
-    for(var i = 0; i < (blocks.length - 1); i++){
+    for(var i = 0; i < (blocks.length); i++){
         if(collision(this, blocks[i]) && this.past === "right" && this.y >= blocks[i].y || collision(this, blocks[i]) && this.past === "right" && this.onground === false){ 
             if(this.y >= blocks[i].y || this.onground === false){
                 this.x -= this.speed;
@@ -849,7 +849,7 @@ player.prototype.move = function(){
         }
     }
     this.onground = false;
-    for(var i = 0; i < (blocks.length - 1); i++){
+    for(var i = 0; i < (blocks.length); i++){
         if(collision(this, blocks[i]) && this.gforce >= 0){ 
             this.y -= ((this.y + this.h) - blocks[i].y);
             this.onground = true;
