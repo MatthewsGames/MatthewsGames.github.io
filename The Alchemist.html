@@ -1,12 +1,31 @@
 <!DOCTYPE html>
 <html> 
   <head>
-    <title>Processing.JS inside Webpages: Template</title> 
-  </head>
-  <body>
-	<!--This draws the canvas on the webpage -->
-    <canvas id="mycanvas"></canvas> 
-  </body>
+    <title>The Alchemist</title> 
+	 <style>
+		 body {
+			 background-color: rgb(0,0,0);
+		 }
+		 h1 {
+			color: rgb(103, 4, 184); 
+		 }
+		 h2 {
+			 color: rgb(129, 230, 230);
+		 }
+		 .rightalign {
+  			 text-align: right;
+		 }
+	 </style>
+</head>
+ <body>
+    <p align="center"> 
+	    <center>
+	 <h1>The Alchemist</h1>
+	<!--This draws the Canvas on the webpage -->
+      <canvas id="mycanvas"></canvas> 
+	 </center>
+    </p>
+ </body>
  
   <!-- Include the processing.js library -->
   <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
@@ -3417,6 +3436,7 @@ for(var i = 0; i < notifications.length; i++){
             notifications[i].stop = true;
         }
     }
+notifications = [];
 clicked = false;
 };
 
@@ -3430,5 +3450,6 @@ clicked = false;
   // Pass the function to ProcessingJS constructor
   var processingInstance = new Processing(canvas, programCode); 
   </script>
+	<h2><a href="index.html">Home</a> <a class="rightalign" href="https://goo.gl/forms/z1pawqkxHrCbVw3f2">Rate This Game!</a></h2>
 </html>
 
