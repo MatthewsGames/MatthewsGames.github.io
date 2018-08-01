@@ -1,0 +1,3436 @@
+<!-- This is based on DillingerLee's great template here:
+https://github.com/Team-Code/KA_Offline -->
+<html> 
+ <head>
+    <title>The Alchemist</title> 
+	 <style>
+		 body {
+			 background-color: rgb(0,0,0);
+		 }
+		 h1 {
+			color: rgb(103, 4, 184); 
+		 }
+		 h2 {
+			 color: rgb(129, 230, 230);
+		 }
+		 .rightalign {
+  			 text-align: right;
+		 }
+	 </style>
+</head>
+ <body>
+    <p align="center"> 
+	    <center>
+	 <h1>The Alchemist</h1>
+	<!--This draws the Canvas on the webpage -->
+      <canvas id="mycanvas"></canvas> 
+	 </center>
+    </p>
+ </body>
+ <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+ 
+ <script>
+    var sketchProc = function(processingInstance) {
+     with (processingInstance) {
+        size(400, 400); 
+        //frameRate(55);
+var gravity = 0.02;
+var setPos = true;
+var coins = 0;
+var items = ["Water","Ice","Leaf","Twig","Banana","Berry","Stone","Steel","Gold","Silver","Diamond","Emerald","Wind","Pear","OceanWater","Sand","Ashes","Glass","Steam","Grass","Lava","Obsidian","Log","Flint","Fire","Steam","WaterStone","FreezeStone","EarthStone","PortalStone"];
+var player1config = {
+    x:200,
+    y:200,
+    up: "W",
+    down: "S",
+    left: "A",
+    right: "D",
+    speed: 1.2,
+    velocity: 0.01,
+    jumps: 1,
+    jumpHeight: 2,
+    color: color(13, 26, 168)
+    
+};
+var currentLevel;
+if(currentLevel === undefined){
+    currentLevel = 0;
+}
+var levelSide = 1;
+var input = [];
+var blocks = [];
+var cannons = [];
+var doors = [];
+var secretDoors = [];
+var keys = [];
+var keys2 = [];
+var phases = [0,0,0,1,0,2,0,0,2,0,0,2,0,0,10,2];
+var fallBlocks = [];
+var fallBlocks2 = [];
+var spikes = [];
+var gameScene = "game";
+var levels = [
+    ["x   @                                                                      ",
+    "                                                                           ",
+    "                   sss sss sss          sss sss sss          sss sss sss   ",
+    "                   szssszssszs          szssszssszs          szssszssszs   ",
+    "                   szzzzzzzzzs          szzzzzzzzzs          szzzzzzzzzs   ",
+    "                   swKzzzzzzzs          szzzzzzzzzs          szzzzzzzzzs   ",
+    "                   swwzzz$$$$s          szzzzzzzzzs          szzzzzzzzzs   ",
+    "                   sss|sssssss          sss|sssssss          sssssss|sss   ",
+    "                     s|zzzzs              s|zzzzs              szzzz|s     ",
+    "                     s|zz*zssssssssssssssss|zzzzsssssssssssssssszzzz|s     ",
+    "                     s|zGzzszzzzzzszzzzzzzs|zzzzszzzzzzszzzzzzzszzzz|s     ",
+    "                     s|ssssszzzzzzszzzzzzzs|zzzzszzzzzzszzzzzzzszzzz|s     ",
+    "                     s|zzzzszzzzzzszzzzzzzs|zzzzszzzzzzszzzzzzzszzzz|s     ",
+    "                     s|zzzzszzzzzzszzzzzzzs|zzzzszzzzzzszzzzzzzszzzz|s     ",
+    "                     #zzzzzszzzzzzszzzzzzzs|zzzzszzzzzzszzzzzzzszzzz|s     ",
+    "~~~~~~~~~~~~~~~yyyyyyszzzzz#zzzzzz#zzzzzzz#zzzzz#zzzzzz#zzzzzzz#zzzzz#     ",
+    "~~~~~~~~~~~~~yyyyyyyysssssssssssssssssssssssssssssssssssssssssssssssssggggg",],
+    ["x                                                                          ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                            wwww                                           ",
+    "                           wwzzww                                          ",
+    "                          wwzzzzww                                         ",
+    "                           s|ssss             wwwwww                       ",
+    "                           s|zzzs            wwwwwwww                      ",
+    "                           s|zzzs             BBBBBB                       ",
+    "                   s~~~~s  s|zzzs             BzzzzB                       ",
+    "                   s~~~~s  s|zzzs             BzzzzB                       ",
+    " a a a a a a a a a ss~~ss  s|zzz# a a a a a a #zzzzB                       ",
+    "ggggggggggggggggggggssssggggggggggggggggggggggggggggggggggggggggggggggggggg",],
+    ["x                                                                          ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                     g                                     ",
+    "       a  a                        agggg              a                    ",
+    "   a gggggggga      a a        a aggggggg~~~~~~~~~~~gggg a         a       ",
+    "a ggggggggggggg a  gggggga a  gggggggggggg~~~~~~~~gggggggggga  a  gg a a   ",
+    "ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",],
+    ["x                                                                          ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "           i                                                               ",
+    "         iiii                                                              ",
+    "       iiiiiiiii                                        iii                ",
+    "    iiiiiiiiiiiiiii         iiiii                    iiiiiiii   iii        ",
+    "  iiiiiiiiiiiiiiiiiii     iiiiiiiii       iiiiii    iiiiiiiiiiiiiiii   iii ",
+    "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",],
+    ["x                                                                          ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                      yyy                                                  ",
+    "                     yyyyy              yyy                         yyy    ",
+    "   yyy              yyyyyyy           yyyyyy                       yyyyyy  ",
+    "  yyyyy            yyyyyyyyyy        yyyyyyyy     yyy    yyy      yyyyyyyyy",
+    "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",],
+    ["x                                                                               x",
+    "                                                                           ",
+    "                   ooo ooo ooo          ooo ooo ooo          ooo ooo ooo   ",
+    "                   ozooozooozo          ozooozooozo          ozooozooozo   ",
+    "                   ozzzzzzzzzo          ozzzzzzzzzo          ozzzzzzzzzo   ",
+    "                   owKzzzzzzzo          ozzzzzzzzzo          ozzzzzzzzzo   ",
+    "                   owwzzz$$$$o          ozzzzzzzzzo          ozzzzzzzzzo   ",
+    "                   ooo|ooooooo          ooo|ooooooo          ooooooo|ooo   ",
+    "                     o|zzzzo              o|zzzzo              ozzzz|o     ",
+    "                     o|zz*zoooooooooooooooo|zzzzoooooooooooooooozzzz|o     ",
+    "                     o|zGzzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
+    "                     o|ooooozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
+    "                     o|zzzzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
+    "                     o|zzzzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
+    "     oo!!!!!!oo   c  #zzzzzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
+    "~~~~~~oooooooo~yyyyyyozzzzz#zzzzzz#zzzzzzz#zzzzz#zzzzzz#zzzzzzz#zzzzz#         x",
+    "~~~~~~~~~~~~~yyyyyyyyoooooooooooooooooooooooooooooooooooooooooooooooooooo      x",],
+    ["x~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
+    "~~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
+    "~~~~~~~~~~~~~~~~~~ssssssssssss  sssssssss",
+    "~~~~~~~~~~~~~~~~~~ssssssssss       ssssss",
+    "~~~~~~~~~~~~~~~~~~ssssssssss        sssss",
+    "~~~~~~~~~~~~~~~~~~ssssssssss         ssss",
+    "~~~~~~~~~~~~~~~~~~ssssssssss           ss",
+    "~~~~~~~~~~~~~~~~~~SSSSSSSSSS           ss",
+    "~~~~~~~~~~~~~~~~~~ssssssssss           ss",
+    "~~~~~~~~~~~~~~~~~~ssssssssss           ss",
+    "~~~~~~~~~~~~~~~~~~ssssssssss         ssss",
+    "~~~~~~~~~~~~~~~~~~ssssssssss        sssss",
+    "~~~~~~~~~~~~~~~~~~sssssssssss    ssssssss",
+    "~~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
+    "~~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
+    "~~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
+    "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"],
+    
+    ];
+    var levels2 = [
+    ["x                                       s",
+    "                                        s",
+    "                                        s",
+    "                 s                      s",
+    "                                        s",
+    "                                        s",
+    "                                        s",
+    "                       t      t         s",
+    "          ssssssssssssssssssssssssss    s",
+    "                                        s",
+    "          a                             s",
+    "      @   sssssssssssssssssssssssssssssss",
+    "      sst                               s",
+    "     ssss                               s",
+    "    ssssssb                             s",
+    " c ssssssssb a     c          c        cs",
+    "ggggggggggggggggggggggggggggggggggggggggs",],
+    ["x                                       s",
+    "                                        s",
+    "                                        s",
+    "                                        s",
+    "                                        s",
+    "                                        s",
+    "                                        s",
+    "                                        s",
+    "                                        s",
+    "                                        s",
+    "            wwwwww                      s",
+    "           wwwwwwww                     s",
+    "            BBBBBB                      s",
+    "            B    B                      s",
+    "            B  S B                c     s",
+    "   @        # ww B      tatatata  s     s",
+    "ggggggggggggggggggggggggggggggggggggggggs",],
+    ["x                                                                 ~~~~~~~~~~~~~~~~",
+    "                                                                  ~~~~~~~~~~~~~~~~",
+    "                          xxxxx                                   ~~~~~~~~~~~~~~~~",
+    "                          x   x                                   ~~~~~~~~~~~~~~~~",
+    "                         ~~   x                                   ~~~~~~~~~~~~~~~~",
+    "                        ~~~xxxx                                   ~~~~~~~~~~~~~~~~",
+    "                       ~~xxx                                      ~~~~~~~~~~~~~~~~",
+    "                       ~~                                         ~~~~~~~~~~~~~~~~",
+    "                       ~~                                         ~~~~~~~~~~~~~~~~",
+    "                       ~~                                         ~~~~~~~~~~~~~~~~",
+    "                       ~~          a                              ~~~~~~~~~~~~~~~~",
+    "                       ~~         asa                 iii         ~~~~~~~~~~~~~~~~",
+    "                       ~~        aslla          i    iiii  i      ~~~~~~~~~~~~~~~~",
+    "  @         c       y~~~~~~~y    sssssa        iii  iiiiiiiii     ~~~~~~~~~~~~~~~~",
+    "  gg  i     s      yyy~~~~~yyy  lslsssla      iiiiiiiiiiiiiiiiyyyy~~~~~~~~~~~~~~~~",
+    " ggg iiii tas     yyyyy~~~yyyyylssssssssiiiiiiiiiiiiiiiiiiiiiiiyyy~~~~~~~~~~~~~~~~",
+    "ggggiiiiiiggggggyyyyyyyyyyyyyyygggggggggsiiiiiiiiiiiiiiiiiiiiiiiyyyyyyyyyyyyyyyyyy",],
+    ];
+/**
+ * ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "ssssssssssssssssssss"],
+    ["x                                                                          ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
+    "ggggggggggggggggggggssssggggggggggggggggggggggggggggggggggggggggggggggggggg",],
+    **/
+    
+    var world = [
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    ];
+for(var i = 0; i < levels.length - 1; i++){
+    for(var row = 0; row < levels[i].length; row++){
+        world[row] += levels[i][row];
+    }
+}
+levels.push(world);
+var level = levels.length - 1;
+var used = 1;
+var scene = "game";
+var clicked ;
+var notifications = [];
+var btn1 = {
+    x: 300,
+    y: 500,
+    width:180,
+    height:90,
+    r: 230, 
+    g:163,
+    b:183,
+    t:"level",
+    goto:0,
+    txt:"PLAY",
+    locked: false
+    
+};
+var btn2 = {
+    x: 100,
+    y: 500,
+    width:180,
+    height:90,
+    r: 230, 
+    g:163,
+    b:183,
+    goto:"howto",
+    txt:"HOW TO",
+    locked: false
+    
+};
+var btn3 = {
+    x: 500,
+    y: 500,
+    width:180,
+    height:90,
+    r: 230, 
+    g:163,
+    b:183,
+    goto:"lvlselect",
+    txt:"LEVELS",
+    locked: false
+    
+};
+var btn4 = {
+    x: 535,
+    y: 580,
+    width: 60,
+    height:40,
+    r: 230, 
+    g:163,
+    b:183,
+    goto:"home",
+    txt:"MENU",
+    txts: 15,
+    locked: false
+    
+};
+var collision = function(obj1,obj2){
+    if(obj1.y + obj1.h >= obj2.y && obj1.y + obj1.h <= obj2.y + obj2.h && obj1.x <= obj2.x + obj2.w  && obj1.x + obj1.w >= obj2.x || obj1.y <= obj2.y + obj2.h && obj1.y >= obj2.y && obj1.x <= obj2.x + obj2.w && obj1.x + obj1.w >= obj2.x){
+        return true;    
+    } else {
+        return false;    
+    }
+};
+var collision2 = function(obj1,obj2){
+    if(obj1.y2 + obj1.h >= obj2.y - obj2.h && obj1.y2 + obj1.h <= obj2.y + obj2.h2 && obj1.x2 <= obj2.x + obj2.w2 - 1 && obj1.x2 + obj1.w -1 >= obj2.x || obj1.y2 <= obj2.y + obj2.h2 && obj1.y2 >= obj2.y && obj1.x2 <= obj2.x + obj2.w2 -1 && obj1.x2 + obj1.w -1 >= obj2.x){
+        return true;    
+    } else {
+        return false;    
+    }
+};
+var objectPythag = function(obj1,obj2){
+    var slopeX = obj1.x - (obj2.x + obj2.w/2);
+    var slopeY = obj1.y - (obj2.y + obj2.h/2);
+    var slope =  sqrt((slopeX * slopeX) + (slopeY * slopeY));
+    return slope;
+};
+var notification = function(txt){
+    this.x = 0;
+    this.y = -50;
+    this.t = 0;
+    this.txt = txt;
+    this.stop = false;
+};
+notification.prototype.draw = function() {
+    if(this.stop === false){
+    rectMode(LEFT);
+    fill(201, 201, 201);
+    rect(this.x,this.y,400,50,20);
+    fill(0, 0, 0);
+    textAlign(LEFT,TOP);
+    textSize(15);
+    text("NOTIFICATION:",this.x + 10,this.y + 5);
+    text(this.txt,this.x + 20,this.y + 25);
+    if(this.t <= 50){
+        this.y += 1;
+    }
+    if(this.t >= 150){
+        this.y -= 1;
+    }
+    this.t += 1;
+    }
+    
+};
+var mousePythag = function(obj1){
+    var slopeX = obj1.x - (mouseX);
+    var slopeY = obj1.y - (mouseY);
+    var slope =  sqrt((slopeX * slopeX) + (slopeY * slopeY));
+    return slope;
+};
+var keyPressed = function() {
+    input[keyCode] = true;
+    input[key.toString().toUpperCase()] = true;
+};
+var keyReleased = function() {
+    input[keyCode] = false;
+    input[key.toString().toUpperCase()] = false;
+};
+mouseClicked = function(){
+    clicked = true;
+};
+var button = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.width = config.width;
+    this.height = config.height;
+    this.r = config.r;
+    this.g = config.g;
+    this.b = config.b;
+    this.goto = config.goto;
+    this.txt = config.txt;
+    this.t = config.t;
+    this.locked = config.locked;
+    this.txts = config.txts || 40;
+};
+var playButton = new button(btn1);
+var howToButton = new button(btn2);
+var recordButton = new button(btn3);
+var menuButton = new button(btn4);
+button.prototype.draw = function() {
+    textFont(createFont("Impact"));
+     var o;
+     stroke(0);
+     if(this.txts === 15){
+        noStroke();
+     }
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        o = 210;
+        
+        
+    } else {
+        o = 145;
+        
+    }
+     rectMode(CENTER);
+     fill(0,0,0,130);
+     rect(this.x,this.y,this.width,this.height,15);
+     fill(this.r,this.g,this.b,o);
+     rect(this.x,this.y,this.width-10,this.height-10,10);
+     textAlign(CENTER,CENTER);
+     fill(10);
+     textSize(this.txts);
+     if(this.locked === true){
+        textSize(16);
+        this.txt = "LOCKED";
+     }
+     text(this.txt,this.x,this.y);
+    textFont(createFont("l"));
+};
+var stone = function(x,y,xSpeed,ySpeed,t){
+    this.x2 = x;
+    this.y2 = y;
+    this.x = x - 2;
+    this.y = y - 2;
+    this.w2 = 10;
+    this.h2 = 10;
+    this.s = 10;
+    this.w = 4;
+    this.h = 4;
+    this.xSpeed = xSpeed;
+    this.ySpeed = ySpeed;
+    this.hit = false;
+    this.stop = false;
+    this.name = t;
+   // println(this.t);
+};
+stone.prototype.draw = function() {
+    if(this.name === "Stone"){
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+    }
+    if(this.name === "Berry"){
+         rectMode(CENTER);
+    noStroke();
+    fill(194, 21, 21);
+    rect(this.x,this.y,this.s*4/5,this.s*4/5,this.s);
+    fill(59, 217, 111);
+    pushMatrix();
+    translate(this.x + this.s/10,this.y-this.s/2);
+    rotate(30);
+    ellipse(0,0,this.s/5,this.s * 2/5);
+    popMatrix();
+    }
+    if(this.name === "Banana"){
+        noStroke();
+    fill(237, 230, 31);
+    arc(this.x,this.y,this.s,this.s,-90,120);
+    noFill();
+    stroke(0);
+    strokeWeight(1);
+    arc(this.x,this.y,this.s,this.s,-90,120);
+    line(this.x,this.y,this.x - this.s/4,this.y + this.s*9/20);
+    line(this.x,this.y,this.x,this.y - this.s/2);
+    fill(0);
+    rect(this.x - this.s/30,this.y - this.s/2 -this.s/10,this.s*3/20,this.s*3/20);
+    noStroke();
+    }
+    if(this.name === "FreezeStone"){
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(199, 221, 237);
+        rectMode(CENTER);
+        for(var i = 0; i < 6; i++ ){
+            pushMatrix();
+            translate(this.x, this.y);
+            rotate(60*i);
+            rect(0,0,this.s/10,this.s);
+            popMatrix();
+        }
+    }
+    if(this.name === "EarthStone"){
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(27, 112, 41);
+        rectMode(CENTER);
+        for(var i = 0; i < 4; i++ ){
+            pushMatrix();
+            translate(this.x, this.y);
+            rotate(90*i);
+            rect(0,0,this.s/10,this.s);
+            popMatrix();
+        }
+        fill(89, 68, 11);
+        rectMode(CENTER);
+        for(var i = 0; i < 4; i++ ){
+            pushMatrix();
+            translate(this.x, this.y);
+            rotate(90*i + 45);
+            rect(0,0,this.s/10,this.s);
+            popMatrix();
+        }
+    }
+    if(this.name === "Ice"){
+        fill(199, 221, 237);
+        ellipse(this.x,this.y,this.s,this.s);
+    }
+    if(this.name === "WaterStone"){
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(63, 156, 227);
+        rectMode(CENTER);
+        rect(this.x,this.y,this.s/8,this.s);
+    }
+    if(this.name === "PortalStone"){
+        fill(227, 217, 28);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s*3/4,this.s*3/4);
+        
+    }
+    if(this.name === "Obsidian"){
+        fill(54, 54, 53);
+        ellipse(this.x,this.y,this.s,this.s);
+    }
+    if(this.name === "Glass"){
+        fill(221, 221, 224,80);
+        ellipse(this.x,this.y,this.s,this.s);
+        pushMatrix();
+        translate(this.x + this.s/4.7,this.y - this.s/4.4);
+        rotate(-45);
+        ellipse(0,0,this.s/5,this.s/4);
+        popMatrix();
+    }
+    if(this.name === "Diamond"){
+        fill(72, 189, 189);
+        stroke(8, 8, 8);
+        beginShape();
+        vertex(this.x - this.s/4,this.y);
+        vertex(this.x + this.s/4,this.y);
+        vertex(this.x + this.s/3,this.y - this.s/3);
+        vertex(this.x - this.s/3,this.y - this.s/3);
+        endShape();
+        beginShape();
+        vertex(this.x + this.s/4,this.y);
+        vertex(this.x + this.s/2,this.y - this.s/5);
+        vertex(this.x + this.s/3,this.y - this.s/3);
+        vertex(this.x + this.s/4,this.y);
+        endShape();
+        beginShape();
+        vertex(this.x - this.s/4,this.y);
+        vertex(this.x - this.s/2,this.y - this.s/5);
+        vertex(this.x - this.s/3,this.y - this.s/3);
+        vertex(this.x - this.s/4,this.y);
+        endShape();
+        beginShape();
+        vertex(this.x + this.s/4,this.y);
+        vertex(this.x,this.y + this.s/2);
+        vertex(this.x - this.s/4,this.y);
+        endShape();
+        vertex(this.x - this.s/2,this.y - this.s/5);
+        vertex(this.x,this.y + this.s/2);
+        vertex(this.x + this.s/2,this.y - this.s/5);
+        endShape();
+        noStroke();
+    }
+    if(this.name === "FireStone"){
+        //136, 138, 140
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(227, 131, 4);
+        pushMatrix();
+        translate(this.x/2,this.y/2);
+        scale(1/2);
+        ellipse(this.x,this.y + this.s/6,this.s*0.8,this.s*0.8);
+        triangle(this.x,this.y,this.x - this.s*0.4,this.y,this.x - this.s *0.4,this.y - this.s/2);
+        triangle(this.x,this.y - this.s*2/3,this.x - this.s/4,this.y,this.x + this.s/4,this.y);
+        triangle(this.x,this.y,this.x + this.s*0.35,this.y + this.s/2,this.x + this.s *0.5,this.y - this.s/3);
+        fill(227, 40, 7);
+        ellipse(this.x,this.y + this.s/3,this.s*0.5,this.s*0.5);
+        triangle(this.x,this.y + this.s/3,this.x - this.s*0.26,this.y + this.s/3,this.x - this.s *0.3,this.y - this.s/5);
+        triangle(this.x,this.y - this.s*0.35,this.x - this.s/8,this.y + this.s/3,this.x + this.s/8,this.y + this.s/3);
+        triangle(this.x,this.y + this.s/3,this.x + this.s*0.2,this.y + this.s/2,this.x + this.s *0.37,this.y - this.s/7);
+        popMatrix();
+    }
+    if(this.name === "InfernoStone"){
+        //136, 138, 140
+        fill(217, 79, 20);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(54, 54, 53);
+        ellipse(this.x,this.y,this.s*0.8,this.s*0.8);
+        fill(227, 131, 4);
+        pushMatrix();
+        translate(this.x/2,this.y/2);
+        scale(1/2);
+        ellipse(this.x,this.y + this.s/6,this.s*0.8,this.s*0.8);
+        triangle(this.x,this.y,this.x - this.s*0.4,this.y,this.x - this.s *0.4,this.y - this.s/2);
+        triangle(this.x,this.y - this.s*2/3,this.x - this.s/4,this.y,this.x + this.s/4,this.y);
+        triangle(this.x,this.y,this.x + this.s*0.35,this.y + this.s/2,this.x + this.s *0.5,this.y - this.s/3);
+        fill(227, 40, 7);
+        ellipse(this.x,this.y + this.s/3,this.s*0.5,this.s*0.5);
+        triangle(this.x,this.y + this.s/3,this.x - this.s*0.26,this.y + this.s/3,this.x - this.s *0.3,this.y - this.s/5);
+        triangle(this.x,this.y - this.s*0.35,this.x - this.s/8,this.y + this.s/3,this.x + this.s/8,this.y + this.s/3);
+        triangle(this.x,this.y + this.s/3,this.x + this.s*0.2,this.y + this.s/2,this.x + this.s *0.37,this.y - this.s/7);
+        popMatrix();
+    }
+    if(this.name === "WindStone"){
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        pushMatrix();
+        scale(0.75,0.75);
+        translate(this.x*0.32,this.y*0.33);
+        fill(201, 201, 201);
+        rect(this.x,this.y,this.s/2,this.s/6);
+        fill(230, 230, 230);
+        rect(this.x + this.s/4,this.y - this.s/4,this.s/3,this.s/9);
+        fill(199, 199, 199);
+        rect(this.x + this.s/4,this.y + this.s/2.5,this.s/3.4,this.s/9);
+        fill(168, 168, 168);
+        rect(this.x - this.s/10,this.y + this.s/5,this.s/1.5,this.s/10);
+        fill(156, 156, 156);
+        rect(this.x - this.s/2,this.y,this.s/3,this.s/9);
+        fill(181, 179, 181);
+        rect(this.x + this.s/2,this.y + this.s/6,this.s/3,this.s/9);
+        popMatrix();
+    }
+    if(this.name === "CactusFruit"){
+        fill(166, 217, 26);
+        ellipse(this.x,this.y + this.s/5,this.s/1.5,this.s/1.5);
+        ellipse(this.x,this.y - this.s/5,this.s/2.5,this.s/2.5);
+        fill(99, 56, 12);
+        rect(this.x,this.y - this.s/2.2,this.s/10,this.s/5);
+    }
+};
+stone.prototype.move = function(){
+    if(this.stop === false){
+    this.x2 += this.xSpeed;
+    this.y2 += this.ySpeed;
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+    for(var i = 0; i < blocks.length; i ++){
+        if(collision(this,blocks[i])&& this.name !== "WaterStone"){
+            this.stop = true;
+        }
+    }
+    }
+};
+var item = function(x,y,name,s){
+    this.name = name;
+    this.s = s;
+    this.x = x;
+    this.y = y;
+};
+item.prototype.draw = function() {
+    if(this.name === "Water"){
+        fill(17, 120, 194);
+        ellipse(this.x,this.y,this.s,this.s);
+    }
+    if(this.name === "Stone"){
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+    }
+    if(this.name === "Berry"){
+        rectMode(CENTER);
+    noStroke();
+    fill(194, 21, 21);
+    rect(this.x,this.y,this.s*4/5,this.s*4/5,this.s);
+    fill(59, 217, 111);
+    pushMatrix();
+    translate(this.x + this.s/10,this.y-this.s/2);
+    rotate(30);
+    ellipse(0,0,this.s/5,this.s * 2/5);
+    popMatrix();
+    }
+    if(this.name === "Banana"){
+        noStroke();
+    fill(237, 230, 31);
+    arc(this.x,this.y,this.s,this.s,-90,120);
+    noFill();
+    stroke(0);
+    strokeWeight(1);
+    arc(this.x,this.y,this.s,this.s,-90,120);
+    line(this.x,this.y,this.x - this.s/4,this.y + this.s*9/20);
+    line(this.x,this.y,this.x,this.y - this.s/2);
+    fill(0);
+    rect(this.x - this.s/30,this.y - this.s/2 -this.s/10,this.s*3/20,this.s*3/20);
+    noStroke();
+    }
+    if(this.name === "Twig"){
+        fill(92, 72, 36);
+        pushMatrix();
+        translate(this.x,this.y);
+        rotate(150);
+        rect(-this.s/4,0,this.s/2,this.s/4);
+        popMatrix();
+        rect(this.x,this.y,this.s/4,this.s);
+    }
+    if(this.name === "Leaf"){
+        pushMatrix();
+        translate(this.x,this.y);
+        rotate(20);
+        fill(92, 72, 36);
+        rect(0,this.s/3,this.s/8,this.s/2);
+        fill(46, 156, 50);
+        ellipse(0,0,this.s*2/3,this.s * 7/8);
+        popMatrix();
+        
+    }
+    if(this.name === "FreezeStone"){
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(199, 221, 237);
+        rectMode(CENTER);
+        for(var i = 0; i < 6; i++ ){
+            pushMatrix();
+            translate(this.x, this.y);
+            rotate(60*i);
+            rect(0,0,this.s/10,this.s);
+            popMatrix();
+        }
+    }
+    if(this.name === "Ice"){
+        fill(199, 221, 237);
+        ellipse(this.x,this.y,this.s,this.s);
+    }
+    if(this.name === "EarthStone"){
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(27, 112, 41);
+        rectMode(CENTER);
+        for(var i = 0; i < 4; i++ ){
+            pushMatrix();
+            translate(this.x, this.y);
+            rotate(90*i);
+            rect(0,0,this.s/10,this.s);
+            popMatrix();
+        }
+        fill(89, 68, 11);
+        rectMode(CENTER);
+        for(var i = 0; i < 4; i++ ){
+            pushMatrix();
+            translate(this.x, this.y);
+            rotate(90*i + 45);
+            rect(0,0,this.s/10,this.s);
+            popMatrix();
+        }
+    }
+    if(this.name === "WaterStone"){
+        //136, 138, 140
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(17, 120, 194);
+        rectMode(CENTER);
+        rect(this.x,this.y,this.s/8,this.s);
+    }
+     if(this.name === "PortalStone"){
+        fill(227, 217, 28);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s*3/4,this.s*3/4);
+        
+    }
+    if(this.name === "Dirt"){
+        fill(107, 81, 48);
+        rectMode(CENTER);
+        pushMatrix();
+        rotate(20);
+        translate(this.x,this.y);
+        rect(0,0,this.s/3,this.s);
+        popMatrix();
+    }
+    if(this.name === "Grass"){
+        for(var i = 0; i < 4; i++){
+        pushMatrix();
+        rectMode(LEFT);
+        translate(this.x,this.y + this.s/4);
+        rotate(200 + 40*i);
+        fill(67, 196, 69);
+        rect(0,0,this.s/1.3,this.s/5);
+        popMatrix();
+    }
+    rectMode(CENTER);
+    }
+    if(this.name === "Lava"){
+        fill(217, 79, 20);
+        ellipse(this.x,this.y,this.s,this.s);
+    }
+    if(this.name === "Obsidian"){
+        fill(54, 54, 53);
+        ellipse(this.x,this.y,this.s,this.s);
+    }
+    if(this.name === "Log"){
+        fill(92, 72, 36);
+        ellipse(this.x + this.s/2,this.y,this.s/1.5,this.s/1.5);
+        rect(this.x,this.y,this.s,this.s/1.5 + 1);
+        fill(191, 155, 94);
+        ellipse(this.x - this.s/2,this.y,this.s/1.5,this.s/1.5);
+    }
+    if(this.name === "Steel"){
+        stroke(0);
+        strokeWeight(1);
+        fill(143, 140, 136);
+        beginShape();
+        vertex(this.x - this.s*3/5,this.y - this.s/5);
+        vertex(this.x - this.s*3/4,this.y + this.s/5);
+        vertex(this.x - this.s*3/20,this.y + this.s*7/20);
+        vertex(this.x - this.s/5,this.y - this.s/10);
+        vertex(this.x - this.s*3/5,this.y - this.s/5);
+        vertex(this.x + this.s/2,this.y - this.s/5);
+        vertex(this.x + this.s*3/4,this.y - this.s/10);
+        vertex(this.x - this.s/5,this.y - this.s/10);
+        vertex(this.x - this.s*3/20,this.y + this.s*7/20);
+        vertex(this.x + this.s*9/10,this.y + this.s*7/20);
+        vertex(this.x + this.s*3/4,this.y - this.s/10);
+        endShape();
+        noStroke();
+    }
+    if(this.name === "Flint"){
+        fill(214, 206, 178);
+        rect(this.x,this.y,this.s,this.s*2/3,20);
+    }
+    if(this.name === "Fire"){
+        fill(227, 131, 4);
+        ellipse(this.x,this.y + this.s/6,this.s*0.8,this.s*0.8);
+        triangle(this.x,this.y,this.x - this.s*0.4,this.y,this.x - this.s *0.4,this.y - this.s/2);
+        triangle(this.x,this.y - this.s*2/3,this.x - this.s/4,this.y,this.x + this.s/4,this.y);
+        triangle(this.x,this.y,this.x + this.s*0.35,this.y + this.s/2,this.x + this.s *0.5,this.y - this.s/3);
+        fill(227, 40, 7);
+        ellipse(this.x,this.y + this.s/3,this.s*0.5,this.s*0.5);
+        triangle(this.x,this.y + this.s/3,this.x - this.s*0.26,this.y + this.s/3,this.x - this.s *0.3,this.y - this.s/5);
+        triangle(this.x,this.y - this.s*0.35,this.x - this.s/8,this.y + this.s/3,this.x + this.s/8,this.y + this.s/3);
+        triangle(this.x,this.y + this.s/3,this.x + this.s*0.2,this.y + this.s/2,this.x + this.s *0.37,this.y - this.s/7);
+    }
+    if(this.name === "Gold"){
+        stroke(0);
+        strokeWeight(1);
+        fill(171, 154, 24);
+        beginShape();
+        vertex(this.x - this.s*3/5,this.y - this.s/5);
+        vertex(this.x - this.s*3/4,this.y + this.s/5);
+        vertex(this.x - this.s*3/20,this.y + this.s*7/20);
+        vertex(this.x - this.s/5,this.y - this.s/10);
+        vertex(this.x - this.s*3/5,this.y - this.s/5);
+        vertex(this.x + this.s/2,this.y - this.s/5);
+        vertex(this.x + this.s*3/4,this.y - this.s/10);
+        vertex(this.x - this.s/5,this.y - this.s/10);
+        vertex(this.x - this.s*3/20,this.y + this.s*7/20);
+        vertex(this.x + this.s*9/10,this.y + this.s*7/20);
+        vertex(this.x + this.s*3/4,this.y - this.s/10);
+        endShape();
+        noStroke();
+    }
+    if(this.name === "Silver"){
+        stroke(0);
+        strokeWeight(1);
+        fill(209, 206, 202);
+        beginShape();
+        vertex(this.x - this.s*3/5,this.y - this.s/5);
+        vertex(this.x - this.s*3/4,this.y + this.s/5);
+        vertex(this.x - this.s*3/20,this.y + this.s*7/20);
+        vertex(this.x - this.s/5,this.y - this.s/10);
+        vertex(this.x - this.s*3/5,this.y - this.s/5);
+        vertex(this.x + this.s/2,this.y - this.s/5);
+        vertex(this.x + this.s*3/4,this.y - this.s/10);
+        vertex(this.x - this.s/5,this.y - this.s/10);
+        vertex(this.x - this.s*3/20,this.y + this.s*7/20);
+        vertex(this.x + this.s*9/10,this.y + this.s*7/20);
+        vertex(this.x + this.s*3/4,this.y - this.s/10);
+        endShape();
+        noStroke();
+    }
+    if(this.name === "Ashes"){
+        fill(71, 71, 70);
+        ellipse(this.x,this.y,this.s,this.s/4);
+        ellipse(this.x + this.s/3,this.y - this.s/10,this.s/3,this.s/3);
+        ellipse(this.x + this.s/10,this.y - this.s/10,this.s/4,this.s/4);
+        ellipse(this.x - this.s/4,this.y - this.s/10,this.s/2.5,this.s/2.5);
+    }
+    if(this.name === "Sand"){
+        fill(230, 230, 163);
+        ellipse(this.x,this.y,this.s,this.s/4);
+        ellipse(this.x + this.s/3,this.y - this.s/10,this.s/3,this.s/3);
+        ellipse(this.x + this.s/10,this.y - this.s/10,this.s/4,this.s/4);
+        ellipse(this.x - this.s/4,this.y - this.s/10,this.s/2.5,this.s/2.5);
+    }
+    if(this.name === "Salt"){
+        fill(245, 245, 240);
+        ellipse(this.x,this.y,this.s,this.s/4);
+        ellipse(this.x + this.s/3,this.y - this.s/10,this.s/3,this.s/3);
+        ellipse(this.x + this.s/10,this.y - this.s/10,this.s/4,this.s/4);
+        ellipse(this.x - this.s/4,this.y - this.s/10,this.s/2.5,this.s/2.5);
+    }
+    if(this.name === "Steam"){
+        fill(186, 188, 204,120);
+        ellipse(this.x,this.y,this.s/2,this.s/2);
+        ellipse(this.x + this.s/3,this.y - this.s/10,this.s/3,this.s/3);
+        ellipse(this.x + this.s/5,this.y - this.s/5,this.s/4,this.s/4);
+        ellipse(this.x - this.s/4,this.y - this.s/10,this.s/2,this.s/2);
+        ellipse(this.x,this.y - this.s/4,this.s/2,this.s/2);
+        ellipse(this.x + this.s/2,this.y - this.s/3,this.s/3,this.s/3);
+        ellipse(this.x + this.s/4,this.y + this.s/4,this.s/3,this.s/3);
+        ellipse(this.x - this.s/4,this.y + this.s/10,this.s/2,this.s/2);
+    }
+    if(this.name === "OceanWater"){
+        fill(67, 79, 209);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(204, 202, 202);
+        ellipse(this.x - this.s/5,this.y - this.s/4,this.s/6,this.s/6);
+        ellipse(this.x + this.s/5,this.y,this.s/5,this.s/5);
+        ellipse(this.x - this.s/10,this.y + this.s/3,this.s/7,this.s/7);
+    }
+    if(this.name === "Glass"){
+        fill(221, 221, 224,80);
+        ellipse(this.x,this.y,this.s,this.s);
+        pushMatrix();
+        translate(this.x + this.s/4.7,this.y - this.s/4.4);
+        rotate(-45);
+        ellipse(0,0,this.s/5,this.s/4);
+        popMatrix();
+    }
+    if(this.name === "Diamond"){
+        fill(72, 189, 189);
+        stroke(8, 8, 8);
+        strokeWeight(this.s/20);
+        beginShape();
+        vertex(this.x - this.s/4,this.y);
+        vertex(this.x + this.s/4,this.y);
+        vertex(this.x + this.s/3,this.y - this.s/3);
+        vertex(this.x - this.s/3,this.y - this.s/3);
+        endShape();
+        beginShape();
+        vertex(this.x + this.s/4,this.y);
+        vertex(this.x + this.s/2,this.y - this.s/5);
+        vertex(this.x + this.s/3,this.y - this.s/3);
+        vertex(this.x + this.s/4,this.y);
+        endShape();
+        beginShape();
+        vertex(this.x - this.s/4,this.y);
+        vertex(this.x - this.s/2,this.y - this.s/5);
+        vertex(this.x - this.s/3,this.y - this.s/3);
+        vertex(this.x - this.s/4,this.y);
+        endShape();
+        beginShape();
+        vertex(this.x + this.s/4,this.y);
+        vertex(this.x,this.y + this.s/2);
+        vertex(this.x - this.s/4,this.y);
+        endShape();
+        vertex(this.x - this.s/2,this.y - this.s/5);
+        vertex(this.x,this.y + this.s/2);
+        vertex(this.x + this.s/2,this.y - this.s/5);
+        endShape();
+        noStroke();
+    }
+    if(this.name === "Emerald"){
+        fill(42, 168, 36);
+        stroke(0);
+        strokeWeight(1);
+        rect(this.x,this.y,this.s/3,this.s/2);
+        quad(this.x - this.s/3 + this.s/10,this.y - this.s/2,this.x + this.s/3,this.y - this.s/2,this.x + this.s/6 + this.s/20,this.y - this.s/4,this.x - this.s/6 + this.s/20,this.y - this.s/4);
+        quad(this.x - this.s/3 + this.s/10,this.y + this.s/2,this.x + this.s/3,this.y + this.s/2,this.x + this.s/6 + this.s/20,this.y + this.s/4,this.x - this.s/6 + this.s/20,this.y + this.s/4);
+        quad(this.x + this.s/3 + this.s/20,this.y - this.s/2,this.x + this.s/3 + this.s/40,this.y + this.s/2,this.x + this.s/6 + this.s/20,this.y + this.s/4,this.x + this.s/6 + this.s/20,this.y - this.s/4);
+        quad(this.x - this.s/3 + this.s/20,this.y - this.s/2,this.x - this.s/3 + this.s/20,this.y + this.s/2,this.x - this.s/6 + this.s/20,this.y + this.s/4,this.x - this.s/6 + this.s/20,this.y - this.s/4);
+        noStroke();
+    }
+    if(this.name === "CactusFruit"){
+        fill(166, 217, 26);
+        ellipse(this.x,this.y + this.s/5,this.s/1.5,this.s/1.5);
+        ellipse(this.x,this.y - this.s/5,this.s/2.5,this.s/2.5);
+        fill(99, 56, 12);
+        rect(this.x,this.y - this.s/2.2,this.s/10,this.s/5);
+    }
+    if(this.name === "Wind"){
+        fill(201, 201, 201);
+        rect(this.x,this.y,this.s/2,this.s/6);
+        fill(230, 230, 230);
+        rect(this.x + this.s/4,this.y - this.s/4,this.s/3,this.s/9);
+        fill(199, 199, 199);
+        rect(this.x + this.s/4,this.y + this.s/2.5,this.s/3.4,this.s/9);
+        fill(168, 168, 168);
+        rect(this.x - this.s/10,this.y + this.s/5,this.s/1.5,this.s/10);
+        fill(156, 156, 156);
+        rect(this.x - this.s/2,this.y,this.s/3,this.s/9);
+        fill(181, 179, 181);
+        rect(this.x + this.s/2,this.y + this.s/6,this.s/3,this.s/9);
+        
+    }
+    if(this.name === "HealStone"){
+        //136, 138, 140
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        image(getImage("cute/Heart"),this.x - this.s/3,this.y - this.s/1.7,this.s * 3/4,this.s*23/20);
+    }
+    if(this.name === "FireStone"){
+        //136, 138, 140
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(227, 131, 4);
+        pushMatrix();
+        translate(this.x/2,this.y/2);
+        scale(1/2);
+        ellipse(this.x,this.y + this.s/6,this.s*0.8,this.s*0.8);
+        triangle(this.x,this.y,this.x - this.s*0.4,this.y,this.x - this.s *0.4,this.y - this.s/2);
+        triangle(this.x,this.y - this.s*2/3,this.x - this.s/4,this.y,this.x + this.s/4,this.y);
+        triangle(this.x,this.y,this.x + this.s*0.35,this.y + this.s/2,this.x + this.s *0.5,this.y - this.s/3);
+        fill(227, 40, 7);
+        ellipse(this.x,this.y + this.s/3,this.s*0.5,this.s*0.5);
+        triangle(this.x,this.y + this.s/3,this.x - this.s*0.26,this.y + this.s/3,this.x - this.s *0.3,this.y - this.s/5);
+        triangle(this.x,this.y - this.s*0.35,this.x - this.s/8,this.y + this.s/3,this.x + this.s/8,this.y + this.s/3);
+        triangle(this.x,this.y + this.s/3,this.x + this.s*0.2,this.y + this.s/2,this.x + this.s *0.37,this.y - this.s/7);
+        popMatrix();
+    }
+    if(this.name === "InfernoStone"){
+        //136, 138, 140
+        fill(217, 79, 20);
+        ellipse(this.x,this.y,this.s,this.s);
+        fill(54, 54, 53);
+        ellipse(this.x,this.y,this.s*0.8,this.s*0.8);
+        fill(227, 131, 4);
+        pushMatrix();
+        translate(this.x/2,this.y/2);
+        scale(1/2);
+        ellipse(this.x,this.y + this.s/6,this.s*0.8,this.s*0.8);
+        triangle(this.x,this.y,this.x - this.s*0.4,this.y,this.x - this.s *0.4,this.y - this.s/2);
+        triangle(this.x,this.y - this.s*2/3,this.x - this.s/4,this.y,this.x + this.s/4,this.y);
+        triangle(this.x,this.y,this.x + this.s*0.35,this.y + this.s/2,this.x + this.s *0.5,this.y - this.s/3);
+        fill(227, 40, 7);
+        ellipse(this.x,this.y + this.s/3,this.s*0.5,this.s*0.5);
+        triangle(this.x,this.y + this.s/3,this.x - this.s*0.26,this.y + this.s/3,this.x - this.s *0.3,this.y - this.s/5);
+        triangle(this.x,this.y - this.s*0.35,this.x - this.s/8,this.y + this.s/3,this.x + this.s/8,this.y + this.s/3);
+        triangle(this.x,this.y + this.s/3,this.x + this.s*0.2,this.y + this.s/2,this.x + this.s *0.37,this.y - this.s/7);
+        popMatrix();
+    }
+    if(this.name === "ArmorStone"){
+        //136, 138, 140
+        fill(143, 140, 136);
+        ellipse(this.x,this.y,this.s,this.s);
+        strokeWeight(this.s*3/20);
+        noFill();
+        stroke(171, 154, 24);
+        arc(this.x - this.s/1.5,this.y,this.s,this.s,-40,40);
+        arc(this.x + this.s/1.5,this.y,this.s,this.s,140,220);
+        noStroke();
+        strokeWeight(1);
+    }
+    if(this.name === "InvisibilityStone"){
+        fill(221, 221, 224,80);
+        ellipse(this.x,this.y,this.s,this.s);
+        pushMatrix();
+        translate(this.x + this.s/4.7,this.y - this.s/4.4);
+        rotate(-45);
+        ellipse(0,0,this.s/5,this.s/4);
+        popMatrix();
+        pushMatrix();
+        scale(0.75,0.75);
+        translate(this.x*0.32,this.y*0.33);
+        fill(201, 201, 201);
+        rect(this.x,this.y,this.s/2,this.s/6);
+        fill(230, 230, 230);
+        rect(this.x + this.s/4,this.y - this.s/4,this.s/3,this.s/9);
+        fill(199, 199, 199);
+        rect(this.x + this.s/4,this.y + this.s/2.5,this.s/3.4,this.s/9);
+        fill(168, 168, 168);
+        rect(this.x - this.s/10,this.y + this.s/5,this.s/1.5,this.s/10);
+        fill(156, 156, 156);
+        rect(this.x - this.s/2,this.y,this.s/3,this.s/9);
+        fill(181, 179, 181);
+        rect(this.x + this.s/2,this.y + this.s/6,this.s/3,this.s/9);
+        popMatrix();
+    }
+    if(this.name === "WindStone"){
+        fill(136, 138, 140);
+        ellipse(this.x,this.y,this.s,this.s);
+        pushMatrix();
+        scale(0.75,0.75);
+        translate(this.x*0.32,this.y*0.33);
+        fill(201, 201, 201);
+        rect(this.x,this.y,this.s/2,this.s/6);
+        fill(230, 230, 230);
+        rect(this.x + this.s/4,this.y - this.s/4,this.s/3,this.s/9);
+        fill(199, 199, 199);
+        rect(this.x + this.s/4,this.y + this.s/2.5,this.s/3.4,this.s/9);
+        fill(168, 168, 168);
+        rect(this.x - this.s/10,this.y + this.s/5,this.s/1.5,this.s/10);
+        fill(156, 156, 156);
+        rect(this.x - this.s/2,this.y,this.s/3,this.s/9);
+        fill(181, 179, 181);
+        rect(this.x + this.s/2,this.y + this.s/6,this.s/3,this.s/9);
+        popMatrix();
+    }
+};
+var inv = [];
+for(var y = 0; y < 4; y++){
+    for(var x = 0; x < 8; x++){
+        fill(79, 70, 70,150);
+        inv.push([new item(x*50 + 25,240 - y*50,"",20),""]);
+}
+}
+var inventory = function(x,y,i){
+    this.x = x;
+    this.y = y;
+    this.w = 779;
+    this.h = 60;
+    this.leftItems = [];
+    for(var i = 0; i< 8; i++){
+        this.leftItems.push([new item(i*50 + 25,370,"",20),""]);
+    }
+    this.items = [[new item(25,370,"ArmorStone",20),10],[new item(75,370,"InvisibilityStone",20),10]];
+    this.selected = 0;
+    for(var i = 0; i< 6; i++){
+        this.items.push([new item(i*50 + 25,370,"",20),""]);
+    }
+};
+inventory.prototype.draw = function() {
+    fill(161, 161, 161);
+    rectMode(LEFT);
+    rect(this.x,this.y,this.w,this.h);
+    rectMode(CENTER);
+    fill(255, 0, 0);
+    rect(this.selected*50 + 25,370,45,45,10);
+    for(var i = 0;i < 8; i++){
+        textSize(8);
+        fill(79, 70, 70,150);
+        rect(i*50 + 25,370,40,40,10);
+        fill(0);
+        textAlign(LEFT,BOTTOM);
+        text((i + 1) + ". " + this.items[i][0].name,i*50 + 5,358);
+        this.items[i][0].draw();
+        fill(0);
+        textAlign(CENTER,CENTER);
+        textSize(15);
+        text(this.items[i][1],i*50 + 25,370);
+        if(this.items[i][1] === 0){
+            this.items.splice(i,1,[new item(i*50 + 25,370,"","",20),""]);
+        }
+        if(mouseX >= i*50 + 5 && mouseX <= i*50 + 45 && mouseY <= 390 && mouseY >= 350 && clicked || input[i + 1]){
+            this.selected = i;
+        }
+        if(input[LEFT] && this.selected > 0){
+            this.selected -= 1;
+        }
+        if(input[RIGHT] && this.selected < 7){
+            this.selected += 1;
+        }
+    }
+    
+    
+};
+var I = new inventory(0,340);
+var stoneMaker = function(x,y){
+    this.x = x;
+    this.y = y;
+    this.itemList = [];
+    this.numList = [];
+    this.itemMade = [new item(0,0,"",0),""];
+    this.combinations = [[[["Water",2],["Stone",1]],"WaterStone"],[[["Ice",2],["Stone",1]],"FreezeStone"],[[["Banana",1],["Berry",1],["Leaf",1],["Twig",1]],"EarthStone"],[[["Lava",1],["Water",1]],"Obsidian"],[[["Flint",1],["Steel",1]],"Fire"],[[["Fire",1],["Ice",1]],"Water"],[[["Fire",1],["Sand",1]],"Glass"],[[["Fire",1],["Twig",1]],"Ashes"],[[["Fire",1],["Log",1]],"Ashes"],[[["Fire",1],["Water",1]],"Steam"]];
+    this.u = 0;
+    //println(this.combinations[1][0].length);
+};
+stoneMaker.prototype.draw = function() {
+    noStroke();
+    rectMode(CENTER);
+    fill(163, 163, 163);
+    rect(this.x,this.y,350,100);
+    fill(117, 115, 115);
+    for(var i = 0; i < 4; i++){
+        rect(this.x - 140 + 60 * i,this.y,50,50,10);
+    }
+    rect(this.x + 130,this.y,70,70);
+    fill(0);
+    rect(this.x + 80,this.y + 7, 20,7);
+    rect(this.x + 80,this.y - 7, 20,7);
+    for(var i = 0; i < this.itemList.length; i++){
+        fill(0);
+        this.itemList[i][0].draw();
+        textSize(20);
+        fill(0);
+        text(this.itemList[i][1],this.x - 140 + 60 * i,this.y);
+    }
+    this.itemMade[0].draw();
+    fill(0);
+    textSize(30);
+    fill(0);
+    text(this.itemMade[1],this.x + 130,this.y);
+};
+stoneMaker.prototype.make = function(){
+    var d = 0;
+    for(var i = 0; i < this.itemList.length; i++){
+        if(I.items[I.selected][0].name === this.itemList[i][0].name){
+            d = 1;
+        }
+    }
+    if(clicked && mouseY <= 250 && mouseY >= 150 && mouseX > 50 && mouseX <= 350 && this.itemList.length < 4 && I.items[I.selected][1] > 0 || clicked && mouseY <= 250 && mouseY >= 150 && mouseX > 50 && mouseX <= 350 && this.itemList.length === 4 && I.items[I.selected][1] > 0 && d === 1){
+        var a = 5;
+        for(var i = 0; i < this.itemList.length; i++){
+            if(this.itemList[i][0].name === I.items[I.selected][0].name){
+                a = i;
+            }
+        }
+        if(a < 5){
+            this.itemList[a][1] += 1;
+            I.items[I.selected][1] -= 1;
+        }
+        else{
+            this.itemList.push([new item(this.x - 140 + this.itemList.length*60,200,I.items[I.selected][0].name,20),1]);
+            I.items[I.selected][1] -= 1;
+        }
+            var a = 0;
+            this.b = 0;
+        for(var i = 0; i < this.combinations.length; i++){
+            if(this.itemList.length === this.combinations[i][0].length){
+                a = 0;
+                for(var i2 = 0; i2 < this.itemList.length; i2++){
+                    if(this.itemList[i2][0].name === this.combinations[i][0][i2][0]){
+                        a += 1;
+                        
+                    }
+                }
+            }
+        if(a === this.itemList.length){
+                        this.b = i + 1;
+                        a = 0;
+                    }
+                    
+        }
+         var b = 0;
+         this.c = 0;
+            for(var i = 0; i < this.combinations.length; i++){
+            if(this.itemList.length === this.combinations[i][0].length){
+                b = 0;
+                for(var i2 = 0; i2 < this.itemList.length - 1; i2++){
+                    if(this.itemList[i2 + 1][1]/(this.itemList[i2][1]/this.combinations[i][0][i2][1]) === this.combinations[i][0][i2 + 1][1]){
+                        b += 1;
+                        
+                    }
+                }
+            }
+            if(this.b === i + 1 && b === this.itemList.length - 1){
+                this.itemMade = [new item(this.x + 130,this.y,this.combinations[i][1],40),this.itemList[0][1]/this.combinations[this.b - 1][0][0][1]];
+                this.c = 1;
+            }
+            }
+        }
+        if(this.b === 0 || this.c === 0){
+            this.itemMade = [new item(0,0,"",0),""];
+        }
+        //this.b = 0;
+        if(input[ENTER] && this.itemMade[0].name !== ""){
+            if(this.u === 0){
+        notifications.push(new notification("You made " + this.combinations[this.b - 1][1] + "!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === this.itemMade[0].name){
+            I.items[i][1] += this.itemMade[1];
+            this.u = 1;
+        }
+        }
+    }
+    if(this.u === 0){
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = this.itemMade[1];
+            I.items[i][0] = new item(25 + i*50,370,this.itemMade[0].name,20);
+            this.u = 1;
+            break;
+        }
+    }
+    }
+        }
+        if(this.u === 1){
+            this.u = 0;
+            this.itemList = [];
+            this.itemMade = [new item(0,0,"",0),""];
+        }
+        if(input.C){
+            for(var i2 = 0; i2 < this.itemList.length; i2++){
+        this.u = 0;
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === this.itemList[i2][0].name){
+            I.items[i][1] += this.itemList[i2][1];
+            this.u = 1;
+        }
+    }
+    if(this.u === 0){
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = this.itemList[i2][1];
+            I.items[i][0] = new item(25 + i*50,370,this.itemList[i2][0].name,20);
+            this.u = 1;
+            break;
+        }
+        }
+    }
+    }
+           }
+};
+var StoneMaker = new stoneMaker(200,200);
+var player = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.h = 18;
+    this.w = 18;
+    this.up = config.up;
+    this.down = config.down;
+    this.right = config.right;
+    this.left = config.left;
+    this.speed = config.speed;
+    this.gforce = 0;
+    this.velocity = config.velocity;
+    this.past = "";
+    this.origSpeed = config.speed;
+    this.jumps = config.jumps;
+    this.usedJumps = 0;
+    this.jumpHeight = config.jumpHeight;
+    this.jumpAbility = config.jumpAbility;
+    this.speedAbility = config.speedAbility;
+    this.noAbility = config.noAbility;
+    this.phaseAbility = config.phaseAbility;
+    this.stealthAbility = config.stealthAbility;
+    this.ability = "nothing";
+    this.color = config.color;
+    this.onground = false;
+    this. circW = width/20;
+    this.circH = height/60;
+    this.t = "add";
+    this.lives = 3;
+    this.phase = config.phase;
+    this.phases = 0;
+    this.ballList = [];
+    this.side = false;
+    this.notMoving = false;
+    this.inWater = false;
+    this.invisible = 601;
+    this.armor = 601;
+    this.inLava = false;
+    this.lavaTimer = 20;
+    this.wasInLava = false;
+};
+player.prototype.draw = function() {
+    if(this.invisible > 600){
+    noStroke();
+    rectMode(LEFT);
+    fill(230, 213, 159);
+    rect(this.x,this.y,this.w,this.h - 2,4);
+    fill(125, 84, 12);
+    rectMode(LEFT);
+    rect(this.x,this.y - 1,this.w,this.h/4);
+    rectMode(CENTER);
+    fill(181, 26, 26);
+    rect(this.x + this.w/2,this.y + this.h * 3/5, this.w/3,this.h/20);
+    rectMode(LEFT);
+    fill(this.color);
+    rect(this.x, this.y + this.h * 3/4,this.w,this.h/6);
+    rect(this.x, this.y + this.h * 3/4,this.w,this.h/4 - 1,3);
+    fill(0);
+    if(mouseX >= this.x + this.w){
+        ellipse(this.x + this.w/3 + this.w/8,this.y + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x + this.w*2/3 + this.w/8,this.y + this.h*2/5,this.w/7,this.h/7);
+    }
+    else if(mouseX <= this.x){
+        ellipse(this.x + this.w/3 - this.w/8,this.y + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x + this.w*2/3 - this.w/8,this.y + this.h*2/5,this.w/7,this.h/7);
+    }
+    else{
+    ellipse(this.x + this.w/3,this.y + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x + this.w*2/3,this.y + this.h*2/5,this.w/7,this.h/7);
+    }
+    if(this.ability === "jump" && this.onground === false){
+        fill(118, 227, 220);
+        ellipse(this.x + this.w/2,this.y + this.h*1.25,this.circW,this.circH);
+        fill(115,115,115);
+        ellipse(this.x + this.w/2,this.y + this.h*1.25,this.circW/2,this.circH/2);
+            fill(118, 227, 220);
+            if(this.speed === this.origSpeed){
+                ellipse(this.x + this.w/2,this.y + this.h*1.65,this.circW+ 5,this.circH);
+        fill(115,115,115);
+        ellipse(this.x + this.w/2,this.y + this.h*1.65,this.circW/2 + 5,this.circH/2);
+            }
+            else if(this.past === "left"){
+        ellipse(this.x + this.w/2 + this.speed,this.y + this.h*1.65,this.circW+ 5,this.circH);
+        fill(115,115,115);
+        ellipse(this.x + this.w/2 + this.speed,this.y + this.h*1.65,this.circW/2 + 5,this.circH/2);
+            }
+            else if(this.past === "right"){
+                ellipse(this.x + this.w/2 - this.speed,this.y + this.h*1.65,this.circW+ 5,this.circH);
+        fill(115,115,115);
+        ellipse(this.x + this.w/2 - this.speed,this.y + this.h*1.65,this.circW/2 + 5,this.circH/2);
+            }
+    }
+    if(this.armor < 600){
+        fill(120, 120, 120,200);
+        rect(this.x,this.y,this.w,this.h);
+    }
+    rectMode(LEFT);
+    if(this.circW <= 20){
+        this.t = "add";
+    }
+    if(this.circW >= 40){
+        this.t = "sub";
+    }
+    if(this.t === "add"){
+        this.circW += 0.5;
+    }
+    else if(this.t === "sub"){
+        this.circW -= 0.5;
+    }
+    if(this.ability === "speed" && this.onGround === true){
+        
+        
+    }
+    }
+    else{
+        fill(114, 164, 181,50);
+        rect(this.x,this.y,this.w,this.h,3);
+    }
+    this.invisible += 1;
+    this.armor += 1;
+};
+player.prototype.move = function(){
+        this.timer = 0;
+    if(input[this.up] && this.usedJumps < this.jumps && this.onground === true){
+        this.gforce = -this.jumpHeight;
+        this.usedJumps += 1;
+    }
+    if(input[this.down] && this.onground === false){
+        this.gforce += gravity;
+    }
+    if(input[this.right] && this.past !== "left"){
+        if(!this.notMoving){
+        this.x += this.speed;
+        }
+        if(!this.inWater){
+            if(this.speed < 3){
+        this.speed += this.velocity;
+            }
+        this.gforce += gravity/2;
+        }
+        this.past = "right";
+    }
+    else if(this.past === "right" && this.speed > this.origSpeed){
+        if(!this.notMoving){
+        this.x += this.speed;
+        }
+        if(!this.inWater){
+        if(this.onground === true){
+            this.speed -= this.velocity*4;
+        }
+        else{
+            this.speed -= this.velocity*2;
+        }
+        }
+        this.past = "right";
+    }
+    else if(this.past === "right"){
+        if(!this.inWater){
+        this.speed = this.origSpeed;
+        }
+        this.past = "";
+    }
+    if(this.x <= 0 && levelSide === 1){
+        this.p = 1;
+        this.past = "right";
+        this.speed = this.origSpeed;
+    }
+    else{
+        this.p = 0;
+    }
+    if(this.inLava && this.wasInLava === false || this.lavaTimer >= 50){
+        this.lavaTimer = 0;
+        this.lives -= 1;
+        background(255, 0, 0);
+    }
+    if(this.inLava){
+        this.lavaTimer += 1;
+    }
+    this.wasInLava = this.inLava;
+    if(input[this.left] && this.past !== "right" && this.p !== 1){
+        if(!this.notMoving){
+        this.x -= this.speed;
+        }
+        if(!this.inWater){
+        if(this.speed < 3){
+        this.speed += this.velocity;
+            }
+        this.gforce += gravity/2;
+        }
+        this.past = "left";
+    }
+    else if(this.past === "left" && this.speed > this.origSpeed && this.p !== 1){
+        if(!this.notMoving){
+        this.x -= this.speed;
+        }
+        if(!this.inWater){
+        if(this.onground === true){
+            this.speed -= this.velocity*4;
+        }
+        else{
+            this.speed -= this.velocity*2;
+        }
+        }
+        this.past = "left";
+    }
+    else if(this.past === "left" && this.p!== 1){
+        if(!this.inWater){
+        this.speed = this.origSpeed;
+        }
+        this.past = "";
+    }
+    this.y += this.gforce;
+    this.gforce += gravity;
+    this.side = false;
+    for(var i = 0; i < (blocks.length); i++){
+        if(collision(this,blocks[i])){
+        if(collision(this, blocks[i]) && this.past === "right" && this.y >= blocks[i].y || collision(this, blocks[i]) && this.past === "right" && this.onground === false){ 
+            if(this.y >= blocks[i].y || this.onground === false){
+                this.x -= this.speed;
+                this.past = "";
+            }
+            if(this.y >= blocks[i].y){
+                this.speed = this.origSpeed;
+            }
+            this.side = true;
+        }
+        else if(collision(this, blocks[i]) && this.past === "left" && this.y >= blocks[i].y || collision(this, blocks[i]) && this.past === "left" && this.onground === false){ 
+            if(this.y >= blocks[i].y || this.onground === false){
+                this.x += this.speed;
+                this.past = "";
+            }
+            if(this.y >= blocks[i].y){
+                this.speed = this.origSpeed;
+            }
+            this.side = true;
+        }
+        }
+    }
+    this.onground = false;
+    for(var i = 0; i < (blocks.length); i++){
+        if(collision(this,blocks[i])){
+        if(collision(this, blocks[i]) && this.gforce >= 0){ 
+            this.y -= ((this.y + this.h) - blocks[i].y);
+            this.onground = true;
+            this.lastgforce = this.gforce;
+        }
+        if(collision(this, blocks[i]) && this.gforce < 0){ 
+            this.y -= this.gforce - 0.1;
+            this.gforce = 1;
+        }
+    }
+    if(this.onground === true){
+        this.gforce = 0;
+        this.usedJumps = 0;    
+    }
+    }
+};
+player.prototype.reset = function(config){
+    this.gforce = 0;
+    this.past = "";
+    this.usedJumps = 0;
+    this.ability = "nothing";
+    this.onground = false;
+    this.t = "add";
+    this.lives = 3;
+    this.velocity = config.velocity;
+    this.ability = "nothing";
+    this.jumpHeight = config.jumpHeight;
+    this.speed = config.speed;
+    this.phases = 0;
+    this.ballList = [];
+};
+var player1 = new player(player1config);
+var groundBlock = function(x,y,w,h,r){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = "ground";
+    this.r = r;
+    this.g = floor(random(0,3));
+    this.open = false;
+    this.u = 0;
+};
+groundBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(186, 121, 65);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    if(this.r){
+    fill(67, 196, 69);
+    arc(this.x + this.w/2,this.y,this.w,this.h,0,180);
+    if(this.g === 2 && !this.open){
+    for(var i = 0; i < 4; i++){
+        pushMatrix();
+        translate(this.x + this.w/2,this.y + 2);
+        rotate(130 + 40*i);
+        fill(67, 196, 69);
+        rect(0,0,y,10,3);
+        popMatrix();
+    }
+    }
+    }
+    if(this.open && this.u === 0){
+                var a = 0;
+                for(var i = 0; i < I.items.length; i++){
+                    if(I.items[i][0].name !== ""){
+                        a += 1;
+                    }
+                }
+                if(a !== 8){
+        notifications.push(new notification("You collected Grass!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === "Grass"){
+            I.items[i][1] += 1;
+            this.u = 1;
+        }
+    }
+    if(this.u === 0){
+        notifications.push(new notification("You collected Grass!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = 1;
+            I.items[i][0] = new item(25 + i*50,370,"Grass",20);
+            this.u = 1;
+            break;
+        }
+    }
+    }
+                }
+        }
+        if(collision(this,player1) && input.X && this.g === 2){
+        this.open = true;
+    }
+};
+stone.prototype.collide = function(){
+    /**if(dist(this.x,this.y,player1.x + player1.w/2,player1.y + player1.h/2) <= 10 + player1.w/2 && this.hit === false){
+        player1.lives -= 1;
+        this.hit = true;
+        this.x = width*2;
+        this.y = height*2;
+    }**/
+    if(this.name === "EarthStone"){
+        for(var i = 0; i < blocks.length; i++){
+            if(collision(this,blocks[i])){
+                if(this.y <= blocks[i].y + this.ySpeed){
+                    blocks.splice(1,0,new groundBlock(blocks[i].x,blocks[i].y - blocks[i].h,20,20));
+                    blocks[i].g = 0;
+                }
+                else if(this.y >= blocks[i].y + blocks[i].h*7/8){
+                    blocks.splice(1,0,new groundBlock(blocks[i].x,blocks[i].y + blocks[i].h,20,20));
+                    blocks[i].g = 0;
+                } 
+                else if(this.x <= blocks[i].x + this.xSpeed){
+                    blocks.splice(1,0,new groundBlock(blocks[i].x - blocks[i].w,blocks[i].y,20,20));
+                    blocks[i].g = 0;
+                }
+                else if(this.x >= blocks[i].x + blocks[i].w*7/8){
+                    blocks.splice(1,0,new groundBlock(blocks[i].x + blocks[i].w,blocks[i].y,20,20));
+                    blocks[i].g = 0;
+                }
+                this.x = width * 700;
+                this.y = width*700;
+                this.x2 = width * 700;
+                this.y2 = width*700;
+            }
+        }
+    }
+    if(this.name === "PortalStone"){
+        for(var i = 0; i < blocks.length; i++){
+            if(collision(this,blocks[i])){
+                var x = player1.x;
+                var y = player1.y;
+                if(this.y <= blocks[i].y  + blocks[i].w*1/8){
+                    player1.x = blocks[i].x + 1;
+                    player1.y = blocks[i].y - blocks[i].h;
+                }
+                else if(this.y >= blocks[i].y + blocks[i].h*7/8){
+                    player1.x = blocks[i].x + 1;
+                    player1.y = blocks[i].y + blocks[i].h + 1;
+                } 
+                else if(this.x <= blocks[i].x + blocks[i].w*1/8){
+                    player1.x = blocks[i].x - blocks[i].w - 1;
+                    player1.y = blocks[i].y;
+                }
+                else if(this.x >= blocks[i].x + blocks[i].w*7/8){
+                    player1.x = blocks[i].x + blocks[i].w + 2;
+                    player1.y = blocks[i].y;
+                }
+                if(x > 188 && x < 192 || this.x < 0 || this.x > 400 || x < 189 && this.x > 200 || x >191 && this.x < 200){
+                    var dist2 = player1.x - 190;
+                player1.x = 190;
+                for(var i = 0; i < player1.ballList.length; i++){
+                player1.ballList[i].x -= dist2;
+                player1.ballList[i].x2 -= dist2;
+        for(var i = 0;i < blocks.length; i++){
+           blocks[i].x -= dist2; 
+           
+        }
+        for(var i = 0;i < cannons.length; i++){
+           cannons[i].x -= dist2;
+           cannons[i].x2 -= dist2;
+           for(var i2 = 0; i2 < cannons[i].ballList.length; i2++){
+                cannons[i].ballList[i2].x -= dist2;
+                cannons[i].ballList[i2].x2 -= dist2;
+           }
+        }
+        for(var i = 0;i < doors.length; i++){
+           doors[i].x -= dist2; 
+           doors[i].x2 -= dist2;
+           
+        }
+        for(var i = 0;i < spikes.length; i++){
+           spikes[i].x -= dist2; 
+        }
+        for(var i = 0;i < keys.length; i++){
+           keys[i].x -= dist2; 
+        }
+                }
+                }
+        
+                this.x = width * 700;
+            }
+            }
+        }
+        if(this.name === "WaterStone"){
+            for(var i = 0; i < blocks.length; i++){
+                if(blocks[i].t === "ground" && dist(this.x,this.y,blocks[i].x + blocks[i].h/2,blocks[i].y + blocks[i].h/2) <= 10){
+                    blocks.splice(i,1);
+                    this.x = width * 700;
+                }
+            }
+        }
+};
+player.prototype.shoot = function(){
+    if(clicked && mouseY <= 340){  
+        var canThrow = ["Stone","Ice","Berry","Banana","Obsidian","Glass","Diamond","Pear","WaterStone","EarthStone","FireStone","InfernoStone","FreezeStone","WindStone"];
+        var a = 0;
+        for(var i = 0; i < canThrow.length; i++){
+            if(I.items[I.selected][0].name === canThrow[i]){
+                a = 1;
+            }
+        }
+        if(I.items[I.selected][1] > 0 && a === 1){
+        this.ballList.push(new stone(this.x + this.w/2,this.y + this.h/2,-(this.x - (mouseX))/mousePythag(this)*2,-(this.y - (mouseY))/mousePythag(this)*2));
+        I.items[I.selected][1] -= 1;
+        this.ballList[this.ballList.length - 1].name = I.items[I.selected][0].name;
+        
+    }
+    else if(I.items[I.selected][1] > 0){
+        if(I.items[I.selected][0].name === "HealStone"){
+            player1.lives += 1;
+            I.items[I.selected][1] -= 1;
+        }
+        if(I.items[I.selected][0].name === "InvisibilityStone"){
+            player1.invisible = 0;
+            I.items[I.selected][1] -= 1;
+        }
+        if(I.items[I.selected][0].name === "ArmorStone"){
+            player1.armor = 0;
+            I.items[I.selected][1] -= 1;
+        }
+    }
+    }
+    for(var i = 0; i < this.ballList.length; i++){
+        this.ballList[i].draw();
+        this.ballList[i].move();
+        this.ballList[i].collide();
+        if(this.ballList[i].x >= 700*width){
+            player1.ballList.splice(i,1);
+        }
+    }
+};
+var sandBlock = function(x,y,w,h,g){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = "ground";
+    this.r = true;
+    this.g = floor(random(0,3));
+    this.open = false;
+    this.u = 0;
+};
+sandBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(214, 212, 141);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    this.s = this.w;
+    if(this.g === 2 && !this.open){
+        //fill(102, 102, 96);
+        ellipse(this.x + this.w/2,this.y,this.s,this.s/4);
+        ellipse(this.x + this.w/2 + this.s/3,this.y - this.s/10,this.s/3,this.s/3);
+        ellipse(this.x + this.w/2 + this.s/10,this.y - this.s/10,this.s/4,this.s/4);
+        ellipse(this.x +this.w/2 - this.s/4,this.y - this.s/10,this.s/2.5,this.s/2.5);
+    }
+    if(this.open && this.u === 0){
+                var a = 0;
+                for(var i = 0; i < I.items.length; i++){
+                    if(I.items[i][0].name !== ""){
+                        a += 1;
+                    }
+                }
+                if(a !== 8){
+        notifications.push(new notification("You collected Sand!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === "Sand"){
+            I.items[i][1] += 1;
+            this.u = 1;
+        }
+    }
+    if(this.u === 0){
+        notifications.push(new notification("You collected Sand!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = 1;
+            I.items[i][0] = new item(25 + i*50,370,"Sand",20);
+            this.u = 1;
+            break;
+        }
+    }
+    }
+                }
+        }
+        if(collision(this,player1) && input.X && this.g === 2){
+        this.open = true;
+    }
+};
+var iceBlock = function(x,y,w,h,r){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = "ground";
+    this.r = r;
+    this.g = floor(random(0,3));
+    this.open = false;
+    this.u = 0;
+};
+iceBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(115, 87, 16);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    if(this.r === true){
+    fill(199, 221, 237);
+    rect(this.x,this.y,this.w,this.h/4);
+    this.s = this.w;
+    if(this.g === 2 && !this.open){
+        //fill(102, 102, 96);
+        ellipse(this.x + this.w/2,this.y,this.w,this.h/3);
+    }
+    }
+    if(this.open && this.u === 0){
+                var a = 0;
+                for(var i = 0; i < I.items.length; i++){
+                    if(I.items[i][0].name !== ""){
+                        a += 1;
+                    }
+                }
+                if(a !== 8){
+        notifications.push(new notification("You collected Ice!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === "Ice"){
+            I.items[i][1] += 1;
+            this.u = 1;
+        }
+    }
+    if(this.u === 0){
+        notifications.push(new notification("You collected Ice!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = 1;
+            I.items[i][0] = new item(25 + i*50,370,"Ice",20);
+            this.u = 1;
+            break;
+        }
+    }
+    }
+                }
+        }
+        if(collision(this,player1) && input.X && this.g === 2){
+        this.open = true;
+    }
+};
+var limestoneBlock = function(x,y,w,h,r){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = "ground";
+    this.r = r;
+    this.g = floor(random(1.5,3));
+    this.open = false;
+    this.u = 0;
+    this.num = floor(random(1,4));
+};
+limestoneBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(171, 189, 166);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    this.s = this.w;
+    if(this.g === 2 && !this.open){
+    fill(227, 218, 189);
+    if(this.num >= 1){
+    ellipse(this.x + this.w/3,this.y + this.h/4,this.w/5,this.h/5);
+    }
+    if(this.num >= 2){
+    ellipse(this.x + this.w*3/4,this.y + this.h*1/2,this.w/5,this.h/5);
+    }
+    if(this.num === 3){
+    ellipse(this.x + this.w/2,this.y + this.h*2/3,this.w/5,this.h/5);
+    }
+    }
+    if(this.open && this.u === 0){
+                var a = 0;
+                for(var i = 0; i < I.items.length; i++){
+                    if(I.items[i][0].name !== ""){
+                        a += 1;
+                    }
+                }
+                if(a !== 8){
+        notifications.push(new notification("You collected Flint!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === "Flint"){
+            I.items[i][1] += this.num;
+            this.u = 1;
+        }
+    }
+    if(this.u === 0){
+        notifications.push(new notification("You collected Flint!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = this.num;
+            I.items[i][0] = new item(25 + i*50,370,"Flint",20);
+            this.u = 1;
+            break;
+        }
+    }
+    }
+                }
+        }
+        if(collision(this,player1) && input.X && this.g === 2){
+        this.open = true;
+    }
+};
+var interiorBlock = function(x,y,w,h,r){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+};
+interiorBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(163, 147, 125);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+};
+interiorBlock.prototype.collide = function(){
+};
+var torch = function(x,y,w,h,r){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.s = this.w;
+};
+torch.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(163, 147, 125);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    rectMode(CENTER);
+    fill(171, 115, 46);
+    rect(this.x,this.y + this.h/2,this.w/4,this.h);
+    fill(255, 136, 0);
+    rect(this.x,this.y - this.h/3 + this.h/2,this.w/3,this.h/3);
+    fill(222, 52, 33);
+    rect(this.x,this.y - this.h/4 + this.h/2,this.w/5,this.h/5);
+    /**pushMatrix();
+    translate(this.x/2,this.y/2 - this.h/2);
+    scale(1/2);
+        ellipse(this.x,this.y + this.s/6,this.s*0.8,this.s*0.8);
+        triangle(this.x,this.y,this.x - this.s*0.4,this.y,this.x - this.s *0.4,this.y - this.s/2);
+        triangle(this.x,this.y - this.s*2/3,this.x - this.s/4,this.y,this.x + this.s/4,this.y);
+        triangle(this.x,this.y,this.x + this.s*0.35,this.y + this.s/2,this.x + this.s *0.5,this.y - this.s/3);
+        fill(227, 40, 7);
+        ellipse(this.x,this.y + this.s/3,this.s*0.5,this.s*0.5);
+        triangle(this.x,this.y + this.s/3,this.x - this.s*0.26,this.y + this.s/3,this.x - this.s *0.3,this.y - this.s/5);
+        triangle(this.x,this.y - this.s*0.35,this.x - this.s/8,this.y + this.s/3,this.x + this.s/8,this.y + this.s/3);
+        triangle(this.x,this.y + this.s/3,this.x + this.s*0.2,this.y + this.s/2,this.x + this.s *0.37,this.y - this.s/7);
+        popMatrix();**/
+    
+    
+};
+torch.prototype.collide = function(){
+};
+var waterBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.gravity = gravity;
+    this.velocity = player1.velocity;
+    this.t = "water";
+};
+waterBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(17, 120, 194,200);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+waterBlock.prototype.collide = function(){
+    
+    if(collision(this,player1) && player1.onground !== true && player1.gforce > 0){
+        player1.gforce = 0.5;
+    }
+    if(collision(this,player1) && player1.gforce < 0){
+        player1.gforce = - 0.5;
+    }
+    if(collision(this,player1) && player1.past === "right"){
+        player1.speed = 1;
+    }
+    if(collision(this,player1) && player1.past === "left"){
+        player1.speed = 1;
+    }
+    if(collision(this,player1) && input.W){
+        player1.gforce = -0.5;
+    }
+    else if(collision(this,player1)){
+        player1.gforce = 0.5;
+    }
+    if(collision(this,player1)){
+        player1.inWater = true;
+    }
+    
+};
+var lavaBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.gravity = gravity;
+    this.velocity = player1.velocity;
+    this.t = "water";
+    this.timer = 1;
+};
+lavaBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(250, 89, 3,240);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+lavaBlock.prototype.collide = function(){
+    
+    if(collision(this,player1) && player1.onground !== true && player1.gforce > 0){
+        player1.gforce = 0.5;
+    }
+    if(collision(this,player1) && player1.gforce < 0){
+        player1.gforce = - 0.5;
+    }
+    if(collision(this,player1) && player1.past === "right"){
+        player1.speed = 1;
+    }
+    if(collision(this,player1) && player1.past === "left"){
+        player1.speed = 1;
+    }
+    if(collision(this,player1) && input.W){
+        player1.gforce = -0.5;
+    }
+    else if(collision(this,player1)){
+        player1.gforce = 0.5;
+    }
+    //println(player1.inWater);
+    if(collision(this,player1)){
+        player1.inLava = true;
+        player1.inWater = true;
+    }
+};
+var ladderBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.gravity = gravity;
+    this.velocity = player1.velocity;
+    this.t = "ladder";
+};
+ladderBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(163, 147, 125);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    fill(171, 115, 46);
+    rect(this.x,this.y,this.w/6,this.h);
+    rect(this.x + this.w * 5/6,this.y,this.w/6,this.h);
+    rect(this.x,this.y,this.w,this.h/6);
+    rect(this.x,this.y + this.h/2,this.w,this.h/6);
+    
+};
+ladderBlock.prototype.collide = function(){
+    
+    if(collision(this,player1) && player1.onground !== true && player1.gforce > 0){
+        player1.gforce = 0.5;
+    }
+    if(collision(this,player1) && player1.gforce < 0){
+        player1.gforce = - 0.5;
+    }
+    if(collision(this,player1) && player1.past === "right"){
+        player1.speed = 1;
+    }
+    if(collision(this,player1) && player1.past === "left"){
+        player1.speed = 1;
+    }
+    if(collision(this,player1) && input.W){
+        player1.gforce = -0.5;
+    }
+    else if(collision(this,player1) && input.S){
+        player1.gforce = 0.5;
+    }
+    else if(collision(this,player1)){
+        player1.gforce = 0;
+    }
+    if(collision(this,player1)){
+        player1.inWater = true;
+    }
+    
+};
+var stoneBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+};
+stoneBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(181, 181, 181);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+var ObsidianBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+};
+ObsidianBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(89, 89, 89);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+var fakeStoneBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+};
+fakeStoneBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(181, 181, 181);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+fakeStoneBlock.prototype.collide = function(){
+    
+    
+};
+var brickBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+};
+brickBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(173, 81, 81);
+    strokeWeight(1);
+    stroke(140, 43, 79);
+    rect(this.x,this.y,this.w,this.h);
+    line(this.x + this.w/2,this.y,this.x + this.w/2,this.y + this.h/2);
+    line(this.x + 1,this.y + this.h/2 + 1,this.x + this.w - 1,this.y + this.h/2 + 1);
+    stroke(128, 116, 116);
+    line(this.x,this.y + 2,this.x,this.y + this.h/2 - 2);
+    noStroke();
+};
+var chest = function(x,y,w,h,i){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.open = false;
+    this.u = 0;
+    this.indoor = i|| false;
+};
+chest.prototype.draw = function() {
+    if(this.indoor === true){
+        rectMode(LEFT);
+        fill(163, 147, 125);
+        rect(this.x,this.y,this.w,this.h);
+    }
+    if(this.open === false){
+    rectMode(LEFT);
+    fill(158, 117, 40);
+    rect(this.x,this.y,this.w,this.h,10);
+    rect(this.x, this.y + this.h/2,this.w,this.h/2);
+    noStroke();
+    fill(0);
+    rect(this.x,this.y + this.h * 1/2, this.w,this.h/20);
+    fill(120, 120, 120);
+    rectMode(CENTER);
+    rect(this.x + this.w/2, this.y + this.h/2,7,7,5);
+    fill(0);
+    rect(this.x + this.w/2, this.y + this.h/2,3,3,5);
+    }
+    else{
+    rectMode(LEFT);
+    fill(158, 117, 40);
+    rect(this.x,this.y,this.w,this.h);
+    rect(this.x, this.y + this.h/2,this.w,this.h/2);
+    noStroke();
+    fill(0);
+    rect(this.x,this.y + this.h * 1/2, this.w,this.h/20);
+    rectMode(CENTER);
+    rect(this.x + this.w/2,this.y + this.h/4,15,6);
+    fill(120,120,120);
+    rect(this.x + this.w/2,this.y + this.h/2 + 1,7,3);
+    }
+    this.r = floor(random(6,12));
+        if(this.open && this.u === 0){
+                var a = 0;
+                for(var i = 0; i < I.items.length; i++){
+                    if(I.items[i][0].name !== ""){
+                        a += 1;
+                    }
+                }
+                if(a !== 8){
+        notifications.push(new notification("You got " + items[this.r] + " from a chest!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === items[this.r]){
+            I.items[i][1] += floor(random(1,3));
+            this.u = 1;
+        }
+    }
+    if(this.u === 0){
+        notifications.push(new notification("You got " + items[this.r] + " from a chest!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = floor(random(2,8));
+            I.items[i][0] = new item(25 + i*50,370,items[this.r],20);
+            this.u = 1;
+            break;
+        }
+    }
+    }
+                }
+        }
+};
+chest.prototype.collide = function(){
+    if(collision(this,player1) && input.X){
+        this.open = true;
+    }
+    
+};
+var bag = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.open = false;
+    this.u = 0;
+};
+bag.prototype.draw = function() {
+    if(this.open === false){
+    rectMode(LEFT);
+    fill(158, 117, 40);
+    rect(this.x,this.y,this.w,this.h,10);
+    rect(this.x, this.y + this.h/2,this.w,this.h/2);
+    noStroke();
+    fill(0);
+    rect(this.x,this.y + this.h * 1/2, this.w,this.h/20);
+    fill(120, 120, 120);
+    rectMode(CENTER);
+    rect(this.x + this.w/2, this.y + this.h/2,7,7,5);
+    fill(0);
+    rect(this.x + this.w/2, this.y + this.h/2,3,3,5);
+    }
+    var r = 0;
+    for(var i = 0; i < items.length - 7; i++){
+        r += i;
+    }
+    this.r = floor(random(7,items.length + 1));
+        if(this.open && this.u === 0){
+            if(this.r < items.length){
+        notifications.push(new notification("You got a" + items[this.r] + " from a bag!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === items[this.r]){
+            I.items[i][1] += floor(random(1,3));
+            this.u = 1;
+        }
+    }
+    if(this.u === 0){
+        notifications.push(new notification("You got " + items[this.r] + " from a chest!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = floor(random(2,8));
+            I.items[i][0] = new item(25 + i*50,370,items[this.r],20);
+            this.u = 1;
+            break;
+        }
+    }
+    }
+            }
+            else{
+                var r = floor(random(1,11));
+                notifications.push(new notification("You got " + r + " coins from a chest!"));
+                coins += r;
+                this.u = 1;
+            }
+    }
+    
+};
+bag.prototype.collide = function(){
+    if(collision(this,player1) && input.X){
+        this.open = true;
+    }
+    
+};
+var bush = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.open = false;
+    this.u = 0;
+};
+bush.prototype.draw = function() {
+    fill(49, 143, 46);
+    rectMode(LEFT);
+    rect(this.x,this.y,this.w,this.h,7);
+    //rect(this.x,this.y + this.h/2,this.w,this.h/2);
+    if(!this.open){
+    fill(145, 24, 24);
+    ellipse(this.x + this.w/3,this.y + this.h/4,this.w/5,this.h/5);
+    ellipse(this.x + this.w*3/4,this.y + this.h*1/2,this.w/5,this.h/5);
+    ellipse(this.x + this.w/2,this.y + this.h*2/3,this.w/5,this.h/5);
+    }
+    this.r = floor(random(2,6));
+        if(this.open && this.u === 0){
+        notifications.push(new notification("You found a " + items[this.r] + " in a bush!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === items[this.r]){
+            I.items[i][1] += 1;
+            this.u = 1;
+        }
+    }
+    if(this.u === 0){
+        notifications.push(new notification("You found a " + items[this.r] + " in a bush!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = 1;
+            I.items[i][0] = new item(25 + i*50,370,items[this.r],20);
+            this.u = 1;
+            break;
+        }
+    }
+    }
+    }
+    
+};
+bush.prototype.collide = function(){
+    if(collision(this,player1) && input.X){
+        this.open = true;
+    }
+    
+};
+var bounceBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+};
+bounceBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(161, 67, 63);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h/6);
+    rect(this.x,this.y + this.h*5/6,this.w,this.h/6);
+    fill(176, 152, 84);
+    triangle(this.x + this.w/7, this.y + this.h * 1/6, this.x + this.w*6/7, this.y + this.h * 1/6, this.x + this.w/2, this.y + this.h*6/7);
+    triangle(this.x + this.w/7, this.y + this.h * 5/6, this.x + this.w*6/7, this.y + this.h * 5/6, this.x + this.w/2, this.y + this.h*1/7);
+    strokeWeight(2);
+    stroke(107, 96, 90);
+    line(this.x + this.w/4, + this.y + this.h*4/6,this.x + this.w*3/4, + this.y + this.h*4/6);
+    line(this.x + this.w/4, + this.y + this.h*2/6,this.x + this.w*3/4, + this.y + this.h*2/6);
+    line(this.x + this.w/3, + this.y + this.h*3/6,this.x + this.w*2/3, + this.y + this.h*3/6);
+    
+    
+};
+var smashBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.startY = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.velocity = 0.15;
+    this.speed = 1;
+    this.smashing = true;
+};
+smashBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(181,181,181);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h * 3/4);
+    fill(189, 151, 151);
+    for(var i = 0; i < 4; i++){
+        triangle(this.x + this.w *i/4,this.y + this.h*3/4,this.x + this.w *(i+1)/4,this.y + this.h*3/4,this.x + this.w*(i+0.5)/4,this.y + this.h);
+    }
+    
+};
+smashBlock.prototype.smash = function(){
+    if(this.smashing === true){
+        this.speed += this.velocity;
+        this.y += this.speed;
+    }
+    if(this.smashing === false){
+        this.speed = 1;
+        this.y -= this.speed;
+    }
+    if(this.y === this.startY){
+        this.smashing = true;
+    }
+    for(var i = 0; i < blocks.length; i++){
+        if(collision(blocks[i],this) && blocks[i].y > this.y && this.smashing === true && blocks[i].t !== "smash"){
+            this.smashing = false;
+            this.y = floor(this.y);
+        }
+    }
+    if(collision(player1,this) && player1.y > this.y + this.h *3/4 && this.smashing === true){
+            player1.lives -= 3;
+        }
+    
+};
+
+var breakBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.ready = -1;
+};
+breakBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(156, 121, 15);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+breakBlock.prototype.fall = function(){
+    if(collision(this,player1) && this.ready === -1){
+        this.ready = 0;
+    }
+    if(this.ready >= 0){
+        this.ready += 1;
+    }
+    if(this.ready >= 30){
+        this.y += 1;
+    }
+        
+};
+var glassBlock = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+};
+glassBlock.prototype.draw = function() {
+    fill(255,255,255,0);
+    rect(this.x,this.y,this.w,this.h);
+};
+var woodBlock = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+};
+woodBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(176, 137, 46);
+    rect(this.x,this.y,this.w,this.h);
+};
+
+var spike = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.collected = true;
+};
+spike.prototype.draw = function() {
+    fill(171, 133, 133);
+    triangle(this.x, this.y + this.h,this.x + this.w/2,this.y,this.x + this.w, this.y + this.h);
+};
+spike.prototype.collide = function(){
+    if(collision(this,player1)){
+        player1.lives -= 1;
+        background(255, 0, 0);
+    }
+    if(collision(this,player1) && player1.onground === false){
+        player1.gforce = -1;
+    }
+    if(collision(this,player1) && player1.past === "right"){
+        player1.past = "left";
+        player1.x -= player1.speed;
+    }
+    else if(collision(this,player1) && player1.past === "left"){
+        player1.past = "right";
+        player1.x += player1.speed;
+    }
+};
+var secretDoor = function(x,y,w,h,l){
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.w = w;
+    this.l = l;
+};
+var fakeDoor = function(x,y,w,h,l){
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.w = w;
+    this.l = l;
+};
+var yellowKey = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.collected = false;
+};
+yellowKey.prototype.draw = function() {
+    if(this.collected === false){
+    fill(224, 216, 98);
+    ellipse(this.x + this.w/5,this.y + this.h/2,this.h,this.w*2/5);
+    fill(115,115,115);
+    ellipse(this.x + this.w/5,this.y + this.h/2,this.h/2,this.w*1/5);
+    fill(224, 216, 98);
+    rect(this.x + this.w*2/5,this.y + this.h/4, this.w * 3/5,this.h/2);
+    rect(this.x + this.w * 7/10,this.y,this.w/10,this.h/4);
+    rect(this.x + this.w * 9/10,this.y,this.w/10,this.h/4);
+    }
+};
+yellowKey.prototype.collide = function(){
+    if(collision(this,player1)){
+        this.collected = true;
+    }
+};
+var door = function(x,y,s,l){
+    this.x2 = x + s/2;
+    this.y2 = y + s/2;
+    this.x = x;
+    this.y = y;
+    this.w = s;
+    this.h = s;
+    this.s = s;
+    this.o = 60;
+    this.a = 0;
+    this.l = l;
+};
+door.prototype.draw= function() {
+    noStroke();
+    fill(235, 221, 97,this.o);
+    rectMode(CENTER);
+    rect(this.x2,this.y2,this.s,this.s);
+    fill(115,115,115);
+    rect(this.x2,this.y2,this.s - 3,this.s - 3);
+    fill(235, 221, 97,this.o);
+    ellipse(this.x2,this.y2,this.s,this.s);
+    fill(115,115,115);
+    ellipse(this.x2,this.y2,this.s - 3,this.s - 3);
+    fill(235, 221, 97,this.o);
+    pushMatrix();
+        translate(this.x2,this.y2);
+        rotate(this.a);
+        ellipse(0,0,this.s/2 - 3,this.s - 3);
+    popMatrix();
+    pushMatrix();
+        translate(this.x2,this.y2);
+        rotate(this.a + 60);
+        ellipse(0,0,this.s/2 - 3,this.s - 3);
+    popMatrix();
+    pushMatrix();
+        translate(this.x2,this.y2);
+        rotate(this.a + 120);
+        ellipse(0,0,this.s/2 - 3,this.s - 3);
+    popMatrix();
+    this.a += 1;
+};
+secretDoor.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(181, 181, 181);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    fill(59, 56, 59);
+    ellipse(this.x + this.w/4,this.y + this.h*3/5,5,5);
+};
+fakeDoor.prototype.draw = function() {
+    fill(140, 112, 88);
+    noStroke();
+    rectMode(LEFT);
+    rect(this.x,this.y + this.h/2,this.w,this.h/2);
+    arc(this.x + this.w/2,this.y + this.h/2,this.w,this.h,-180,0);
+    fill(59, 56, 59);
+    ellipse(this.x + this.w/4,this.y + this.h*3/5,5,5);
+};
+var decDoor = function(x,y,s,l,side){
+    this.x2 = x + s/2;
+    this.y2 = y + s/2;
+    this.x = x;
+    this.y = y;
+    this.w = s;
+    this.h = s;
+    this.s = s;
+    this.o = 60;
+    this.a = 0;
+    this.l = l;
+    this.side = side;
+};
+decDoor.prototype.draw= function() {
+    noStroke();
+    rectMode(LEFT);
+    if(this.side === "left"){
+    fill(163, 147, 125);
+    rect(this.x,this.y,this.w,this.h);
+    fill(140, 109, 43);
+    rect(this.x,this.y,this.s/4,this.s);
+    fill(0);
+    rect(this.x - this.s/32,this.y + this.s/3,this.s/16,this.s/8);
+    rect(this.x + this.s/4 + this.s/32,this.y + this.s/3,this.s/16,this.s/8);
+    }
+    if(this.side === "right"){
+    fill(163, 147, 125);
+    rect(this.x,this.y,this.w,this.h);
+    fill(140, 109, 43);
+    rect(this.x + this.s*3/4,this.y,this.s/4,this.s);
+    fill(0);
+    rect(this.x - this.s/32 + this.s*3/4,this.y + this.s/3,this.s/16,this.s/8);
+    rect(this.x + this.s/4 + this.s/32 + this.s*3/4,this.y + this.s/3,this.s/16,this.s/8);
+    }
+    if(this.side === "middle"){
+    fill(163, 147, 125);
+    rect(this.x,this.y,this.w,this.h);
+    fill(140, 109, 43);
+    rect(this.x + this.s*3/8,this.y,this.s/4,this.s);
+    fill(0);
+    rect(this.x - this.s/32 + this.s*3/8,this.y + this.s/3,this.s/16,this.s/8);
+    rect(this.x + this.s/4 + this.s/32 + this.s*3/8,this.y + this.s/3,this.s/16,this.s/8);
+    }
+    
+};
+var cannonBall = function(x,y,xSpeed,ySpeed,f){
+    this.x = x - 1;
+    this.y = y - 1;
+    this.x2 = x;
+    this.y2 = y;
+    this.w = 2;
+    this.h = 2;
+    this.xSpeed = xSpeed;
+    this.ySpeed = ySpeed;
+    this.hit = false;
+    this.stop = false;
+    this.f = f;
+};
+cannonBall.prototype.draw = function() {
+    fill(153, 153, 153);
+    ellipse(this.x2,this.y2,10,10);
+    if(!this.f){
+        fill(189, 230, 228,200);
+        ellipse(this.x2,this.y2,10,10);
+    }
+};
+cannonBall.prototype.collide = function(){
+    if(dist(this.x2,this.y2,player1.x + player1.w/2,player1.y + player1.h/2) <= 10 + player1.w/2 && this.hit === false && this.stop === false){
+        if(player1.armor > 600){
+        player1.lives -= 1;
+        background(255, 0, 0);
+        }
+        this.hit = true;
+        this.x2 = width*700;
+    }
+};
+cannonBall.prototype.move = function(){
+    if(this.stop === false){
+    this.x2 += this.xSpeed;
+    this.y2 += this.ySpeed;
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+    for(var i = 0; i < blocks.length; i++){
+        if(collision(this,blocks[i])){
+            this.x = width * 700;
+        }
+    }
+    }
+};
+var cannon = function(x,y){
+    this.x = x + width/40;
+    this.y = y + height/40;
+    this.x2 = x;
+    this.y2 = y;
+    this.ballList = [];
+    this.p = 0;
+    this.sc = 0;
+    this.w = 20;
+    this.h = 20;
+    this.hc = floor(random(1,10));
+    this.health = 5;
+};
+cannon.prototype.draw = function() {
+    //if(player1.x <= this.x && player1.y >= this.y && player1.ability !== "stealth" || player1.x >= this.x && player1.y <= this.y && player1.ability !== "stealth"){
+    //rotate(Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI));
+    //this.p = Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI);
+   // }
+   // else if(player1.ability !== "stealth"){
+        //rotate(-Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.h/2)))*(180/PI));
+        //this.p = -Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI);
+    //}
+   // else{
+        //rotate(this.p);
+    //}
+    noStroke();
+    rectMode(LEFT);
+    fill(255, 0, 0);
+    rect(this.x2,this.y2 - 8,20,4);
+    fill(0, 255, 0);
+    rect(this.x2,this.y2 - 8,(4 * this.health),4);
+    fill(230, 213, 159);
+    rect(this.x2,this.y2,this.w,this.h,4);
+    if(this.hc === 1){
+        fill(125, 84, 12);
+    }
+    if(this.hc === 2){
+        fill(244, 247, 163);
+    }
+    if(this.hc === 3){
+        fill(222, 212, 66);
+    }
+    if(this.hc === 4){
+        fill(255, 255, 255);
+    }
+    if(this.hc === 5){
+        fill(148, 147, 145);
+    }
+    if(this.hc === 6){
+        fill(245, 158, 8);
+    }
+    if(this.hc === 7){
+        fill(66, 63, 66);
+    }
+    if(this.hc === 8){
+        fill(77, 48, 14);
+    }
+    if(this.hc === 9){
+        fill(138, 96, 12);
+    }
+    if(this.hc === 10){
+        fill(140, 115, 5);
+    }
+    rectMode(LEFT);
+    rect(this.x2,this.y2 - 1,this.w,this.h/4);
+    rectMode(CENTER);
+    fill(181, 26, 26);
+    rect(this.x2 + this.w/2,this.y2 + this.h * 3/5, this.w/3,this.h/20);
+    rectMode(LEFT);
+    fill(0);
+    rect(this.x2, this.y2 + this.h * 3/4,this.w,this.h/6);
+    rect(this.x2, this.y2 + this.h * 3/4,this.w,this.h/4,3);
+    fill(0);
+    if(player1.x >= this.x2 + this.w && player1.invisible > 600){
+        ellipse(this.x2 + this.w/3 + this.w/8,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x2 + this.w*2/3 + this.w/8,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    }
+    else if(player1.x <= this.x2 && player1.invisible > 600){
+        ellipse(this.x2 + this.w/3 - this.w/8,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x2 + this.w*2/3 - this.w/8,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    }
+    else{
+    ellipse(this.x2 + this.w/3,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x2 + this.w*2/3,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    }
+    if(this.frozen){
+        fill(189, 230, 228,200);
+        rect(this.x2,this.y2 - 1,this.w,this.h + 1);
+    }
+};
+cannon.prototype.shoot = function(){
+    if(dist(this.x,this.y,player1.x,player1.y) <= width/2 && player1.ability !== "stealth" && this.sc === 0 && player1.invisible > 600){    
+        if(this.frozen === false){
+        this.ballList.push(new cannonBall(this.x,this.y,-(this.x - (player1.x + player1.w))/objectPythag(this,player1)/2,-(this.y - (player1.y + player1.h))/objectPythag(this,player1))/2);
+        this.ballList[this.ballList.length - 1].f = false;
+    }
+    else{
+        this.ballList.push(new cannonBall(this.x,this.y,-(this.x - (player1.x + player1.w))/objectPythag(this,player1)/2,-(this.y - (player1.y + player1.h))/objectPythag(this,player1)/2));
+        this.ballList[this.ballList.length - 1].f = true;
+    }
+    }
+    if(dist(this.x,this.y,player1.x,player1.y) <= width/2 && player1.ability !== "stealth"){
+        this.sc += 1;
+        if(this.sc === 90 && !this.frozen){
+            this.sc = 0;
+        }
+        if(this.sc === 180 && this.frozen){
+            this.sc = 0;
+        }
+    }
+    else{
+        this.sc = 0;
+    }
+    for(var i = 0; i < this.ballList.length; i++){
+        this.ballList[i].draw();
+        this.ballList[i].move();
+        this.ballList[i].collide();
+        if(this.ballList[i].x >= 700*width){
+            this.ballList.splice(i,1);
+        }
+    }
+    for(var i = 0; i < player1.ballList.length; i++){
+        if(dist(this.x,this.y,player1.ballList[i].x2,player1.ballList[i].y2) <= 15){
+            if(player1.ballList[i].name === "FreezeStone"){
+                this.frozen = true;
+            player1.ballList.splice(i,1);
+            }
+            else{
+            this.health -= 1;
+            player1.ballList.splice(i,1);
+            }
+        }
+    }
+    if(this.health <= 0){
+        this.x2 = -width;
+        this.x = -width;
+    }
+};
+var person = function(x,y,name){
+    this.x = x + width/40;
+    this.y = y + height/40;
+    this.x2 = x;
+    this.y2 = y;
+    this.ballList = [];
+    this.p = 0;
+    this.sc = 0;
+    this.w = 20;
+    this.h = 20;
+    this.hc = floor(random(1,10));
+    this.health = 5;
+    this.name = name || "Guard";
+};
+person.prototype.draw = function() {
+    
+    noStroke();
+    rectMode(LEFT);
+    fill(230, 213, 159);
+    rect(this.x2,this.y2,this.w,this.h,4);
+    if(this.name === "King"){
+    fill(38, 38, 38);
+    rect(this.x2,this.y2 + this.h/4,this.w,this.h/20);
+    rect(this.x2,this.y2 + this.h/4,this.w/6,this.h/3);
+    fill(181, 170, 22);
+    rectMode(CENTER);
+    rect(this.x2 + this.w/2,this.y2 + this.h/8,this.w,this.h/4);
+        fill(204, 10, 10);
+        for(var i = 0; i < 3; i++){
+            ellipse(this.x2 + (i+1)*this.w/4,this.y2 + this.h/8, 3,3);
+        }
+    }
+    if(this.name === "Guard"){
+        fill(114, 115, 114);
+        rectMode(CENTER);
+    rect(this.x2 + this.w/2,this.y2 + this.h/8,this.w,this.h/4,3);
+    rect(this.x2 + this.w/2,this.y2 + this.h/6,this.w,this.h/4);
+    }
+    fill(181, 26, 26);
+    rect(this.x2 + this.w/2,this.y2 + this.h * 3/5, this.w/3,this.h/20);
+    rectMode(LEFT);
+    if(this.name === "King"){
+    fill(168, 42, 28);
+    }
+    if(this.name === "Guard"){
+        fill(27, 92, 27);
+    }
+    rect(this.x2, this.y2 + this.h * 3/4,this.w,this.h/6);
+    rect(this.x2, this.y2 + this.h * 3/4,this.w,this.h/4,3);
+    fill(0);
+    if(player1.x >= this.x2 + this.w){
+        ellipse(this.x2 + this.w/3 + this.w/8,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x2 + this.w*2/3 + this.w/8,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    }
+    else if(player1.x <= this.x2){
+        ellipse(this.x2 + this.w/3 - this.w/8,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x2 + this.w*2/3 - this.w/8,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    }
+    else{
+    ellipse(this.x2 + this.w/3,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    ellipse(this.x2 + this.w*2/3,this.y2 + this.h*2/5,this.w/7,this.h/7);
+    }
+    if(this.frozen){
+        fill(189, 230, 228,200);
+        rect(this.x2,this.y2 - 1,this.w,this.h + 1);
+    }
+};
+var loadLevel = function(){
+blocks = [];
+cannons = [];
+doors = [];
+spikes = [];
+levelSide = 1;
+for(var column = 0;column < 17;column++) {
+        for(var row = 0;row < levels[level][0].length;row++) {
+        if(levels[level][column][row] === "s") {
+            blocks.push(new stoneBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "o") {
+            blocks.push(new ObsidianBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "~") {
+            spikes.push(new waterBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "!") {
+            spikes.push(new lavaBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "|") {
+            spikes.push(new ladderBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "B") {
+            blocks.push(new brickBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "w") {
+            blocks.push(new woodBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "y") {
+            blocks.push(new sandBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "l") {
+            blocks.push(new limestoneBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "i" && levels[level][column - 1][row] === "i") {
+            blocks.push(new iceBlock(row* (width/20),column * (height /20), width/20,height/20,false));
+        }
+        if(levels[level][column][row] === "i" && levels[level][column - 1][row] !== "i") {
+            blocks.push(new iceBlock(row* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "t") {
+           keys.push(new chest(row* (width/20),column * (height /20), width/20,height/20, ""));
+        }
+        if(levels[level][column][row] === "S") {
+           keys.push(new fakeStoneBlock(row* (width/20),column * (height /20), width/20,height/20, ""));
+        }
+        if(levels[level][column][row] === "$") {
+           keys.push(new chest(row* (width/20),column * (height /20), width/20,height/20, true));
+        }
+        if(levels[level][column][row] === "x") {
+            blocks.push(new glassBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "b") {
+            blocks.push(new bounceBlock(row* (width/20),column * (height /20), width/20,height/20, "bounce"));
+        }
+        if(levels[level][column][row] === "c") {
+            cannons.push(new cannon(row* (width/20),column * (height /20)));
+        }
+        if(levels[level][column][row] === "K") {
+            doors.push(new person(row* (width/20),column * (height /20),"King"));
+        }
+        if(levels[level][column][row] === "G") {
+            doors.push(new person(row* (width/20),column * (height /20),"Guard"));
+        }
+        if(levels[level][column][row] === "f") {
+            blocks.push(new breakBlock(row* (width/20),column * (height /20), width/20,height/20, "fall"));
+        }
+        if(levels[level][column][row] === "d") {
+            doors.push(new door(row* (width/20),column * (height /20), width/20,true));
+        }
+        if(levels[level][column][row] === "#" && levels[level][column][row - 1] === "z" && levels[level][column][row + 1] !== "z") {
+            doors.push(new decDoor(row* (width/20),column * (height /20), width/20,true,"right"));
+        }
+        if(levels[level][column][row] === "#" && levels[level][column][row - 1] !== "z" && levels[level][column][row + 1] === "z") {
+            doors.push(new decDoor(row* (width/20),column * (height /20), width/20,true,"left"));
+        }
+        if(levels[level][column][row] === "#" && levels[level][column][row - 1] === "z" && levels[level][column][row + 1] === "z") {
+            doors.push(new decDoor(row* (width/20),column * (height /20), width/20,true,"middle"));
+        }
+        if(levels[level][column][row] === "D") {
+            fallBlocks.push(new fakeDoor(row* (width/20),column * (height /20),height/20,true));
+        }
+        if(levels[level][column][row] === "k" && used === 1) {
+            keys.push(new yellowKey(row* (width/20),column * (height /20), width/20,height/50));
+        }
+        if(levels[level][column][row] === "^") {
+            spikes.push(new spike(row* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "g" && levels[level][column -1][row] === "g") {
+            blocks.push(new groundBlock(row* (width/20),column * (height /20), width/20,height/20,false));
+        }
+        if(levels[level][column][row] === "g" && levels[level][column -1][row] !== "g") {
+            blocks.push(new groundBlock(row* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "V") {
+            blocks.push(new smashBlock(row* (width/20),column * (height /20), width/20,height/20,"smash"));
+        }
+        if(levels[level][column][row] === "a") {
+            keys.push(new bush(row* (width/20),column * (height /20), width/20,height/20,""));
+        }
+        if(levels[level][column][row] === "z") {
+            keys.push(new interiorBlock(row* (width/20),column * (height /20), width/20,height/20,""));
+        }
+        if(levels[level][column][row] === "*") {
+            keys.push(new torch(row* (width/20),column * (height /20), width/20,height/20,""));
+        }
+        if(levels[level][column][row] === "@" && setPos === true) {
+            player1.x = row* (width/20);
+            player1.y = column * (height /20);
+        }
+        
+    }
+ }
+ used += 1;
+};
+button.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && clicked === true && this.locked === false){
+        if(this.t === "level"){
+            scene = "game";
+            level = this.goto;
+            setPos = true;
+            keys = [];
+            keys2 = [];
+            used = 1;
+            loadLevel();
+        } else {
+            scene = this.goto;
+            level = 1;
+            player1.reset(player1config);
+        }
+    }
+};
+var playerCamera = function(){
+};
+loadLevel();
+var keyCount = 0;
+var draw = function() {
+    if(scene === "game"){
+    if(gameScene === "game"){
+    background(78, 152, 212);
+    for(var i = 0;i < doors.length; i++) {
+        doors[i].draw();
+        /**if(collision(doors[i],player1) && doors[i].l === false){
+            level += 1;
+            used = 1;
+            levelSide = 1;
+            keys = [];
+            keys2 = [];
+            setPos = true;
+            loadLevel();
+            player1.reset(player1config);
+        }**/
+    } 
+    //stops 
+    if(level > currentLevel){
+        currentLevel = level;
+    }
+    for(var i = 0;i < blocks.length; i++) {
+        if(blocks[i].x <= 400 && blocks[i].x > -20){
+        blocks[i].draw();
+        if(blocks[i].t === "smash"){
+            blocks[i].smash();
+        }
+        if(blocks[i].t === "fall"){
+            blocks[i].fall();    
+        }
+        if(blocks[i].t === "bounce"){
+            if(collision(blocks[i],player1) && player1.y + player1.h <= blocks[i].y){
+                player1.gforce = -player1.lastgforce - 0.5;
+            }
+        }
+    } 
+    }
+    for(var i = 0;i < fallBlocks.length; i++) {
+        if(fallBlocks[i].x <= 400 && fallBlocks[i].x > -20){
+        fallBlocks[i].draw();
+        }
+    } 
+    keyCount = 0;
+    player1.inWater = false;
+    if(levelSide === 1){
+    for(var i = 0;i < keys.length; i++) {
+        if(keys[i].x <= 400 && keys[i].x > -20){
+        keys[i].draw();
+        keys[i].collide();
+        }
+    } 
+    }
+    if(levelSide === 2){
+        for(var i = 0;i < keys2.length; i++) {
+            if(keys2[i].x <= 400 && keys2[i].x > -20){
+            keys2[i].draw();
+            keys2[i].collide();
+            }
+        } 
+    }
+    for(var i = 0;i < keys.length; i++) {
+        if(keys[i].x <= 400 && keys[i].x > -20){
+        if(keys[i].collected){
+            keyCount += 1;
+        }
+    } 
+    }
+    
+    for(var i = 0;i < keys2.length; i++) {
+        if(keys2[i].x <= 400 && keys2[i].x > -20){
+        if(keys2[i].collected){
+            keyCount += 1;    
+        }
+    } 
+    }
+    if(keyCount === keys.length + keys2.length && doors.length > 0){
+        doors[0].l = false;
+    }
+    player1.inLava = false;
+    for(var i = 0;i < spikes.length; i++) {
+        if(spikes[i].x <= 400 && spikes[i].x > -20){
+        if(spikes[i].t === "ladder"){
+        spikes[i].draw();
+        }
+        spikes[i].collide();
+    }
+    }
+    player1.draw();
+    player1.move();
+    player1.shoot();
+    for(var i = 0;i < spikes.length; i++) {
+        if(spikes[i].x <= 400 && spikes[i].x > -20){
+        if(spikes[i].t === "water"){
+        spikes[i].draw();
+        }
+        }
+    }
+    for(var i = 0;i < cannons.length; i++) {
+        if(cannons[i].x <= 400 && cannons[i].x > -20){
+        cannons[i].draw();
+        cannons[i].shoot();
+        }
+    } 
+    player1.notMoving = false;
+    if(player1.x + player1.w/2 >= 200 && blocks[blocks.length - 1].x > 400 - blocks[blocks.length - 1].w + player1.speed && player1.past === "right"){
+        player1.notMoving = true;
+        player1.x = 200 - player1.w/2;
+        for(var i = 0; i < player1.ballList.length; i++){
+                player1.ballList[i].x -= player1.speed;
+                player1.ballList[i].x2 -= player1.speed;
+        }
+        for(var i = 0;i < blocks.length; i++){
+           blocks[i].x -= player1.speed; 
+           
+        }
+        for(var i = 0;i < cannons.length; i++){
+           cannons[i].x -= player1.speed;
+           cannons[i].x2 -= player1.speed;
+           for(var i2 = 0; i2 < cannons[i].ballList.length; i2++){
+                cannons[i].ballList[i2].x -= player1.speed;
+                cannons[i].ballList[i2].x2 -= player1.speed;
+           }
+        }
+        for(var i = 0;i < doors.length; i++){
+           doors[i].x -= player1.speed; 
+           doors[i].x2 -= player1.speed;
+           
+        }
+        for(var i = 0;i < spikes.length; i++){
+           spikes[i].x -= player1.speed; 
+        }
+        for(var i = 0;i < keys.length; i++){
+           keys[i].x -= player1.speed; 
+        }
+        
+    }
+    if(player1.x + player1.w/2 <= 200 && blocks[0].x < 0 - player1.speed && player1.past === "left"){
+        player1.notMoving = true;
+        player1.x = 200 - player1.w/2;
+        for(var i = 0; i < player1.ballList.length; i++){
+                player1.ballList[i].x += player1.speed;
+                player1.ballList[i].x2 += player1.speed;
+        }
+        for(var i = 0;i < blocks.length; i++){
+           blocks[i].x += player1.speed; 
+        }
+        for(var i = 0;i < cannons.length; i++){
+           cannons[i].x += player1.speed; 
+           cannons[i].x2 += player1.speed;
+           for(var i2 = 0; i2 < cannons[i].ballList.length; i2++){
+                cannons[i].ballList[i2].x += player1.speed;
+                cannons[i].ballList[i2].x2 += player1.speed;
+           }
+        }
+        for(var i = 0;i < doors.length; i++){
+           doors[i].x += player1.speed;
+           doors[i].x2 += player1.speed;
+        }
+        for(var i = 0;i < spikes.length; i++){
+           spikes[i].x += player1.speed; 
+        }
+        for(var i = 0;i < keys.length; i++){
+           keys[i].x += player1.speed; 
+        }
+    }
+    for(var i = 0; i < player1.lives; i++){
+        image(getImage("space/healthheart"),21*(i+0),width/10000,20,20);
+    }
+    textSize(20);
+    fill(227, 217, 18);
+    textAlign(RIGHT,TOP);
+    text("Coins: " + coins,390,0);
+    if(keyIsPressed && key.toString() === "r" || player1.lives <= 0){
+        setPos = true;
+        levelSide = 1;
+        keys = [];
+        keys2 = [];
+        used = 1;
+        loadLevel();
+        player1.reset(player1config);
+        level = levels.length - 1;
+    }
+    if(level === levels.length - 1 && player1.y > 340){
+        setPos = false;
+        levelSide = 1;
+        player1.y = 10;
+        keys = [];
+        keys2 = [];
+        level = levels.length - 2;
+        used = 1;
+        loadLevel();
+        player1.reset(player1config);
+    }
+    if(level === levels.length - 2 && player1.y < 0){
+        setPos = false;
+        levelSide = 1;
+        player1.y = 320;
+        keys = [];
+        keys2 = [];
+        level = levels.length - 1;
+        used = 1;
+        loadLevel();
+        player1.reset(player1config);
+    }
+    I.draw();
+    if(input.E){
+        gameScene = "maker";
+    }
+    if(input.F){
+        gameScene = "inventory";
+    }
+    }
+    if(gameScene === "inventory"){
+        background(181, 150, 89);
+        rectMode(CENTER);
+        textAlign(CENTER,CENTER);
+        noStroke();
+        /**
+        for(var i = 0; i < I.leftItems.length; i++){
+            I.leftItems[i][0].draw();
+            //println(I.leftItems[0][0].name);
+        }
+        **/
+        textSize(40);
+        text("Items",200,20);
+        fill(105, 105, 105);
+        rect(200,50,400,10);
+        for(var y = 0; y < 4; y++){
+        for(var x = 0; x < 8; x++){
+            fill(79, 70, 70,150);
+            rect(x*50 + 25,240 - y*50,40,40,10);
+            inv[y*8 + x][0].draw();
+            textSize(8);
+            fill(0);
+            textAlign(LEFT,BOTTOM);
+            text(inv[y*8 + x][0].name,x*50 + 5,228 - y*50);
+            inv[y*8 + x][0].draw();
+            fill(0);
+            textAlign(CENTER,CENTER);
+            textSize(15);
+            text(inv[y*8 + x][1],(x)*50 + 25,240 - y*50);
+            if(mouseX >= x*50 + 5 && mouseX <= x*50 + 45 && mouseY >= 240 - y*50 - 20 && mouseY <= 240 - y*50 + 20 && clicked){
+                if(inv[y*8 + x][0].name !== I.items[I.selected][0].name){
+                var s = inv[y*8 + x][0].name;
+                inv[y*8 + x][0].name = I.items[I.selected][0].name;
+                I.items[I.selected][0].name = s;
+                var s = inv[y*8 + x][1];
+                inv[y*8 + x][1] = I.items[I.selected][1];
+                I.items[I.selected][1] = s;
+                }
+                else{
+                    inv[y*8 + x][1] += I.items[I.selected][1];
+                    I.items[I.selected] = [new item(I.selected*50 + 25,370,"",20),""];
+                }
+        }
+        }
+        }
+        I.draw();
+        if(input.Q){
+        gameScene = "game";
+    }
+    }
+    if(gameScene === "maker"){
+        background(196, 191, 171);
+        StoneMaker.draw();
+        StoneMaker.make();
+        I.draw();
+        if(input.Q){
+            for(var i2 = 0; i2 < StoneMaker.itemList.length; i2++){
+        StoneMaker.u = 0;
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === StoneMaker.itemList[i2][0].name){
+            I.items[i][1] += StoneMaker.itemList[i2][1];
+            StoneMaker.u = 1;
+        }
+    }
+    if(StoneMaker.u === 0){
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = 1;
+            I.items[i][0] = new item(25 + i*50,370,StoneMaker.itemList[i2][0].name,20);
+            StoneMaker.u = 1;
+            break;
+        }
+        }
+    }
+    }
+        StoneMaker.itemMade = [new item(0,0,"",0),""];
+        StoneMaker.u = 0;
+        gameScene = "game";
+        StoneMaker.itemList = [];
+        StoneMaker.numList = [];
+    }
+    }
+}
+for(var i = 0; i < notifications.length; i++){
+        notifications[i].draw();
+        if(notifications[i].y <= -51){
+            notifications[i].stop = true;
+        }
+    }
+clicked = false;
+};
+}};
+    // Get the canvas that Processing-js will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
+    var processingInstance = new Processing(canvas, sketchProc); 
+ </script>
+	<h2><a href="index.html">Home</a> <a class="rightalign" href="https://goo.gl/forms/z1pawqkxHrCbVw3f2">Rate This Game!</a></h2>
+</html>
+
+
+
