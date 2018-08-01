@@ -1,40 +1,24 @@
-<!-- This is based on DillingerLee's great template here:
-https://github.com/Team-Code/KA_Offline -->
+<!DOCTYPE html>
 <html> 
- <head>
-    <title>The Alchemist</title> 
-	 <style>
-		 body {
-			 background-color: rgb(0,0,0);
-		 }
-		 h1 {
-			color: rgb(103, 4, 184); 
-		 }
-		 h2 {
-			 color: rgb(129, 230, 230);
-		 }
-		 .rightalign {
-  			 text-align: right;
-		 }
-	 </style>
-</head>
- <body>
-    <p align="center"> 
-	    <center>
-	 <h1>The Alchemist</h1>
-	<!--This draws the Canvas on the webpage -->
-      <canvas id="mycanvas"></canvas> 
-	 </center>
-    </p>
- </body>
- <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <head>
+    <title>Processing.JS inside Webpages: Template</title> 
+  </head>
+  <body>
+	<!--This draws the canvas on the webpage -->
+    <canvas id="mycanvas"></canvas> 
+  </body>
  
- <script>
-    var sketchProc = function(processingInstance) {
-     with (processingInstance) {
-        size(400, 400); 
-        frameRate(100);
-var gravity = 0.02;
+  <!-- Include the processing.js library -->
+  <!-- See https://khanacademy.zendesk.com/hc/en-us/articles/202260404-What-parts-of-ProcessingJS-does-Khan-Academy-support- for differences -->
+  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+  <script>
+  var programCode = function(processingInstance) {
+    with (processingInstance) {
+      size(400, 400); 
+      frameRate(1000);
+       
+      // Paste code from Khan Academy here:
+      var gravity = 0.02;
 var setPos = true;
 var coins = 0;
 var items = ["Water","Ice","Leaf","Twig","Banana","Berry","Stone","Steel","Gold","Silver","Diamond","Emerald","Wind","Pear","OceanWater","Sand","Ashes","Glass","Steam","Grass","Lava","Obsidian","Log","Flint","Fire","Steam","WaterStone","FreezeStone","EarthStone","PortalStone"];
@@ -56,6 +40,7 @@ var currentLevel;
 if(currentLevel === undefined){
     currentLevel = 0;
 }
+angleMode = "radians";
 var levelSide = 1;
 var input = [];
 var blocks = [];
@@ -368,6 +353,14 @@ var btn4 = {
     locked: false
     
 };
+var heart = function(x,y,w,h){
+    stroke(255, 0, 0);
+    fill(255, 0, 0);
+    ellipse(x,y,w/2,h/2);
+    ellipse(x+w*3/10,y,w/2,h/2);
+    triangle(x-w*3/10,y,x+w*33/200,y+h*9/20,x+w*11/20,y);
+
+};
 var collision = function(obj1,obj2){
     if(obj1.y + obj1.h >= obj2.y && obj1.y + obj1.h <= obj2.y + obj2.h && obj1.x <= obj2.x + obj2.w  && obj1.x + obj1.w >= obj2.x || obj1.y <= obj2.y + obj2.h && obj1.y >= obj2.y && obj1.x <= obj2.x + obj2.w && obj1.x + obj1.w >= obj2.x){
         return true;    
@@ -510,18 +503,18 @@ stone.prototype.draw = function() {
     fill(59, 217, 111);
     pushMatrix();
     translate(this.x + this.s/10,this.y-this.s/2);
-    rotate(30);
+    rotate(radians(30));
     ellipse(0,0,this.s/5,this.s * 2/5);
     popMatrix();
     }
     if(this.name === "Banana"){
         noStroke();
     fill(237, 230, 31);
-    arc(this.x,this.y,this.s,this.s,-90,120);
+    arc(this.x,this.y,this.s,this.s,radians(-90),radians(120));
     noFill();
     stroke(0);
     strokeWeight(1);
-    arc(this.x,this.y,this.s,this.s,-90,120);
+    arc(this.x,this.y,this.s,this.s,radians(-90),radians(120));
     line(this.x,this.y,this.x - this.s/4,this.y + this.s*9/20);
     line(this.x,this.y,this.x,this.y - this.s/2);
     fill(0);
@@ -536,7 +529,7 @@ stone.prototype.draw = function() {
         for(var i = 0; i < 6; i++ ){
             pushMatrix();
             translate(this.x, this.y);
-            rotate(60*i);
+            rotate(radians(60*i));
             rect(0,0,this.s/10,this.s);
             popMatrix();
         }
@@ -549,7 +542,7 @@ stone.prototype.draw = function() {
         for(var i = 0; i < 4; i++ ){
             pushMatrix();
             translate(this.x, this.y);
-            rotate(90*i);
+            rotate(radians(90*i));
             rect(0,0,this.s/10,this.s);
             popMatrix();
         }
@@ -558,7 +551,7 @@ stone.prototype.draw = function() {
         for(var i = 0; i < 4; i++ ){
             pushMatrix();
             translate(this.x, this.y);
-            rotate(90*i + 45);
+            rotate(radians(90*i + 45));
             rect(0,0,this.s/10,this.s);
             popMatrix();
         }
@@ -590,7 +583,7 @@ stone.prototype.draw = function() {
         ellipse(this.x,this.y,this.s,this.s);
         pushMatrix();
         translate(this.x + this.s/4.7,this.y - this.s/4.4);
-        rotate(-45);
+        rotate(radians(-45));
         ellipse(0,0,this.s/5,this.s/4);
         popMatrix();
     }
@@ -730,18 +723,18 @@ item.prototype.draw = function() {
     fill(59, 217, 111);
     pushMatrix();
     translate(this.x + this.s/10,this.y-this.s/2);
-    rotate(30);
+    rotate(radians(30));
     ellipse(0,0,this.s/5,this.s * 2/5);
     popMatrix();
     }
     if(this.name === "Banana"){
         noStroke();
     fill(237, 230, 31);
-    arc(this.x,this.y,this.s,this.s,-90,120);
+    arc(this.x,this.y,this.s,this.s,radians(-90),radians(120));
     noFill();
     stroke(0);
     strokeWeight(1);
-    arc(this.x,this.y,this.s,this.s,-90,120);
+    arc(this.x,this.y,this.s,this.s,radians(-90),radians(120));
     line(this.x,this.y,this.x - this.s/4,this.y + this.s*9/20);
     line(this.x,this.y,this.x,this.y - this.s/2);
     fill(0);
@@ -752,7 +745,7 @@ item.prototype.draw = function() {
         fill(92, 72, 36);
         pushMatrix();
         translate(this.x,this.y);
-        rotate(150);
+        rotate(radians(150));
         rect(-this.s/4,0,this.s/2,this.s/4);
         popMatrix();
         rect(this.x,this.y,this.s/4,this.s);
@@ -760,7 +753,7 @@ item.prototype.draw = function() {
     if(this.name === "Leaf"){
         pushMatrix();
         translate(this.x,this.y);
-        rotate(20);
+        rotate(radians(20));
         fill(92, 72, 36);
         rect(0,this.s/3,this.s/8,this.s/2);
         fill(46, 156, 50);
@@ -776,7 +769,7 @@ item.prototype.draw = function() {
         for(var i = 0; i < 6; i++ ){
             pushMatrix();
             translate(this.x, this.y);
-            rotate(60*i);
+            rotate(radians(60*i));
             rect(0,0,this.s/10,this.s);
             popMatrix();
         }
@@ -793,7 +786,7 @@ item.prototype.draw = function() {
         for(var i = 0; i < 4; i++ ){
             pushMatrix();
             translate(this.x, this.y);
-            rotate(90*i);
+            rotate(radians(90*i));
             rect(0,0,this.s/10,this.s);
             popMatrix();
         }
@@ -802,7 +795,7 @@ item.prototype.draw = function() {
         for(var i = 0; i < 4; i++ ){
             pushMatrix();
             translate(this.x, this.y);
-            rotate(90*i + 45);
+            rotate(radians(90*i + 45));
             rect(0,0,this.s/10,this.s);
             popMatrix();
         }
@@ -826,7 +819,7 @@ item.prototype.draw = function() {
         fill(107, 81, 48);
         rectMode(CENTER);
         pushMatrix();
-        rotate(20);
+        rotate(radians(20));
         translate(this.x,this.y);
         rect(0,0,this.s/3,this.s);
         popMatrix();
@@ -836,7 +829,7 @@ item.prototype.draw = function() {
         pushMatrix();
         rectMode(LEFT);
         translate(this.x,this.y + this.s/4);
-        rotate(200 + 40*i);
+        rotate(radians(200 + 40*i));
         fill(67, 196, 69);
         rect(0,0,this.s/1.3,this.s/5);
         popMatrix();
@@ -976,7 +969,7 @@ item.prototype.draw = function() {
         ellipse(this.x,this.y,this.s,this.s);
         pushMatrix();
         translate(this.x + this.s/4.7,this.y - this.s/4.4);
-        rotate(-45);
+        rotate(radians(-45));
         ellipse(0,0,this.s/5,this.s/4);
         popMatrix();
     }
@@ -1099,8 +1092,8 @@ item.prototype.draw = function() {
         strokeWeight(this.s*3/20);
         noFill();
         stroke(171, 154, 24);
-        arc(this.x - this.s/1.5,this.y,this.s,this.s,-40,40);
-        arc(this.x + this.s/1.5,this.y,this.s,this.s,140,220);
+        arc(this.x - this.s/1.5,this.y,this.s,this.s,radians(-40),radians(40));
+        arc(this.x + this.s/1.5,this.y,this.s,this.s,radians(140),radians(220));
         noStroke();
         strokeWeight(1);
     }
@@ -1109,7 +1102,7 @@ item.prototype.draw = function() {
         ellipse(this.x,this.y,this.s,this.s);
         pushMatrix();
         translate(this.x + this.s/4.7,this.y - this.s/4.4);
-        rotate(-45);
+        rotate(radians(-45));
         ellipse(0,0,this.s/5,this.s/4);
         popMatrix();
         pushMatrix();
@@ -1646,12 +1639,12 @@ groundBlock.prototype.draw = function() {
     rect(this.x,this.y,this.w,this.h);
     if(this.r){
     fill(67, 196, 69);
-    arc(this.x + this.w/2,this.y,this.w,this.h,0,180);
+    arc(this.x + this.w/2,this.y,this.w,this.h,0,radians(180));
     if(this.g === 2 && !this.open){
     for(var i = 0; i < 4; i++){
         pushMatrix();
         translate(this.x + this.w/2,this.y + 2);
-        rotate(130 + 40*i);
+        rotate(radians(130 + 40*i));
         fill(67, 196, 69);
         rect(0,0,y,10,3);
         popMatrix();
@@ -2657,17 +2650,17 @@ door.prototype.draw= function() {
     fill(235, 221, 97,this.o);
     pushMatrix();
         translate(this.x2,this.y2);
-        rotate(this.a);
+        rotate(radians(this.a));
         ellipse(0,0,this.s/2 - 3,this.s - 3);
     popMatrix();
     pushMatrix();
         translate(this.x2,this.y2);
-        rotate(this.a + 60);
+        rotate(radians(this.a + 60));
         ellipse(0,0,this.s/2 - 3,this.s - 3);
     popMatrix();
     pushMatrix();
         translate(this.x2,this.y2);
-        rotate(this.a + 120);
+        rotate(radians(this.a + 120));
         ellipse(0,0,this.s/2 - 3,this.s - 3);
     popMatrix();
     this.a += 1;
@@ -2685,7 +2678,7 @@ fakeDoor.prototype.draw = function() {
     noStroke();
     rectMode(LEFT);
     rect(this.x,this.y + this.h/2,this.w,this.h/2);
-    arc(this.x + this.w/2,this.y + this.h/2,this.w,this.h,-180,0);
+    arc(this.x + this.w/2,this.y + this.h/2,this.w,this.h,radians(-180),0);
     fill(59, 56, 59);
     ellipse(this.x + this.w/4,this.y + this.h*3/5,5,5);
 };
@@ -3218,10 +3211,10 @@ var draw = function() {
         }
     }
     for(var i = 0;i < cannons.length; i++) {
-        if(cannons[i].x <= 400 && cannons[i].x > -20){
+        if(cannons[i].x <= 420 && cannons[i].x > -20){
         cannons[i].draw();
-        cannons[i].shoot();
         }
+        cannons[i].shoot();
     } 
     player1.notMoving = false;
     if(player1.x + player1.w/2 >= 200 && blocks[blocks.length - 1].x > 400 - blocks[blocks.length - 1].w + player1.speed && player1.past === "right"){
@@ -3286,13 +3279,16 @@ var draw = function() {
         }
     }
     for(var i = 0; i < player1.lives; i++){
-        image(getImage("space/healthheart"),21*(i+0),width/10000,20,20);
+        for(var i = 0; i < player1.lives; i++){
+        heart(21*(i)+ 7,width/10000 + 7,20,20);
+        noStroke();
+    }
     }
     textSize(20);
     fill(227, 217, 18);
     textAlign(RIGHT,TOP);
     text("Coins: " + coins,390,0);
-    if(keyPressed && key.toString() === "r" || player1.lives <= 0){
+    /**if(input.R || player1.lives <= 0){
         setPos = true;
         levelSide = 1;
         keys = [];
@@ -3301,7 +3297,7 @@ var draw = function() {
         loadLevel();
         player1.reset(player1config);
         level = levels.length - 1;
-    }
+    }**/
     if(level === levels.length - 1 && player1.y > 340){
         setPos = false;
         levelSide = 1;
@@ -3423,14 +3419,16 @@ for(var i = 0; i < notifications.length; i++){
     }
 clicked = false;
 };
-}};
-    // Get the canvas that Processing-js will use
-    var canvas = document.getElementById("mycanvas"); 
-    // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
-    var processingInstance = new Processing(canvas, sketchProc); 
- </script>
-	<h2><a href="index.html">Home</a> <a class="rightalign" href="https://goo.gl/forms/z1pawqkxHrCbVw3f2">Rate This Game!</a></h2>
+
+
+
+
+    }};
+
+  // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
 </html>
-
-
 
