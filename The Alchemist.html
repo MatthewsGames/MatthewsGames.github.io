@@ -34,10 +34,11 @@
   var programCode = function(processingInstance) {
     with (processingInstance) {
       size(400, 400); 
-      frameRate(1000);
+      frameRate(55);
        
       // Paste code from Khan Academy here:
-      var gravity = 0.02;
+      frameRate(55);
+var gravity = 0.02;
 frameRate(100);
 noSmooth();
 var setPos = true;
@@ -145,21 +146,21 @@ var levels = [
     "  iiiiiiiiiiiiiiiiiii     iiiiiiiii       iiiiii    iiiiiiiiiiiiiiii   iii ",
     "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii",],
     ["x                                                                          ",
-    "                                                                           ",
-    "                                                                           ",
-    "                                                                           ",
-    "           ss                                                              ",
-    "          slsl                                                             ",
-    "         ssssss                                                            ",
-    "        lssslss                                                            ",
-    "        sssssssl                                                           ",
-    "        ssssssss                                                           ",
-    "       lssslsssss                                                          ",
-    "      lsssssssslss                                                         ",
-    "      ssssssssssssl                                                        ",
-    "     sssssslssslsss                                                        ",
-    "    lsslssssssssssss                                                       ",
-    "  slsssssssslsssslssssl                                                    ",
+    "                                                             s             ",
+    "                                                            ssl            ",
+    "                                  l                         sss            ",
+    "           ss                    ss                        ssssl           ",
+    "          slsl                  slsl                      lssssss          ",
+    "         ssssss                ssssss                    ssssslsss         ",
+    "        lssslss               lssslss        sl          sslsssssl         ",
+    "        sssssssl              sssssssl     lsss         lssssssssss        ",
+    "        ssssssss              ssssssss     ssslss      lssssssslsss        ",
+    "       lssslsssss            lssslsssss   lsssssls     ssssslssssssl       ",
+    "      lsssssssslss          lsssssssslss  slssssssl   ssssssssslssss       ",
+    "      ssssssssssssl         sssssssssssslssssssssss   ssslsssssssssss      ",
+    "     sssssslssslsss        sssssslssslssssslsssslsssslsssssssslssssssls    ",
+    "    lsslssssssssssss      lsslsssssssssssssssslssssssssslsssssssssssssss   ",
+    "  slsssssssslsssslsssslslsssssssslsssslsssslssssssslssssssssslsssslssssls  ",
     "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",],
     ["x                                                                          ",
     "                                                                           ",
@@ -1696,7 +1697,8 @@ groundBlock.prototype.draw = function() {
     rect(this.x,this.y,this.w,this.h);
     if(this.r){
     fill(67, 196, 69);
-    arc(this.x + this.w/2,this.y,this.w,this.h,0,PI);
+    rect(this.x,this.y,this.w,this.h/3);
+    //arc(this.x + this.w/2,this.y,this.w,this.h,0,PI);
     if(this.g === 2 && !this.open){
     for(var i = 0; i < 4; i++){
         pushMatrix();
@@ -1952,7 +1954,7 @@ iceBlock.prototype.draw = function() {
     rect(this.x,this.y,this.w,this.h);
     if(this.r === true){
     fill(199, 221, 237);
-    rect(this.x,this.y,this.w,this.h/4);
+    rect(this.x,this.y,this.w,this.h/3);
     this.s = this.w;
     if(this.g === 2 && !this.open){
         //fill(102, 102, 96);
@@ -3343,7 +3345,7 @@ var draw = function() {
     fill(227, 217, 18);
     textAlign(RIGHT,TOP);
     text("Coins: " + coins,390,0);
-    if(keyIsPressed && key.toString() === "r" || player1.lives <= 0){
+    if(player1.lives <= 0){
         setPos = true;
         levelSide = 1;
         keys = [];
@@ -3475,14 +3477,6 @@ for(var i = 0; i < notifications.length; i++){
     notifications = [];
 clicked = false;
 };
-
-
-
-
-
-
-
-
     }};
 
   // Get the canvas that ProcessingJS will use
