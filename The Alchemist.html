@@ -38,6 +38,8 @@
        
       // Paste code from Khan Academy here:
       var gravity = 0.02;
+frameRate(100);
+noSmooth();
 var setPos = true;
 var coins = 0;
 var items = ["Water","Ice","Leaf","Twig","Banana","Berry","Stone","Steel","Gold","Silver","Diamond","Emerald","Wind","Pear","OceanWater","Sand","Ashes","Glass","Steam","Grass","Lava","Obsidian","Log","Flint","Fire","Steam","WaterStone","FreezeStone","EarthStone","PortalStone"];
@@ -146,6 +148,23 @@ var levels = [
     "                                                                           ",
     "                                                                           ",
     "                                                                           ",
+    "           ss                                                              ",
+    "          slsl                                                             ",
+    "         ssssss                                                            ",
+    "        lssslss                                                            ",
+    "        sssssssl                                                           ",
+    "        ssssssss                                                           ",
+    "       lssslsssss                                                          ",
+    "      lsssssssslss                                                         ",
+    "      ssssssssssssl                                                        ",
+    "     sssssslssslsss                                                        ",
+    "    lsslssssssssssss                                                       ",
+    "  slsssssssslsssslssssl                                                    ",
+    "sssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",],
+    ["x                                                                          ",
+    "                                                                           ",
+    "                                                                           ",
+    "                                                                           ",
     "                                                                           ",
     "                                                                           ",
     "                                                                           ",
@@ -159,6 +178,23 @@ var levels = [
     "   yyy              yyyyyyy           yyyyyy                       yyyyyy  ",
     "  yyyyy            yyyyyyyyyy        yyyyyyyy     yyy    yyy      yyyyyyyyy",
     "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",],
+    ["x                                                                          ",
+    "                          oo                   oo                          ",
+    "                          oo!!!            !!!!oo                          ",
+    "                          oo!!!!!!!!!!!!!!!!!!!oo                          ",
+    "                          oooo!!!!!!!!!!!!!!!oooo                          ",
+    "                         ooooo!!!!!!!!!!!!!!!ooooo                         ",
+    "                         ooooo!!!!!!!!!!!!!!!ooooo                         ",
+    "                         oooooo!!!!!!!!!!!!!oooooo                         ",
+    "                        ooooooo!!!!!!!!!!!!oooooooo                        ",
+    "                        oooooooo!!!!!!!!!!!oooooooo                        ",
+    "                       oooooooooo!!!!!!!!!oooooooooo                       ",
+    "                      oooooooooooo!!!!!!!oooooooooooo                      ",
+    "                     oooooooooooooo!!!!ooooooooooooooo                     ",
+    "                   ooooooooooooooooooooooooooooooooooooo                   ",
+    "                ooooooooooooooooooooooooooooooooooooooooooo                ",
+    "          oooooooooooooooooooooooooooooooooooooooooooooooooooooo           ",
+    "ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",],
     ["x                                                                               x",
     "                                                                           ",
     "                   ooo ooo ooo          ooo ooo ooo          ooo ooo ooo   ",
@@ -169,13 +205,13 @@ var levels = [
     "                   ooo|ooooooo          ooo|ooooooo          ooooooo|ooo   ",
     "                     o|zzzzo              o|zzzzo              ozzzz|o     ",
     "                     o|zz*zoooooooooooooooo|zzzzoooooooooooooooozzzz|o     ",
-    "                     o|zGzzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
+    "                     o|zczzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
     "                     o|ooooozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
     "                     o|zzzzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
     "                     o|zzzzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
-    "     oo!!!!!!oo   c  #zzzzzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
-    "~~~~~~oooooooo~yyyyyyozzzzz#zzzzzz#zzzzzzz#zzzzz#zzzzzz#zzzzzzz#zzzzz#         x",
-    "~~~~~~~~~~~~~yyyyyyyyoooooooooooooooooooooooooooooooooooooooooooooooooooo      x",],
+    "                  c  #zzzzzozzzzzzozzzzzzzo|zzzzozzzzzzozzzzzzzozzzz|o     ",
+    "oooooooooooooooooooooozzzzz#zzzzzz#zzzzzzz#zzzzz#zzzzzz#zzzzzzz#zzzzz#     x",
+    "oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo        x",],
     ["x~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
     "~~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
     "~~~~~~~~~~~~~~~~~~ssssssssssss  sssssssss",
@@ -185,10 +221,10 @@ var levels = [
     "~~~~~~~~~~~~~~~~~~ssssssssss           ss",
     "~~~~~~~~~~~~~~~~~~SSSSSSSSSS           ss",
     "~~~~~~~~~~~~~~~~~~ssssssssss           ss",
-    "~~~~~~~~~~~~~~~~~~ssssssssss           ss",
-    "~~~~~~~~~~~~~~~~~~ssssssssss         ssss",
-    "~~~~~~~~~~~~~~~~~~ssssssssss        sssss",
-    "~~~~~~~~~~~~~~~~~~sssssssssss    ssssssss",
+    "~~~~~~~~~~~~~~~~~~ssssssssss         ttss",
+    "~~~~~~~~~~~~~~~~~~sssssssssst       tssss",
+    "~~~~~~~~~~~~~~~~~~sssssssssss    tttsssss",
+    "~~~~~~~~~~~~~~~~~~sssssssssssttttssssssss",
     "~~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
     "~~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
     "~~~~~~~~~~~~~~~~~~sssssssssssssssssssssss",
@@ -1178,7 +1214,7 @@ var inventory = function(x,y,i){
     for(var i = 0; i< 8; i++){
         this.leftItems.push([new item(i*50 + 25,370,"",20),""]);
     }
-    this.items = [[new item(25,370,"ArmorStone",20),10],[new item(75,370,"InvisibilityStone",20),10]];
+    this.items = [[new item(25,370,"ArmorStone",20),10],[new item(75,370,"InfernoStone",20),10]];
     this.selected = 0;
     for(var i = 0; i< 6; i++){
         this.items.push([new item(i*50 + 25,370,"",20),""]);
@@ -1226,7 +1262,7 @@ var stoneMaker = function(x,y){
     this.itemList = [];
     this.numList = [];
     this.itemMade = [new item(0,0,"",0),""];
-    this.combinations = [[[["Water",2],["Stone",1]],"WaterStone"],[[["Ice",2],["Stone",1]],"FreezeStone"],[[["Banana",1],["Berry",1],["Leaf",1],["Twig",1]],"EarthStone"],[[["Lava",1],["Water",1]],"Obsidian"],[[["Flint",1],["Steel",1]],"Fire"],[[["Fire",1],["Ice",1]],"Water"],[[["Fire",1],["Sand",1]],"Glass"],[[["Fire",1],["Twig",1]],"Ashes"],[[["Fire",1],["Log",1]],"Ashes"],[[["Fire",1],["Water",1]],"Steam"]];
+    this.combinations = [[[["Water",2],["Stone",1]],"WaterStone"],[[["Ice",2],["Stone",1]],"FreezeStone"],[[["Banana",1],["Berry",1],["Leaf",1],["Twig",1]],"EarthStone"],[[["Lava",1],["Water",1]],"Obsidian"],[[["Flint",1],["Steel",1]],"Fire"],[[["Fire",1],["Ice",1]],"Water"],[[["Fire",1],["Sand",1]],"Glass"],[[["Fire",1],["Twig",1]],"Ashes"],[[["Fire",1],["Log",1]],"Ashes"],[[["Fire",1],["Water",1]],"Steam"],,[[["Water",1],["Berry",1],["Leaf",1],["Grass",1]],"HealStone"],[[["Fire",2],["Stone",1]],"FireStone"],[[["Wind",1],["Fire",1],["Lava",1],["Obsidian",1]],"InfernoStone"],[[["Steel",1],["Silver",1],["Gold",1],["Fire",1]],"ArmorStone"],[[["Wind",2],["Stone",1]],"WindStone"],[[["Wind",2],["Glass",1]],"InvisibilityStone"]];
     this.u = 0;
     //println(this.combinations[1][0].length);
 };
@@ -1539,8 +1575,10 @@ player.prototype.move = function(){
     }
     if(this.inLava && this.wasInLava === false || this.lavaTimer >= 50){
         this.lavaTimer = 0;
+        if(this.armor > 600){
         this.lives -= 1;
         background(255, 0, 0);
+        }
     }
     if(this.inLava){
         this.lavaTimer += 1;
@@ -1658,7 +1696,7 @@ groundBlock.prototype.draw = function() {
     rect(this.x,this.y,this.w,this.h);
     if(this.r){
     fill(67, 196, 69);
-    arc(this.x + this.w/2,this.y,this.w,this.h,0,radians(180));
+    arc(this.x + this.w/2,this.y,this.w,this.h,0,PI);
     if(this.g === 2 && !this.open){
     for(var i = 0; i < 4; i++){
         pushMatrix();
@@ -3298,16 +3336,14 @@ var draw = function() {
         }
     }
     for(var i = 0; i < player1.lives; i++){
-        for(var i = 0; i < player1.lives; i++){
         heart(21*(i)+ 7,width/10000 + 7,20,20);
         noStroke();
-    }
     }
     textSize(20);
     fill(227, 217, 18);
     textAlign(RIGHT,TOP);
     text("Coins: " + coins,390,0);
-    if(player1.lives <= 0){
+    if(keyIsPressed && key.toString() === "r" || player1.lives <= 0){
         setPos = true;
         levelSide = 1;
         keys = [];
@@ -3436,9 +3472,13 @@ for(var i = 0; i < notifications.length; i++){
             notifications[i].stop = true;
         }
     }
-notifications = [];
+    notifications = [];
 clicked = false;
 };
+
+
+
+
 
 
 
