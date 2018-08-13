@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html> 
+ <head>
+    <title>Snake</title> 
+</head>
+ <body>
+    <p align="center"> 
+      <canvas id="mycanvas"></canvas> 
+    </p>
+ </body>
+ <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+ 
+ <script>
+    var sketchProc = function(processingInstance) {
+     with (processingInstance) {
+        size(700, 700); 
+        frameRate(55);
+        
+var grid = false;
+var snake = {
+    x:110,
+    y:310,
+    s:20,
+    speed:4,
+};
+var btn1 = {
+    x: 200,
+    y: 259,
+    width:170,
+    height:80,
+    r: 0, 
+    g:0,
+    b:0,
+    txt:"PLAY",
+    locked: false
+};
+var btn2 = {
+    x: 200,
+    y: 259,
+    width:170,
+    height:80,
+    r: 0, 
+    g:0,
+    b:0,
+    txt:"RETRY",
+    locked: false
+};
+var gText = function(txt,x,y,s){
+    fill(86, 227, 93);
+    textSize(s);
+    text(txt,x,y);
+    fill(41, 161, 32);
+    textSize(s);
+    text(txt,x + s*3/40,y);
+    
+};
+var highScore;
+if(highScore === undefined){
+    highScore = 0;
+}
+var clicked;
+var scene = "home";
+var golden = false;
+var input = [];
+var keyPressed = function() {
+    input[keyCode] = true;
+    input[key.toString().toUpperCase()] = true;
+};
+var keyReleased = function() {
+    input[keyCode] = false;
+    input[key.toString().toUpperCase()] = false;
+};
+var button = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.width = config.width;
+    this.height = config.height;
+    this.r = config.r;
+    this.g = config.g;
+    this.b = config.b;
+    this.goto = config.goto;
+    this.txt = config.txt;
+    this.t = config.t;
+    this.locked = config.locked;
+    this.txts = config.txts || 40;
+};
+button.prototype.draw = function() {
+     noStroke();
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        fill(43, 41, 43);
+        pushMatrix();
+        translate(5,5);
+        rectMode(CENTER);
+     rect(this.x,this.y,this.width,this.height,50);
+     textAlign(CENTER,CENTER);
+     gText(this.txt,this.x,this.y,this.txts);
+     popMatrix();
+    } else {
+        fill(122, 113, 113);
+        rect(this.x + 5,this.y + 5,this.width,this.height,50);
+        fill(43, 41, 43);
+        rectMode(CENTER);
+     rect(this.x,this.y,this.width,this.height,50);
+     textAlign(CENTER,CENTER);
+     gText(this.txt,this.x,this.y,this.txts);
+    }
+};
+button.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && clicked === true && this.locked === false){
+            scene = "game";
+    }
+};
+var playButton = new button(btn1);
+var menuButton = new button(btn2);
+var collision = function(obj1,obj2){
+    if(obj1.y + obj1.h >= obj2.y && obj1.y + obj1.h <= obj2.y + obj2.h && obj1.x <= obj2.x + obj2.w - 1 && obj1.x + obj1.w -1 >= obj2.x || obj1.y <= obj2.y + obj2.h && obj1.y >= obj2.y && obj1.x <= obj2.x + obj2.w -1 && obj1.x + obj1.w -1 >= obj2.x){
+        return true;    
+    } else {
+        return false;    
+    }
+};
+var runnerTile = function(x,y,s){
+    this.x = x;
+    this.y = y;
+    this.s = 0;
+    this.maxSize = s;
+    this.c = 0;
+    this.p = false;
+    this.created = false;
+    this.h = s;
+    this.w = s;
+};
+runnerTile.prototype.draw = function() {
+    rectMode(CENTER);
+    noStroke();
+    fill(71, 207, 62);
+    rect(this.x,this.y,this.s,this.s);
+    this.c += 1;
+};
+runnerTile.prototype.create = function(){
+    if(this.s < this.maxSize){
+        if(this.p === false){
+            this.s += 2;
+        }
+    }
+    else{
+        this.p = true;
+        this.c = 0;
+    }
+    if(this.p === true && this.c <= 20){
+        this.s -= 1;
+    }
+    if(this.p === true && this.c > 20 && this.c <= 40){
+        this.s += 1;
+        if(this.c === 40){
+            this.created = true;
+            this.s = this.maxSize;
+        }
+    }
+    
+    
+    
+    this.draw();
+};
+var runner = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.s = config.s;
+    this.speed = config.speed;
+    this.tileList = [new runnerTile(this.x,this.y,this.s),new runnerTile(this.x,this.y,this.s)];
+    this.dir = "";
+    this.f = 0;
+    this.lx = 0;
+    this.ly = 400;
+    this.w = config.s;
+    this.h = config.s;
+    this.freeze = false;
+    this.add = false;
+    this.pdir = "";
+    
+};
+runner.prototype.draw = function() {
+    for(var i = 0; i < this.tileList.length; i++){
+        if(this.tileList[i].created === true){
+            this.tileList[i].draw();
+        }
+        else{
+            this.tileList[i].create();
+        }
+    }
+};
+runner.prototype.move = function(){
+    if(this.freeze === false){
+    if(input[UP] && this.tileList.length <= 2 || input[UP] && this.pdir !== "d" || input.W && this.tileList.length <= 2 || input.W && this.pdir !== "d" ){
+        this.dir = "u";
+    }
+    if(input[DOWN] && this.tileList.length <= 2 || input[DOWN] && this.pdir !== "u"   ||input.S && this.tileList.length <= 2 || input.S && this.pdir !== "u" ){
+        this.dir = "d";
+    }
+    if(input[RIGHT] && this.tileList.length <= 2 || input[RIGHT] && this.pdir !== "l"   ||input.D && this.tileList.length <= 2 || input.D && this.pdir !== "l" ){
+        this.dir = "r";
+    }
+    if(input[LEFT] && this.tileList.length <= 2 || input[LEFT] && this.pdir !== "r"   ||input.A && this.tileList.length <= 2 || input.A && this.pdir !== "r" ){
+        this.dir = "l";
+    }
+    if(this.dir === "u" && (this.f)%(this.s - floor(this.speed)) === 0){
+        this.y -= this.s;
+        this.pdir = this.dir;
+    }
+    if(this.dir === "d" && (this.f)%(this.s - floor(this.speed)) === 0){
+        this.y += this.s;
+        this.pdir = this.dir;
+    }
+    if(this.dir === "r" && (this.f)%(this.s - floor(this.speed)) === 0){
+        this.x += this.s;
+        this.pdir = this.dir;
+    }
+    if(this.dir === "l" && (this.f)%(this.s - floor(this.speed)) === 0){
+        this.x -= this.s;
+        this.pdir = this.dir;
+    }
+    if(this.add){
+        this.tileList.push(new runnerTile(this.lx,this.ly,this.s));
+        this.add = false;
+    }
+    if((this.f)%(this.s - floor(this.speed)) === 0){
+        if(this.speed < 15){
+        this.speed += 0.02;
+        }
+        this.tileList[0].x = this.x;
+        this.tileList[0].y = this.y;
+        this.lx = this.tileList[this.tileList.length - 1].x;
+        this.ly = this.tileList[this.tileList.length - 1].y;
+        for(var i = 1; i < this.tileList.length;i++){
+            this.tileList[this.tileList.length - i].x = this.tileList[(this.tileList.length - i)-1].x;
+            this.tileList[this.tileList.length - i].y = this.tileList[(this.tileList.length - i)-1].y;
+        }
+    }
+    this.f += 1;
+    
+    }
+};
+runner.prototype.dead = function(){
+    for(var i = 2; i < this.tileList.length;i++){
+        if(this.x === this.tileList[i].x && this.y === this.tileList[i].y){
+            return true;
+        }
+    }
+    return false;
+};
+var snakey = new runner(snake);
+var apple = function(x,y,s){
+    var i = floor(random(1,20));
+    var i2 = floor(random(1,20));
+    this.x = x||20*i - 10;
+    this.y = y||20*i2 - 10;
+    this.w = s||20;
+    this.h = s||20;
+};
+apple.prototype.draw = function() {
+    rectMode(CENTER);
+    noStroke();
+    if(golden){
+        fill(209, 191, 30);
+    }
+    else{
+    fill(194, 21, 21);
+    }
+    rect(this.x,this.y,this.w*4/5,this.h*4/5,20);
+    fill(59, 217, 111);
+    pushMatrix();
+    translate(this.x + 2,this.y-10);
+    rotate(30);
+    ellipse(0,0,4,8);
+    popMatrix();
+};
+apple.prototype.collide = function(){
+    if(this.x === snakey.x && this.y === snakey.y){
+        if(golden){
+            this.t = 0;
+            this.g = true;
+        }
+        else{
+        snakey.add = true;
+        }
+        var t = true;
+        while(t === true){
+            var i = floor(random(1,20));
+            var i2 = floor(random(1,20));
+            this.x = 20*i - 10;
+            this.y = 20*i2 - 10;
+            t = false;
+            for(var i = 0;i<snakey.tileList.length;i++){
+                if(this.x === snakey.tileList[i].x && this.y === snakey.tileList[i].y){
+                    t = true;
+                }
+            }
+        }
+    }
+    if(this.g && this.t%40 === 0 && this.t <= 200){
+        snakey.add = true;
+    }
+    this.t += 1;
+};
+var Apple = new apple();
+var switcher = 0;
+var draw = function() {
+    if(scene === "home"){
+        background(212, 212, 212);
+        textAlign(CENTER,CENTER);
+        gText("Snake",200,100,90);
+        playButton.draw();
+        playButton.clicked();
+        if(grid){
+            textSize(20);
+            fill(0);
+            text("Grid: ON",200,350);
+        }
+        else{
+            textSize(20);
+            fill(0);
+            text("Grid: OFF",200,350);
+        }
+        
+        textAlign(LEFT,TOP);
+        //155 245       y 344 361
+        if(mouseX >= 155 && mouseX <= 245 && mouseY >= 344 && mouseY <= 361 && clicked){
+            if(grid){
+                grid = false;
+            }
+            else{
+                grid = true;
+            }
+        }
+    }
+    if(scene === "game"){
+    background(255);
+    if(grid){
+    for(var i = 0; i < 20; i++){
+        stroke(247, 247, 247);
+        line(0,20*i,width,20*i);
+        line(20*i,0,20*i,height);
+    }
+    }
+    snakey.draw();
+    snakey.move();
+    Apple.draw();
+    Apple.collide();
+    textAlign(LEFT,TOP);
+    fill(0);
+    gText("Score: " + (snakey.tileList.length - 2),2,0,20);
+    if(input[32]){
+        switcher = abs(1- switcher);
+        if(switcher === 0){
+            snakey.freeze = false;
+        }
+        else{
+            snakey.freeze = true;
+        }
+    }
+    if(snakey.dead() || snakey.x < 0 || snakey.x > width || snakey.y < 0 || snakey.y > height){
+        scene = "death1";
+    }
+    }
+    if(scene === "death1"){
+        textAlign(CENTER,CENTER);
+        gText("You Died",200,100,80);
+        textSize(30);
+        fill(0);
+        if(snakey.tileList.length > highScore){
+            highScore = snakey.tileList.length - 2;
+        }
+        text("High Score: " + highScore,200,160);
+        snakey = new runner(snake);
+        scene = "death";
+    }
+    if(scene === "death"){
+        fill(255);
+        rect(200,250,180,90);
+        menuButton.draw();
+        menuButton.clicked();
+    }
+    clicked = false;
+};
+mouseClicked = function(){
+    clicked = true;
+};
+
+         }};
+
+    // Get the canvas that Processing-js will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
+    var processingInstance = new Processing(canvas, sketchProc); 
+ </script>
+
+</html>
