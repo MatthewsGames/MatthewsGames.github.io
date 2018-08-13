@@ -270,7 +270,7 @@ apple.prototype.draw = function() {
     fill(59, 217, 111);
     pushMatrix();
     translate(this.x + 2,this.y-10);
-    rotate(30);
+    rotate(PI/6);
     ellipse(0,0,4,8);
     popMatrix();
 };
@@ -306,6 +306,12 @@ var Apple = new apple();
 var switcher = 0;
 var draw = function() {
     if(scene === "home"){
+     if(input.G && !golden){
+      golden = true;
+     }
+     if(input.G && golden){
+      golden = false;
+     }
         background(212, 212, 212);
         textAlign(CENTER,CENTER);
         gText("Snake",200,100,90);
