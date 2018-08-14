@@ -1099,7 +1099,10 @@ item.prototype.draw = function() {
         //136, 138, 140
         fill(136, 138, 140);
         ellipse(this.x,this.y,this.s,this.s);
-        image(getImage("cute/Heart"),this.x - this.s/3,this.y - this.s/1.7,this.s * 3/4,this.s*23/20);
+        textAlign(CENTER,CENTER);
+        fill(255,0,0);
+        textSize(this.s);
+        text("H",this.x,this.y);
     }
     if(this.name === "FireStone"){
         //136, 138, 140
@@ -1215,7 +1218,7 @@ var inventory = function(x,y,i){
     for(var i = 0; i< 8; i++){
         this.leftItems.push([new item(i*50 + 25,370,"",20),""]);
     }
-    this.items = [[new item(25,370,"ArmorStone",20),10],[new item(75,370,"InfernoStone",20),10]];
+    this.items = [[new item(25,370,"HealStone",20),10],[new item(75,370,"InfernoStone",20),10]];
     this.selected = 0;
     for(var i = 0; i< 6; i++){
         this.items.push([new item(i*50 + 25,370,"",20),""]);
@@ -1263,7 +1266,7 @@ var stoneMaker = function(x,y){
     this.itemList = [];
     this.numList = [];
     this.itemMade = [new item(0,0,"",0),""];
-    this.combinations = [[[["Water",2],["Stone",1]],"WaterStone"],[[["Ice",2],["Stone",1]],"FreezeStone"],[[["Banana",1],["Berry",1],["Leaf",1],["Twig",1]],"EarthStone"],[[["Lava",1],["Water",1]],"Obsidian"],[[["Flint",1],["Steel",1]],"Fire"],[[["Fire",1],["Ice",1]],"Water"],[[["Fire",1],["Sand",1]],"Glass"],[[["Fire",1],["Twig",1]],"Ashes"],[[["Fire",1],["Log",1]],"Ashes"],[[["Fire",1],["Water",1]],"Steam"],,[[["Water",1],["Berry",1],["Leaf",1],["Grass",1]],"HealStone"],[[["Fire",2],["Stone",1]],"FireStone"],[[["Wind",1],["Fire",1],["Lava",1],["Obsidian",1]],"InfernoStone"],[[["Steel",1],["Silver",1],["Gold",1],["Fire",1]],"ArmorStone"],[[["Wind",2],["Stone",1]],"WindStone"],[[["Wind",2],["Glass",1]],"InvisibilityStone"]];
+    this.combinations = [[[["Water",2],["Stone",1]],"WaterStone"],[[["Ice",2],["Stone",1]],"FreezeStone"],[[["Banana",1],["Berry",1],["Leaf",1],["Twig",1]],"EarthStone"],[[["Lava",1],["Water",1]],"Obsidian"],[[["Flint",1],["Steel",1]],"Fire"],[[["Fire",1],["Ice",1]],"Water"],[[["Fire",1],["Sand",1]],"Glass"],[[["Fire",1],["Twig",1]],"Ashes"],[[["Fire",1],["Log",1]],"Ashes"],[[["Fire",1],["Water",1]],"Steam"],[[["Water",1],["Berry",1],["Leaf",1],["Grass",1]],"HealStone"],[[["Fire",2],["Stone",1]],"FireStone"],[[["Wind",1],["Fire",1],["Lava",1],["Obsidian",1]],"InfernoStone"],[[["Steel",1],["Silver",1],["Gold",1],["Fire",1]],"ArmorStone"],[[["Wind",2],["Stone",1]],"WindStone"],[[["Wind",2],["Glass",1]],"InvisibilityStone"],[[["Banana",2],["Stone",1]],"PortalStone"]];
     this.u = 0;
     //println(this.combinations[1][0].length);
 };
@@ -1300,6 +1303,7 @@ stoneMaker.prototype.make = function(){
             d = 1;
         }
     }
+    
     if(clicked && mouseY <= 250 && mouseY >= 150 && mouseX > 50 && mouseX <= 350 && this.itemList.length < 4 && I.items[I.selected][1] > 0 || clicked && mouseY <= 250 && mouseY >= 150 && mouseX > 50 && mouseX <= 350 && this.itemList.length === 4 && I.items[I.selected][1] > 0 && d === 1){
         var a = 5;
         for(var i = 0; i < this.itemList.length; i++){
@@ -1317,6 +1321,7 @@ stoneMaker.prototype.make = function(){
         }
             var a = 0;
             this.b = 0;
+            
         for(var i = 0; i < this.combinations.length; i++){
             if(this.itemList.length === this.combinations[i][0].length){
                 a = 0;
@@ -1331,8 +1336,8 @@ stoneMaker.prototype.make = function(){
                         this.b = i + 1;
                         a = 0;
                     }
-                    
-        }
+                }
+        
          var b = 0;
          this.c = 0;
             for(var i = 0; i < this.combinations.length; i++){
@@ -1346,6 +1351,7 @@ stoneMaker.prototype.make = function(){
                 }
             }
             if(this.b === i + 1 && b === this.itemList.length - 1){
+                //
                 this.itemMade = [new item(this.x + 130,this.y,this.combinations[i][1],40),this.itemList[0][1]/this.combinations[this.b - 1][0][0][1]];
                 this.c = 1;
             }
@@ -1355,6 +1361,7 @@ stoneMaker.prototype.make = function(){
             this.itemMade = [new item(0,0,"",0),""];
         }
         //this.b = 0;
+        
         if(input[ENTER] && this.itemMade[0].name !== ""){
             if(this.u === 0){
         notifications.push(new notification("You made " + this.combinations[this.b - 1][1] + "!"));
@@ -1376,6 +1383,8 @@ stoneMaker.prototype.make = function(){
     }
     }
         }
+        
+        
         if(this.u === 1){
             this.u = 0;
             this.itemList = [];
@@ -1401,7 +1410,10 @@ stoneMaker.prototype.make = function(){
         }
     }
     }
+    
            }
+           
+           
 };
 var StoneMaker = new stoneMaker(200,200);
 var player = function(config){
