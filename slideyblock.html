@@ -1,5 +1,3 @@
-<!-- This is based on DillingerLee's great template here:
-https://github.com/Team-Code/KA_Offline -->
 <html> 
  <head>
     <title>Slidey Block</title> 
@@ -22,7 +20,6 @@ https://github.com/Team-Code/KA_Offline -->
     <p align="center"> 
 	    <center>
 	 <h1>Slidey Block</h1>
-	<!--This draws the Canvas on the webpage -->
       <canvas id="mycanvas"></canvas> 
 	 </center>
     </p>
@@ -32,6 +29,35 @@ https://github.com/Team-Code/KA_Offline -->
  <script>
     var sketchProc = function(processingInstance) {
      with (processingInstance) {
+	     function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+function checkCookie() {
+    var user = getCookie("username");
+    if (user != "") {
+        currentLevel = user;
+  	}
+}
+checkCookie();
         size(900, 900); 
         frameRate(55);
 	var scene = "home";
@@ -1706,6 +1732,7 @@ var draw = function() {
     menuButton.clicked();
     }
     clicked = false;
+    setCookie("username", currentLevel, 365);
 };
 
     }};
@@ -1717,5 +1744,6 @@ var draw = function() {
  </script>
 	<h2><a href="index.html">Home</a> <a class="rightalign" href="https://goo.gl/forms/z1pawqkxHrCbVw3f2">Rate This Game!</a></h2>
 </html>
+
 
 
