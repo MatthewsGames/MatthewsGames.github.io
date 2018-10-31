@@ -1,0 +1,267 @@
+<html> 
+ <head>
+    <title>Pixel Dodge</title> 
+	 <style>
+		 body {
+			 background-color: rgb(0,0,0);
+		 }
+		 h1 {
+			color: rgb(103, 4, 184); 
+		 }
+		 h2 {
+			 color: rgb(129, 230, 230);
+		 }
+		 h4 {
+			 color: rgb(103, 4, 184);
+		 }
+		 .rightalign {
+  			 text-align: right;
+		 }
+	 </style>
+</head>
+ <body>
+    <p align="center"> 
+	    <center>
+	 <h1>Pixel Dodge</h1>
+      <canvas id="mycanvas"></canvas> 
+	 </center>
+    </p>
+ </body>
+ <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+ 
+ <script>
+    var sketchProc = function(processingInstance) {
+     with (processingInstance) {
+noStroke();
+var collision = function(obj1,obj2){
+    if(obj1.y + obj1.h >= obj2.y && obj1.y + obj1.h <= obj2.y + obj2.h && obj1.x <= obj2.x + obj2.w  && obj1.x + obj1.w >= obj2.x || obj1.y <= obj2.y + obj2.h && obj1.y >= obj2.y && obj1.x <= obj2.x + obj2.w && obj1.x + obj1.w >= obj2.x){
+        return true;    
+    } else {
+        return false;    
+    }
+};
+var input = [];
+var clicked;
+var plus1 = false;
+var score = 0;
+var highScore = 0;
+var scene = "game";
+var keyPressed = function() {
+    input[keyCode] = true;
+    input[key.toString().toUpperCase()] = true;
+};
+var keyReleased = function() {
+    input[keyCode] = false;
+    input[key.toString().toUpperCase()] = false;
+};
+mouseClicked = function(){
+    clicked = true;
+};
+var pixel = function(){
+    this.x = floor(random(0,400));
+    this.y = floor(random(0,-400));
+};
+pixel.prototype.draw = function(){
+    fill(194, 19, 19);
+    rect(this.x,this.y,2,2);
+};
+pixel.prototype.move = function(){
+    this.y += 1;
+};
+pixel.prototype.collide = function(p1){
+    if(abs(p1.x - this.x) < 2 && abs(p1.y - this.y) < 2 && p1.invincibility >= 1000){
+            background(255, 0, 0);
+            score = 0;
+            p1.speed = 1;
+            p1.magnet = 10000;
+            p1.invincibility = 10000;
+            
+    }
+    
+};
+var goldenPixel = function(){
+    this.x = floor(random(0,400));
+    this.y = floor(random(0,-400));
+};
+goldenPixel.prototype.draw = function(){
+    fill(237, 182, 0);
+    rect(this.x,this.y,2,2);
+    fill(179, 146, 27,30);
+    ellipse(this.x + 1,this.y +1 ,10,10);
+};
+goldenPixel.prototype.move = function(){
+    this.y += 1;
+};
+goldenPixel.prototype.collide = function(p1){
+    if(abs(p1.x - this.x) < 2 && abs(p1.y - this.y) < 2){
+            p1.invincibility = 0;
+            return true;
+    }
+    else if(abs(p1.x - this.x) < 2 && abs(p1.y - this.y) < 10 && p1.magnet < 1000){
+            p1.invincibility = 0;
+            return true;
+    }
+};
+var magnetPixel = function(){
+    this.x = floor(random(0,400));
+    this.y = floor(random(0,-400));
+};
+magnetPixel.prototype.draw = function(){
+    fill(0, 0, 255);
+    rect(this.x,this.y,2,2);
+    fill(0, 0, 255,30);
+    ellipse(this.x + 1,this.y +1 ,10,10);
+};
+magnetPixel.prototype.move = function(){
+    this.y += 1;
+};
+magnetPixel.prototype.collide = function(p1){
+    if(abs(p1.x - this.x) < 2 && abs(p1.y - this.y) < 2){
+            p1.magnet = 0;
+            return true;
+    }
+    
+};
+var pixel2 = function(){
+    this.x = floor(random(0,400));
+    this.y = floor(random(0,-400));
+};
+pixel2.prototype.draw = function(){
+    fill(42, 194, 19);
+    rect(this.x,this.y,2,2);
+};
+pixel2.prototype.move = function(){
+    this.y += 1;
+};
+pixel2.prototype.collide = function(p1){
+    if(abs(p1.x - this.x) < 2 && abs(p1.y - this.y) < 2){
+            plus1 = 0;
+            p1.speed += 0.01;
+            return true;
+    }
+    else if(abs(p1.x - this.x) < 2 && abs(p1.y - this.y) < 10 && p1.magnet < 1000){
+            plus1 = 0;
+            p1.speed += 0.01;
+            return true;
+    }
+    return false;
+};
+var player = function(x,y){
+    this.x = x;
+    this.y = y;
+    this.speed = 1;
+    this.invincibility = 10000;
+    this.magnet = 10000;
+};
+player.prototype.draw = function(){
+    if(this.invincibility < 1000){
+        fill(floor(random(0,256)),floor(random(0,256)),floor(random(0,256)));
+        this.invincibility++;
+    }
+    else{
+    fill(150, 19, 194);
+    }
+    rect(this.x,this.y,2,2);
+    if(this.magnet < 1000){
+        fill(0, 0, 255,30);
+        ellipse(this.x + 1,this.y +1 ,10,10);
+        this.magnet++;
+    }
+    
+};
+player.prototype.move = function(){
+    if(input[UP] && this.y > 0){
+        this.y -= this.speed;
+    }
+    else if(this.y < 0){
+        this.y = 0;
+    }
+    if(input[DOWN] && this.y < 398){
+        this.y += this.speed;
+    }
+    else if(this.y > 398){
+        this.y = 398;
+    }
+    if(input[LEFT] && this.x > 0){
+        this.x -= this.speed;
+    }
+    else if(this.x < 0){
+        this.x = 0;
+    }
+    if(input[RIGHT] && this.x < 398){
+        this.x += this.speed;
+    }
+    else if(this.x > 398){
+        this.x = 398;
+    }
+    
+};
+var pixels = [];
+for(var i = 0; i < 200; i++){
+    var r = floor(random(1,1001));
+    if(r < 500){
+    pixels.push(new pixel());
+    }
+    else if(r >= 500 && r < 999){
+        pixels.push(new pixel2());
+    }
+    else if(r === 999){
+        pixels.push(new goldenPixel());
+    }
+    else if(r === 1000){
+        pixels.push(new magnetPixel());
+    }
+}
+var p1 = new player(200,200);
+var draw = function() {
+    background(255);
+    p1.draw();
+    p1.move();
+    for(var i = 0; i < pixels.length; i++){
+        pixels[i].move();
+        pixels[i].draw();
+        if(pixels[i].collide(p1)){
+            pixels.splice(i,1);
+            i--;
+        }
+        if(pixels[i].y > 400){
+            pixels.splice(i,1);
+            i--;
+        }
+    }
+    var r = floor(random(1,1001));
+    if(r < 500){
+    pixels.push(new pixel());
+    }
+    else if(r >= 500 && r < 999){
+        pixels.push(new pixel2());
+    }
+    else if(r === 999){
+        pixels.push(new goldenPixel());
+    }
+    else if(r === 1000){
+        pixels.push(new magnetPixel());
+    }
+    textSize(30);
+    fill(255, 0, 0);
+    if(score > highScore){
+        highScore = score;
+    }
+    text("Score: " + score,10,30);
+    text(" HS: " + highScore,240,30);
+    if(plus1 < 20){
+        fill(0, 255, 0);
+        text("+1",200,30);
+        plus1++;
+    }
+    score++;
+};
+// Get the canvas that Processing-js will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
+    var processingInstance = new Processing(canvas, sketchProc); 
+ </script>
+	<center>
+	</center>
+	<h2><a href="index.html">Home</a> <a class="rightalign" href="https://goo.gl/forms/z1pawqkxHrCbVw3f2">Rate This Game!</a></h2>
+</html>
