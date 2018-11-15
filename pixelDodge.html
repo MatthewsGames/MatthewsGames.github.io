@@ -1,6 +1,6 @@
 <html> 
  <head>
-    <title>Pixel Dodge</title> 
+    <title>Slidey Block</title> 
 	 <style>
 		 body {
 			 background-color: rgb(0,0,0);
@@ -22,7 +22,7 @@
  <body>
     <p align="center"> 
 	    <center>
-	 <h1>Pixel Dodge</h1>
+	 <h1>Slidey Block</h1>
       <canvas id="mycanvas"></canvas> 
 	 </center>
     </p>
@@ -32,8 +32,9 @@
  <script>
     var sketchProc = function(processingInstance) {
      with (processingInstance) {
-	     size(400, 400);
-noStroke();
+        size(400, 400); 
+        frameRate(55);
+		noStroke();
 var collision = function(obj1,obj2){
     if(obj1.y + obj1.h >= obj2.y && obj1.y + obj1.h <= obj2.y + obj2.h && obj1.x <= obj2.x + obj2.w  && obj1.x + obj1.w >= obj2.x || obj1.y <= obj2.y + obj2.h && obj1.y >= obj2.y && obj1.x <= obj2.x + obj2.w && obj1.x + obj1.w >= obj2.x){
         return true;    
@@ -257,12 +258,14 @@ var draw = function() {
     }
     score++;
 };
-// Get the canvas that Processing-js will use
+}};
+    // Get the canvas that Processing-js will use
     var canvas = document.getElementById("mycanvas"); 
     // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
     var processingInstance = new Processing(canvas, sketchProc); 
  </script>
-	<center>
-	</center>
 	<h2><a href="index.html">Home</a> <a class="rightalign" href="https://goo.gl/forms/z1pawqkxHrCbVw3f2">Rate This Game!</a></h2>
 </html>
+
+
+
