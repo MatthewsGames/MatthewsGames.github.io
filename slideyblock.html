@@ -1549,7 +1549,7 @@ player.move();
 player.reset();
 var levelButtonList = [];
 scene = "home";
-fill(0,0,0);
+fill(100,100,100);
 rect(0,0,width,height);
 var draw = function() {
     fill(0,0,0,20);
@@ -1557,6 +1557,8 @@ var draw = function() {
     rect(0,0,width,height);
     if(scene === "game" || scene === "game2"){
         if(scene === "game"){
+		fill(100,100,100);
+		rect(0,0,width,height);
             level = 1;
             scene = "game2";
             started = false;
@@ -1629,7 +1631,8 @@ var draw = function() {
             player.reset();
             player.moving = "down";
             scene = "home2";
-            
+            fill(100,100,100);
+		rect(0,0,width,height);
         }
         textFont(createFont("Impact"));
         textAlign(CENTER,CENTER);
@@ -1653,6 +1656,8 @@ var draw = function() {
         
     }
     if(scene === "howto"){
+	    fill(100,100,100);
+rect(0,0,width,height);
         textAlign(CENTER,CENTER);
         fill(4, 0, 255);
         textSize(70);
