@@ -26,6 +26,27 @@
       <canvas id="mycanvas"></canvas> 
 	 </center>
     </p>
+	 <!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/6.0.1/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#config-web-app -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyCZCqZB4QiWr-uWXhK0_c4W8rxaOmfV08o",
+    authDomain: "slidey-block-high-score.firebaseapp.com",
+    databaseURL: "https://slidey-block-high-score.firebaseio.com",
+    projectId: "slidey-block-high-score",
+    storageBucket: "slidey-block-high-score.appspot.com",
+    messagingSenderId: "355260695040",
+    appId: "1:355260695040:web:e28f6da35a7c598b"
+  };
+  // Initialize Firebase
+<script src="/__/firebase/init.js"></script>
+  firebase.initializeApp(firebaseConfig);
+</script>
  </body>
  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
  
@@ -61,8 +82,19 @@ function checkCookie() {
         currentLevel = user;
   	}
 }
+function setHighScore(score) {
+  firebase.database().ref('slidey-block-high-score').set({
+  	highScore: score
+  });
+}
+	     function getHighScore(score){
+return firebase.database().ref('slidey-block-high-score').once('value').then(function(snapshot) {
+  var username = (snapshot.val() && snapshot.val().username) || 'Anonymous';
+  // ...
+});
+	     }
 checkCookie();
-
+setHighScore(10);
         size(900, 900); 
         frameRate(55);
 	var scene = "home";
