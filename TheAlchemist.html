@@ -2698,6 +2698,84 @@ chest.prototype.collide = function(){
     }
     
 };
+var chest2 = function(x,y,w,h,i){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.open = false;
+    this.u = 0;
+    this.indoor = i|| false;
+};
+chest2.prototype.draw = function() {
+    if(this.indoor === true){
+        rectMode(LEFT);
+        fill(163, 147, 125);
+        rect(this.x,this.y,this.w,this.h);
+    }
+    if(this.open === false){
+    rectMode(LEFT);
+    fill(158, 117, 40);
+    rect(this.x,this.y,this.w,this.h,10);
+    rect(this.x, this.y + this.h/2,this.w,this.h/2);
+    noStroke();
+    fill(0);
+    rect(this.x,this.y + this.h * 1/2, this.w,this.h/20);
+    fill(120, 120, 120);
+    rectMode(CENTER);
+    rect(this.x + this.w/2, this.y + this.h/2,7,7,5);
+    fill(0);
+    rect(this.x + this.w/2, this.y + this.h/2,3,3,5);
+    }
+    else{
+    rectMode(LEFT);
+    fill(158, 117, 40);
+    rect(this.x,this.y,this.w,this.h);
+    rect(this.x, this.y + this.h/2,this.w,this.h/2);
+    noStroke();
+    fill(0);
+    rect(this.x,this.y + this.h * 1/2, this.w,this.h/20);
+    rectMode(CENTER);
+    rect(this.x + this.w/2,this.y + this.h/4,15,6);
+    fill(120,120,120);
+    rect(this.x + this.w/2,this.y + this.h/2 + 1,7,3);
+    }
+    this.r = floor(random(6,12));
+        if(this.open && this.u === 0){
+                var a = 0;
+                for(var i = 0; i < I.items.length; i++){
+                    if(I.items[i][0].name !== ""){
+                        a += 1;
+                    }
+                }
+                if(a !== 8){
+        notifications.push(new notification("You got " + items[this.r] + " from a chest!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === items[this.r]){
+            I.items[i][1] += floor(random(1,3));
+            this.u = 1;
+        }
+    }
+    if(this.u === 0){
+        notifications.push(new notification("You got " + items[this.r] + " from a chest!"));
+        for(var i = 0; i < I.items.length; i++){
+        if(I.items[i][0].name === ""){
+            I.items[i][1] = floor(random(2,8));
+            I.items[i][0] = new item(25 + i*50,370,items[this.r],20);
+            this.u = 1;
+            break;
+        }
+    }
+    }
+                }
+        }
+};
+chest2.prototype.collide = function(){
+    if(collision(this,player1) && input.X){
+        this.open = true;
+    }
+    
+};
 var cactus = function(x,y,w,h,i){
     this.x = x;
     this.y = y;
@@ -3504,6 +3582,9 @@ for(var column = 0;column < 17;column++) {
         }
         if(levels[level][column][row] === "$") {
            keys.push(new chest(row* (width/20),column * (height /20), width/20,height/20, true));
+        }
+	if(levels[level][column][row] === "2") {
+           keys.push(new chest2(row* (width/20),column * (height /20), width/20,height/20, true));
         }
         if(levels[level][column][row] === "x") {
             blocks.push(new glassBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
