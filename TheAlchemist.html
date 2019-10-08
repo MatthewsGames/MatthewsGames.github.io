@@ -2740,7 +2740,7 @@ chest2.prototype.draw = function() {
     fill(120,120,120);
     rect(this.x + this.w/2,this.y + this.h/2 + 1,7,3);
     }
-    this.r = floor(random(11,13));
+    this.r = 12;
         if(this.open && this.u === 0){
                 var a = 0;
                 for(var i = 0; i < I.items.length; i++){
@@ -3990,6 +3990,7 @@ var draw = function() {
     }
     }
 }
+
 for(var i = 0; i < notifications.length; i++){
         notifications[i].draw();
         if(notifications[i].y <= -51){
