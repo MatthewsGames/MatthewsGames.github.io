@@ -90,9 +90,9 @@ var levels = [
     "      @                                                                    ",
     "                   sss sss sss          sss sss sss          sss sss sss   ",
     "                   szssszssszs          szssszssszs          szssszssszs   ",
-    "                   szzzzzzzzzs          szzzzzzzzzs          szzzzzzzzzs   ",
-    "                   swKzzzzzzzs          szzzzzzzzzs          szzzzzzzzzs   ",
-    "                   swwzzz$$$$s          szzzzzzzzzs          szzzzzzzzzs   ",
+    "                   szzzzzzzzzs          s22zzzzzzzs          szzzzzzzzzs   ",
+    "                   swKzzzzzzzs          ssszzzzzzzs          szzzzzzzzzs   ",
+    "                   swwzzz$$$$s          szzzzz2222s          szzzzzzzzzs   ",
     "                   sss|sssssss          sss|sssssss          sssssss|sss   ",
     "                     s|zzzzs              s|zzzzs              szzzz|s     ",
     "                     s|zz*zssssssssssssssss|zzzzsssssssssssssssszzzz|s     ",
@@ -2705,7 +2705,7 @@ var chest2 = function(x,y,w,h,i){
     this.h = h;
     this.open = false;
     this.u = 0;
-    this.indoor = i|| false;
+    this.indoor = i || false;
 };
 chest2.prototype.draw = function() {
     if(this.indoor === true){
@@ -2715,7 +2715,7 @@ chest2.prototype.draw = function() {
     }
     if(this.open === false){
     rectMode(LEFT);
-    fill(158, 117, 40);
+    fill(255);
     rect(this.x,this.y,this.w,this.h,10);
     rect(this.x, this.y + this.h/2,this.w,this.h/2);
     noStroke();
@@ -2729,7 +2729,7 @@ chest2.prototype.draw = function() {
     }
     else{
     rectMode(LEFT);
-    fill(158, 117, 40);
+    fill(255);
     rect(this.x,this.y,this.w,this.h);
     rect(this.x, this.y + this.h/2,this.w,this.h/2);
     noStroke();
@@ -2740,7 +2740,7 @@ chest2.prototype.draw = function() {
     fill(120,120,120);
     rect(this.x + this.w/2,this.y + this.h/2 + 1,7,3);
     }
-    this.r = floor(random(6,12));
+    this.r = floor(random(11,13));
         if(this.open && this.u === 0){
                 var a = 0;
                 for(var i = 0; i < I.items.length; i++){
