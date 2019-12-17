@@ -30,8 +30,7 @@
  <script>
     var sketchProc = function(processingInstance) {
      with (processingInstance) {
-        size(400, 400); 
-        frameRate(55);
+        size(600, 600); 
 frameRate(95);
 var gravity = 0.02;
 var setPos = true;
