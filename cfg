@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html> 
+  <head>
+    <title>The Campaign Finance Game</title> 
+	 <style>
+		 body {
+			 background-color: rgb(0,0,0);
+		 }
+		 h1 {
+			color: rgb(103, 4, 184); 
+		 }
+		 h2 {
+			 color: rgb(129, 230, 230);
+		 }
+		 .rightalign {
+  			 text-align: right;
+		 }
+	 </style>
+</head>
+ <body>
+    <p align="center"> 
+	    <center>
+	 <h1>The Campaign Finance Game</h1>
+      <canvas id="mycanvas"></canvas> 
+      </center>
+    </p>
+ </body>
+ <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+ 
+ <script>
+    var sketchProc = function(processingInstance) {
+     with (processingInstance) {
+        size(400, 400); 
+        frameRate(55);
+frameRate(95);
+var gravity = 0.02;
+var setPos = true;
+var cash = 0;
+smooth();
+var player1config = {
+    x:200,
+    y:200,
+    up: UP,
+    down: DOWN,
+    left: LEFT,
+    right: RIGHT,
+    speed: 1.2,
+    velocity: 0.01,
+    jumps: 2,
+    jumpHeight: 2,
+    color: color(255)
+    
+};
+
+var currentLevel = 0;
+var donations = [["Abortion",false],["Gun Control",false],["More Social Programs",false],["Same-sex marriage",false]];
+var platform = [["Abortion",""],["Gun Control",""],["More Social Programs",""],["Same-sex marriage",""]];
+var levelSide = 1;
+var input = [];
+var blocks = [];
+var cannons = [];
+var doors = [];
+var secretDoors = [];
+var keys = [];
+var moneys = [];
+var keys2 = [];
+var fallBlocks = [];
+var fallBlocks2 = [];
+var spikes = [];
+var levels = [
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s @    m m m m  d  s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s            m     s",
+    "s           sss    s",
+    "s                  s",
+    "s        m         s",
+    "s       sss        s",
+    "s                  s",
+    "s    m             s",
+    "s   sss            s",
+    "s                  s",
+    "s @               ds",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s k                s",
+    "ssss             m s",
+    "s          ss    m s",
+    "s                m s",
+    "s                m s",
+    "s        ss      m s",
+    "s                m s",
+    "s                m s",
+    "s     ss         m s",
+    "s                  s",
+    "s                  s",
+    "s   ss             s",
+    "s                  s",
+    "s        @        ds",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s  @               s",
+    "s                  s",
+    "sssss              s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s m                s",
+    "s f                s",
+    "s                  s",
+    "s     m            s",
+    "s     f            s",
+    "s           m      s",
+    "s           f      s",
+    "s^^^^^^^^^^^^^^^^^ds",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "ssssssssssssssssssss",
+    "svvvvvvvvvvvvvvvvvvs",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s  m    mcm   m   ds",
+    "s  f          f   fs",
+    "s        f         s",
+    "s@  m              s",
+    "sss^^^^^^^^^^^^^^^^s",
+    "ssssssssssssssssssss"],
+     ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s    mmm    mmm    s",
+    "s    mcm    mcm    s",
+    "sd   mmm    mmm  @ s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s              s   s",
+    "s    m         s @ s",
+    "s  s           s   s",
+    "s  s^^  ^^ m   s   s",
+    "s  sssssssss   s   s",
+    "s  s           s   s",
+    "s  s    m  m ^ s   s",
+    "s  s m sssssssss   s",
+    "s  s               s",
+    "s  s ^ m  m  m     s",
+    "s  sssssssssssss   s",
+    "s              s   s",
+    "s              s   s",
+    "s              s   s",
+    "s              s^ ^s",
+    "s   m     m    ss ss",
+    "s                   ",
+    "s  ^^^ m ^^^ m   d s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s            mmm   s",
+    "sd           mmm   s",
+    "ssssssssss   mmm   s",
+    "svvvvvvvvv         s",
+    "s                  s",
+    "s @                s",
+    "sss                s",
+    "s                  s",
+    "s       m          s",
+    "s^^^^^^bbb^^^^^^^^^s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                @ s",
+    "s              sssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s^^^^^^^^^^        s",
+    "sssssssssss        s",
+    "svvmmvvvmmv        s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s    m     m       s",
+    "s                  s",
+    "sd^^bbb^^^bbb^^^^^^s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s       m m m      s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s   !!!!!!!!!!!!   s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "sd    m      m   @ s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s      k     !!!   s",
+    "s     sss          s",
+    "s     vvv     m    s",
+    "s                  s",
+    "s             m    s",
+    "s^^^^^             s",
+    "ssssss        m    s",
+    "svvvvv       sss   s",
+    "s            vvv   s",
+    "s        s   !!!   s",
+    "s                  s",
+    "s     ^^^^^        s",
+    "s     sssss   m    s",
+    "s     vvvvv        s",
+    "s                  s",
+    "s d ^^^^^^^      @ s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s        m m       s",
+    "s      s s@s s     s",
+    "s        s s       s",
+    "s       ms sm      s",
+    "s       ss ss      s",
+    "s                  s",
+    "s                  s",
+    "s     ssss ssss    s",
+    "s                  s",
+    "s                  s",
+    "s       ss ss      s",
+    "s       ms sm      s",
+    "s        s s       s",
+    "s      s s s s     s",
+    "s        m m       s",
+    "s                  s",
+    "s^^^^^^^^^ ^^d^^^^^s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s    m s  @ s m    s",
+    "s      s!!!!s      s",
+    "s      s    s      s",
+    "ss     v    v     ss",
+    "s                  s",
+    "s^^^            ^^^s",
+    "ssssssss    ssssssss",
+    "s      s    s      s",
+    "s      s    s      s",
+    "s m    v    v    m s",
+    "s  m            m  s",
+    "s m              m s",
+    "s     ss    ss     s",
+    "sd   ss      ss    s",
+    "ssssss        ssssss",
+    "s                  s",
+    "s m m    ^^    m m s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s             sss  s",
+    "sm            vsv  s",
+    "sf m    !ss        s",
+    "s  f     ss      m s",
+    "s        ss       ds",
+    "s        ss       ss",
+    "s        ss    c   s",
+    "s        ss        s",
+    "s        ss        s",
+    "s       fss        s",
+    "s                  s",
+    "s!  s   ^^^        s",
+    "s       sss    c   s",
+    "sm       ss        s",
+    "s        ss        s",
+    "s        ss        s",
+    "s        ss        s",
+    "s      @ ssbbb^^^^^s",
+    "ssssssssssssssssssss"],
+    ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s         @        s",
+    "s                  s",
+    "s               d  s",
+    "s      sssssssssssss"],
+    ];
+var lvltxt = ["Use the arrow keys to move and collect money.","Use the up key to jump.","Sometimes you will need a key to unlock the door.","Some blocks fall when you land on them.","Cannons and spikes will make you lose lives.","Cannons only fire if you are within their range.","","Springs bounce you higher the longer you jump on them.","","Smashing blocks can smash you but will also lift you up."];
+/**
+ * ["ssssssssssssssssssss",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "s                  s",
+    "ssssssssssssssssssss"],
+    **/
+var level = 0;
+var used = 1;
+var offer = 0;
+var scene = "home";
+var clicked ;
+var btn1 = {
+    x: 300,
+    y: 500,
+    width:140,
+    height:90,
+    r: 117, 
+    g:58,
+    b:26,
+    t:"level",
+    goto: "play",
+    txt:"PLAY",
+    locked: false
+    
+};
+fill(117, 58, 26);
+var btn2 = {
+    x: 450,
+    y: 500,
+    width:140,
+    height:90,
+    r: 117, 
+    g:58,
+    b:26,
+    goto:"howto",
+    txt:"?",
+    txts: 60,
+    locked: false
+    
+};
+var btn3 = {
+    x: 150,
+    y: 500,
+    width:140,
+    height:90,
+    r: 117, 
+    g:58,
+    b:26,
+    goto:"lvlselect",
+    txt:"LEVELS",
+    locked: false
+    
+};
+var btn4 = {
+    x: 535,
+    y: 580,
+    width: 60,
+    height:40,
+    r: 117, 
+    g:58,
+    b:26,
+    goto:"home",
+    txt:"MENU",
+    txts: 15,
+    locked: false
+    
+};
+var btn5 = {
+    x: 450,
+    y: 580,
+    width: 100,
+    height:40,
+    r: 117, 
+    g:58,
+    b:26,
+    goto:"platform",
+    txt:"PLATFORM",
+    txts: 15,
+    locked: false
+    
+};
+var collision = function(obj1,obj2){
+    if(obj1.y + obj1.h >= obj2.y && obj1.y + obj1.h <= obj2.y + obj2.h && obj1.x <= obj2.x + obj2.w - 1 && obj1.x + obj1.w -1 >= obj2.x || obj1.y <= obj2.y + obj2.h && obj1.y >= obj2.y && obj1.x <= obj2.x + obj2.w -1 && obj1.x + obj1.w -1 >= obj2.x){
+        return true;    
+    } else {
+        return false;    
+    }
+};
+var objectPythag = function(obj1,obj2){
+    var slopeX = obj1.x - (obj2.x + obj2.w/2);
+    var slopeY = obj1.y - (obj2.y + obj2.h/2);
+    var slope =  sqrt((slopeX * slopeX) + (slopeY * slopeY));
+    return slope;
+};
+var keyPressed = function() {
+    input[keyCode] = true;
+    input[key.toString().toUpperCase()] = true;
+};
+var keyReleased = function() {
+    input[keyCode] = false;
+    input[key.toString().toUpperCase()] = false;
+};
+mouseClicked = function(){
+    clicked = true;
+};
+var heart = function(x,y,w,h){
+    stroke(255, 0, 0);
+    fill(255, 0, 0);
+    ellipse(x,y,w/2,h/2);
+    ellipse(x+w*3/10,y,w/2,h/2);
+    triangle(x-w*3/10,y,x+w*33/200,y+h*9/20,x+w*11/20,y);
+
+};
+var button = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.width = config.width;
+    this.height = config.height;
+    this.r = config.r;
+    this.g = config.g;
+    this.b = config.b;
+    this.goto = config.goto;
+    this.txt = config.txt;
+    this.t = config.t;
+    this.locked = config.locked;
+    this.txts = config.txts || 40;
+};
+var playButton = new button(btn1);
+var howToButton = new button(btn2);
+var recordButton = new button(btn3);
+var menuButton = new button(btn4);
+var platformButton = new button(btn5);
+button.prototype.draw = function() {
+     var o;
+     stroke(0);
+     if(this.txts === 15){
+        noStroke();
+     }
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        o = 210;
+        
+        
+    } else {
+        o = 145;
+        
+    }
+     rectMode(CENTER);
+     fill(0,0,0,130);
+     rect(this.x,this.y,this.width,this.height,15);
+     fill(this.r,this.g,this.b,o);
+     rect(this.x,this.y,this.width-10,this.height-10,10);
+     textAlign(CENTER,CENTER);
+     fill(10);
+     textSize(this.txts);
+     if(this.locked === true){
+        textSize(15);
+        this.txt = "LOCKED";
+     }
+     if(this.txt === "PLAY"){
+         noStroke();
+         triangle(this.x - 10,this.y + 15,this.x - 10,this.y - 15, this.x + 20,this.y);
+     }
+     else if(this.txt === "LEVELS"){
+         noStroke();
+         ellipse(this.x - 30,this.y -20,10,10);
+         ellipse(this.x - 30,this.y,10,10);
+         ellipse(this.x - 30,this.y +20,10,10);
+         rect(this.x + 7,this.y - 21,50,8);
+         rect(this.x + 7,this.y - 1,50,8);
+         rect(this.x + 7,this.y + 19,50,8);
+     }
+     else{
+        text(this.txt,this.x,this.y);
+     }
+    textFont(createFont("l"));
+};
+var dustParticle = function(x,y,xSpeed,ySpeed,w,h,o){
+    this.x = x;
+    this.y = y;
+    this.xSpeed = xSpeed;
+    this.ySpeed = ySpeed;
+    this.w = w;
+    this.h = h;
+    this.o = o;
+};
+dustParticle.draw = function() {
+    fill(161, 156, 161,this.o);
+    ellipse(this.x,this.y,this.w,this.h);
+    this.x+=this.xSpeed;
+    this.y+=this.ySpeed;
+    this.o+=1;
+};
+var ghostText = function(text1){
+    textSize(20);
+    fill(139, 217, 214);
+    textAlign(CENTER,TOP);
+    text(text1,60,100,500,600);
+};
+var sensei = function(x,y,s){
+    this.x = x;
+    this.y = y;
+    this.s = s;
+};
+sensei.prototype.draw = function() {
+    angleMode = "radians";
+    smooth();
+    noStroke();
+    rectMode(LEFT);
+    fill(230, 230, 230);
+    rect(this.x,this.y,this.s,this.s,4);
+    fill(230, 213, 159);
+    rectMode(CENTER);
+    rect(this.x + this.s/2,this.y + this.s*3/7.8,this.s,this.s/2);
+    fill(0);
+    ellipse(this.x + this.s/3,this.y + this.s*2/5,this.s/7,this.s/7);
+    ellipse(this.x + this.s*2/3,this.y + this.s*2/5,this.s/7,this.s/7);
+    fill(217, 202, 71);
+    triangle(this.x - this.s/2,this.y + this.s/4,this.x + this.s*1.5,this.y + this.s/4, this.x + this.s/2, this.y - this.s/4);
+    stroke(156, 6, 6);
+    strokeWeight(2);
+    noFill();
+    arc(this.x + this.s/2,this.y + this.s*1.45/3,this.s/2,this.s/4,1,PI - 1);
+    angleMode = "degrees";
+    
+};
+sensei.prototype.talk = function(speech){
+    fill(245, 128, 128);
+    strokeWeight(3);
+    stroke(0);
+    line(this.x + this.s + 3,this.y + this.s/2,this.x + this.s*1.5 + 3,this.y);
+    noStroke();
+    textAlign(LEFT,TOP);
+    textSize(20);
+    text(speech,this.x + this.s*1.5 + 13,this.y - this.s/2 - speech.length/3,200,600);
+};
+var player = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.h = height/20;
+    this.w = width/20;
+    this.up = config.up;
+    this.down = config.down;
+    this.right = config.right;
+    this.left = config.left;
+    this.speed = config.speed;
+    this.gforce = 0;
+    this.velocity = config.velocity;
+    this.past = "";
+    this.origSpeed = config.speed;
+    this.jumps = config.jumps;
+    this.usedJumps = 0;
+    this.jumpHeight = config.jumpHeight;
+    this.jumpAbility = config.jumpAbility;
+    this.speedAbility = config.speedAbility;
+    this.noAbility = config.noAbility;
+    this.phaseAbility = config.phaseAbility;
+    this.stealthAbility = config.stealthAbility;
+    this.ability = "nothing";
+    this.color = config.color;
+    this.onground = false;
+    this. circW = width/20;
+    this.circH = height/60;
+    this.t = "add";
+    this.lives = 3;
+    this.phase = config.phase;
+    this.phases = 0;
+    this.colliding = false;
+};
+player.prototype.draw = function() {
+    fill(171, 162, 77);
+    noStroke();
+    rectMode(LEFT);
+    rect(this.x,this.y,this.w,this.h,4);
+    fill(230, 213, 159);
+    rectMode(CENTER);
+    rect(this.x + this.w/2,this.y + this.h*2/5,this.w,this.h*2/5);
+    
+    fill(0);
+    if(this.speed === this.origSpeed){
+    ellipse(this.x + this.w/3,this.y + this.h*1/3,this.w/7,this.h/7);
+    ellipse(this.x + this.w*2/3,this.y + this.h*1/3,this.w/7,this.h/7);
+    fill(110, 16, 16);
+    rect(this.x + this.w/2,this.y + this.h*2.5/5,this.w/4,this.h/20);
+    }
+    else if(this.past === "right"){
+        ellipse(this.x + this.w/3 + this.w/8,this.y + this.h*1/3,this.w/7,this.h/7);
+    ellipse(this.x + this.w*2/3 + this.w/8,this.y + this.h*1/3,this.w/7,this.h/7);
+    fill(110, 16, 16);
+    rect(this.x + this.w*5/8,this.y + this.h*2.5/5,this.w/4,this.h/20);
+    }
+    else if(this.past === "left"){
+        ellipse(this.x + this.w/3 - this.w/8,this.y + this.h*1/3,this.w/7,this.h/7);
+    ellipse(this.x + this.w*2/3 - this.w/8,this.y + this.h*1/3,this.w/7,this.h/7);
+    fill(110, 16, 16);
+    rect(this.x + this.w*3/8,this.y + this.h*2.5/5,this.w/4,this.h/20);
+    }
+    fill(255);
+    rect(this.x + this.w/2,this.y + this.h*4/5,this.w,this.h*2/5);
+    fill(105, 105, 105);
+    stroke(105, 105, 105);
+    rect(this.x + this.w/8 - 0.5,this.y + this.h*4/5,this.w/4,this.h*2/5 - 1);
+    rect(this.x + this.w*7/8,this.y + this.h*4/5,this.w/4,this.h*2/5 -1);
+    noStroke();
+    fill(255, 0, 0);
+    triangle(this.x + this.w*3/8,this.y + this.h*3/5,this.x + this.w*5/8,this.y + this.h*3/5,this.x + this.w/2,this.y + this.h*7/10);
+    triangle(this.x + this.w*6.5/16,this.y + this.h*4/5,this.x + this.w*9.5/16,this.y + this.h*4/5,this.x + this.w/2,this.y + this.h*6/10);
+    triangle(this.x + this.w*6.5/16,this.y + this.h*4/5,this.x + this.w*9.5/16,this.y + this.h*4/5,this.x + this.w/2,this.y + this.h);
+};
+player.prototype.move = function(){
+    if(this.ability === "phase"){
+        
+        }
+    else{
+        this.timer = 0;
+    if(input[this.up] && this.usedJumps < this.jumps && this.onground){
+        this.gforce = -this.jumpHeight;
+        this.usedJumps += 1;
+    }
+    if(input[this.down] && this.onground === false){
+        this.gforce += gravity;
+    }
+    if(input[this.right] && this.past !== "left"){
+        this.x += this.speed;
+        this.speed += this.velocity;
+        this.past = "right";
+        this.gforce += gravity/4;
+    }
+    else if(this.past === "right" && this.speed > this.origSpeed){
+        this.x += this.speed;
+        if(this.onground === true){
+            this.speed -= this.velocity*4;
+        }
+        else{
+            this.speed -= this.velocity*2;
+        }
+        this.past = "right";
+    }
+    else if(this.past === "right"){
+        this.speed = this.origSpeed;
+        this.past = "";
+    }
+    if(input[this.left] && this.past !== "right"){
+        this.x -= this.speed;
+        this.speed += this.velocity;
+        this.past = "left";
+        this.gforce += gravity/4;
+    }
+    else if(this.past === "left" && this.speed > this.origSpeed){
+        this.x -= this.speed;
+        if(this.onground === true){
+            this.speed -= this.velocity*4;
+        }
+        else{
+            this.speed -= this.velocity*2;
+        }
+        this.past = "left";
+    }
+    else if(this.past === "left"){
+        this.speed = this.origSpeed;
+        this.past = "";
+    }
+    }
+    this.collided = false;
+    this.y += this.gforce;
+    this.gforce += gravity;
+    for(var i = 0; i < (blocks.length); i++){
+        if(collision(this, blocks[i]) && this.past === "right" && this.y >= blocks[i].y || collision(this, blocks[i]) && this.past === "right" && this.onground === false){ 
+            if(this.y >= blocks[i].y || this.onground === false){
+                this.x -= this.speed;
+                this.collided = true;
+            }
+            if(this.y >= blocks[i].y){
+                this.speed = this.origSpeed;
+                this.collided = true;
+            }
+        }
+        else if(collision(this, blocks[i]) && this.past === "left" && this.y >= blocks[i].y || collision(this, blocks[i]) && this.past === "left" && this.onground === false){ 
+            if(this.y >= blocks[i].y || this.onground === false){
+                this.x += this.speed;
+                this.collided = true;
+            }
+            if(this.y >= blocks[i].y){
+                this.speed = this.origSpeed;
+                this.collided = true;
+            }
+        }
+    }
+    this.onground = false;
+    for(var i = 0; i < (blocks.length); i++){
+        if(collision(this, blocks[i]) && this.gforce >= 0){ 
+            this.y -= ((this.y + this.h) - blocks[i].y);
+            this.onground = true;
+            this.lastgforce = this.gforce;
+        }
+        if(collision(this, blocks[i]) && this.gforce < 0){ 
+            this.y -= this.gforce;
+            this.gforce = 1;
+        }
+    }
+    if(this.onground === true){
+        this.gforce = 0;
+        this.usedJumps = 0;    
+    }
+};
+player.prototype.reset = function(config){
+    this.gforce = 0;
+    this.past = "";
+    this.usedJumps = 0;
+    this.ability = "nothing";
+    this.onground = false;
+    this.t = "add";
+    this.lives = 3;
+    this.velocity = config.velocity;
+    this.ability = "nothing";
+    this.jumpHeight = config.jumpHeight;
+    this.speed = config.speed;
+    this.phases = 0;
+};
+var player1 = new player(player1config);
+var stoneBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+};
+stoneBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(142, 145, 143);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+var bounceBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+};
+bounceBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(161, 67, 63);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h/6);
+    rect(this.x,this.y + this.h*5/6,this.w,this.h/6);
+    fill(176, 152, 84);
+    triangle(this.x + this.w/7, this.y + this.h * 1/6, this.x + this.w*6/7, this.y + this.h * 1/6, this.x + this.w/2, this.y + this.h*6/7);
+    triangle(this.x + this.w/7, this.y + this.h * 5/6, this.x + this.w*6/7, this.y + this.h * 5/6, this.x + this.w/2, this.y + this.h*1/7);
+    strokeWeight(2);
+    stroke(107, 96, 90);
+    line(this.x + this.w/4, + this.y + this.h*4/6,this.x + this.w*3/4, + this.y + this.h*4/6);
+    line(this.x + this.w/4, + this.y + this.h*2/6,this.x + this.w*3/4, + this.y + this.h*2/6);
+    line(this.x + this.w/3, + this.y + this.h*3/6,this.x + this.w*2/3, + this.y + this.h*3/6);
+    
+    
+};
+var smashBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.startY = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.velocity = 0.15;
+    this.speed = 1;
+    this.smashing = true;
+};
+smashBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(142, 145, 143);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h * 3/4);
+    fill(84, 58, 50);
+    for(var i = 0; i < 4; i++){
+        triangle(this.x + this.w *i/4,this.y + this.h*3/4,this.x + this.w *(i+1)/4,this.y + this.h*3/4,this.x + this.w*(i+0.5)/4,this.y + this.h);
+    }
+    
+};
+smashBlock.prototype.smash = function(){
+    if(this.smashing === true){
+        this.speed += this.velocity;
+        this.y += this.speed;
+    }
+    if(this.smashing === false){
+        this.speed = 1;
+        this.y -= this.speed;
+    }
+    if(this.y === this.startY){
+        this.smashing = true;
+    }
+    for(var i = 0; i < blocks.length; i++){
+        if(collision(blocks[i],this) && blocks[i].y > this.y && this.smashing === true && blocks[i].t !== "smash"){
+            this.smashing = false;
+            this.y = floor(this.y);
+        }
+    }
+    if(collision(player1,this) && player1.y > this.y + this.h *3/4 && this.smashing === true){
+            player1.lives -= 3;
+        }
+    
+};
+var breakBlock = function(x,y,w,h,t){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.t = t;
+    this.ready = -1;
+};
+breakBlock.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(148, 130, 77);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    
+};
+breakBlock.prototype.fall = function(){
+    if(collision(this,player1) && this.ready === -1){
+        this.ready = 0;
+    }
+    if(this.ready >= 0){
+        this.ready += 1;
+    }
+    if(this.ready >= 30){
+        this.y += 1;
+    }
+        
+};
+var glassBlock = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+};
+glassBlock.prototype.draw = function() {
+    fill(255,255,255,30);
+    rect(this.x,this.y,this.w,this.h);
+};
+var spike = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.collected = true;
+};
+spike.prototype.draw = function() {
+    fill(84, 58, 50);
+    triangle(this.x, this.y + this.h,this.x + this.w/2,this.y,this.x + this.w, this.y + this.h);
+    /**
+    fill(217, 217, 217);
+    triangle(this.x + this.w/8, this.y + this.h,this.x + this.w/2,this.y + this.h/4,this.x + this.w*7/8, this.y + this.h);
+    fill(102, 87, 65);
+    triangle(this.x + this.w/4, this.y + this.h,this.x + this.w/2,this.y + this.h/2.5,this.x + this.w*3/4, this.y + this.h);
+    fill(173, 64, 31);
+    rectMode(CENTER);
+    */
+    //rect(this.x + this.w/2,this.y + 3,this.w/5,this.h/10);
+};
+spike.prototype.collide = function(){
+    if(collision(this,player1)){
+        player1.lives -= 1;
+    }
+    if(collision(this,player1) && player1.onground === false){
+        player1.gforce = -1;
+    }
+    if(collision(this,player1) && player1.past === "right"){
+        player1.past = "left";
+        player1.x -= player1.speed;
+    }
+    else if(collision(this,player1) && player1.past === "left"){
+        player1.past = "right";
+        player1.x += player1.speed;
+    }
+};
+var spike2 = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.collected = true;
+};
+spike2.prototype.draw = function() {
+    fill(84, 58, 50);
+    triangle(this.x, this.y,this.x + this.w/2,this.y + this.h,this.x + this.w, this.y);
+    /**
+    fill(217, 217, 217);
+    triangle(this.x + this.w/8, this.y + this.h,this.x + this.w/2,this.y + this.h/4,this.x + this.w*7/8, this.y + this.h);
+    fill(102, 87, 65);
+    triangle(this.x + this.w/4, this.y + this.h,this.x + this.w/2,this.y + this.h/2.5,this.x + this.w*3/4, this.y + this.h);
+    fill(173, 64, 31);
+    rectMode(CENTER);
+    */
+    //rect(this.x + this.w/2,this.y + 3,this.w/5,this.h/10);
+};
+spike2.prototype.collide = function(){
+    if(collision(this,player1)){
+        player1.lives -= 1;
+    }
+    if(collision(this,player1) && player1.onground === false){
+        player1.gforce = -1;
+    }
+    if(collision(this,player1) && player1.past === "right"){
+        player1.past = "left";
+        player1.x -= player1.speed;
+    }
+    else if(collision(this,player1) && player1.past === "left"){
+        player1.past = "right";
+        player1.x += player1.speed;
+    }
+};
+var door = function(x,y,w,h,l){
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.w = w;
+    this.l = l;
+};
+var secretDoor = function(x,y,w,h,l){
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.w = w;
+    this.l = l;
+};
+var fakeDoor = function(x,y,w,h,l){
+    this.x = x;
+    this.y = y;
+    this.h = h;
+    this.w = w;
+    this.l = l;
+};
+var money = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.collected = false;
+};
+money.prototype.draw = function() {
+    if(this.collected === false){
+    noStroke();
+    rectMode(LEFT);
+    fill(125, 168, 125);
+    stroke(112, 143, 110);
+    strokeWeight(1);
+    rect(this.x,this.y + this.h/2, this.w,this.h*1.2 + 1);
+    noStroke();
+    fill(122, 150, 120);
+    ellipse(this.x + this.w/2,this.y + this.h + 2,this.h,this.h);
+    fill(77, 112, 71);
+    textSize(10);
+    text("$",this.x + this.w/2,this.y + this.h + 2);
+    }
+};
+money.prototype.collide = function(){
+    this.y += this.h/2;
+    if(collision(this,player1)){
+        this.collected = true;
+        cash += 100;
+        this.w = -100;
+        this.h = -100;
+    }
+    this.y -= this.h/2;
+};
+var yellowKey = function(x,y,w,h){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.collected = false;
+};
+yellowKey.prototype.draw = function() {
+    if(this.collected === false){
+    fill(224, 216, 98);
+    ellipse(this.x + this.w/5,this.y + this.h/2,this.h,this.w*2/5);
+    fill(102, 87, 65);
+    ellipse(this.x + this.w/5,this.y + this.h/2,this.h/2,this.w*1/5);
+    fill(224, 216, 98);
+    rect(this.x + this.w*2/5,this.y + this.h/4, this.w * 3/5,this.h/2);
+    rect(this.x + this.w * 7/10,this.y,this.w/10,this.h/4);
+    rect(this.x + this.w * 9/10,this.y,this.w/10,this.h/4);
+    }
+};
+yellowKey.prototype.collide = function(){
+    if(collision(this,player1)){
+        this.collected = true;
+    }
+};
+door.prototype.draw = function() {
+    fill(140, 112, 88);
+    noStroke();
+    rectMode(LEFT);
+    rect(this.x,this.y + this.h/2,this.w,this.h/2);
+    arc(this.x + this.w/2,this.y + this.h/2,this.w,this.h,-180,0);
+    fill(59, 56, 59);
+    ellipse(this.x + this.w/4,this.y + this.h*3/5,5,5);
+};
+secretDoor.prototype.draw = function() {
+    rectMode(LEFT);
+    fill(181, 181, 181);
+    noStroke();
+    rect(this.x,this.y,this.w,this.h);
+    fill(59, 56, 59);
+    ellipse(this.x + this.w/4,this.y + this.h*3/5,5,5);
+};
+fakeDoor.prototype.draw = function() {
+    fill(140, 112, 88);
+    noStroke();
+    rectMode(LEFT);
+    rect(this.x,this.y + this.h/2,this.w,this.h/2);
+    arc(this.x + this.w/2,this.y + this.h/2,this.w,this.h,-180,0);
+    fill(59, 56, 59);
+    ellipse(this.x + this.w/4,this.y + this.h*3/5,5,5);
+};
+var cannonBall = function(x,y,xSpeed,ySpeed){
+    this.x = x;
+    this.y = y;
+    this.xSpeed = xSpeed;
+    this.ySpeed = ySpeed;
+    this.hit = false;
+};
+cannonBall.prototype.draw = function() {
+    fill(56, 52, 52);
+    ellipse(this.x,this.y,20,20);
+};
+cannonBall.prototype.collide = function(){
+    if(dist(this.x,this.y,player1.x + player1.w/2,player1.y + player1.h/2) <= 20 + player1.w/2 && this.hit === false){
+        player1.lives -= 1;
+        this.hit = true;
+        this.x = width*2;
+        this.y = height*2;
+    }
+};
+cannonBall.prototype.move = function(){
+    this.x += this.xSpeed;
+    this.y += this.ySpeed;
+};
+var cannon = function(x,y){
+    this.x = x + width/40;
+    this.y = y + height/40;
+    this.ballList = [];
+    this.p = 0;
+    this.sc = 0;
+};
+cannon.prototype.draw = function() {
+    pushMatrix();
+    angleMode = "radians";
+    fill(0, 0, 0);
+    translate(this.x,this.y);
+    rectMode(CENTER);
+    if(player1.x <= this.x && player1.y >= this.y && player1.ability !== "stealth" || player1.x >= this.x && player1.y <= this.y && player1.ability !== "stealth"){
+    rotate(radians(Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI)));
+    this.p = Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI);
+    }
+    else if(player1.ability !== "stealth"){
+        rotate(radians(-Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.h/2)))*(180/PI)));
+        this.p = -Math.atan(abs(this.x - (player1.x + player1.w/2))/abs(this.y - (player1.y + player1.w/2)))*(180/PI);
+    }
+    else{
+        rotate(radians(this.p));
+    }
+    rect(0,0,15,40);
+    popMatrix();
+    fill(38, 38, 38);
+    ellipse(this.x,this.y,width/25,height/25);
+    fill(204, 142, 18,70);
+    ellipse(this.x,this.y,width/5,height/5);
+};
+cannon.prototype.shoot = function(){
+    if(dist(this.x,this.y,player1.x,player1.y) <= width/5/2 && player1.ability !== "stealth" && this.sc === 0){    
+        
+        this.ballList.push(new cannonBall(this.x,this.y,-(this.x - (player1.x + player1.w/2))/objectPythag(this,player1),-(this.y - (player1.y + player1.h/2))/objectPythag(this,player1)));
+    }
+    if(dist(this.x,this.y,player1.x,player1.y) <= width/5/2 && player1.ability !== "stealth"){
+        this.sc += 1;
+        if(this.sc === 45){
+            this.sc = 0;
+        }
+    }
+    else{
+        this.sc = 0;
+    }
+    for(var i = 0; i < this.ballList.length; i++){
+        this.ballList[i].draw();
+        this.ballList[i].move();
+        this.ballList[i].collide();
+    }
+};
+var loadLevel = function(){
+blocks = [];
+cannons = [];
+doors = [];
+spikes = [];
+levelSide = 1;
+for(var column = 0;column < 20;column++) {
+        for(var row = 0;row < 20;row++) {
+        if(levels[level][column][row] === "s") {
+            blocks.push(new stoneBlock(row* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "b") {
+            blocks.push(new bounceBlock(row* (width/20),column * (height /20), width/20,height/20, "bounce"));
+        }
+        if(levels[level][column][row] === "c") {
+            cannons.push(new cannon(row* (width/20),column * (height /20)));
+        }
+        if(levels[level][column][row] === "f") {
+            blocks.push(new breakBlock(row* (width/20),column * (height /20), width/20,height/20, "fall"));
+        }
+        if(levels[level][column][row] === "d") {
+            doors.push(new door(row* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "D") {
+            fallBlocks.push(new fakeDoor(row* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "k" && used === 1) {
+            keys.push(new yellowKey(row* (width/20),column * (height /20), width/20,height/50));
+        }
+        if(levels[level][column][row] === "m" && used === 1) {
+            moneys.push(new money(row* (width/20),column * (height /20), width/20,height/50));
+        }
+        if(levels[level][column][row] === "^") {
+            spikes.push(new spike(row* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "v") {
+            spikes.push(new spike2(row* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "g") {
+            blocks.push(new glassBlock(row* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "!") {
+            blocks.push(new smashBlock(row* (width/20),column * (height /20), width/20,height/20,"smash"));
+        }
+        if(levels[level][column][row] === "@" && setPos === true) {
+            player1.x = row* (width/20);
+            player1.y = column * (height /20);
+        }
+        
+    }
+ }
+ used += 1;
+};
+var loadLevel2 = function(){
+blocks = [];
+cannons = [];
+doors = [];
+spikes = [];
+levelSide = 2;
+for(var column = 0;column < levels[level].length;column++) {
+        for(var row = 20;row < levels[level][column].length;row++) {
+        if(levels[level][column][row] === "s") {
+            blocks.push(new stoneBlock((row - 20)* (width/20),column * (height /20), width/20,height/20, "solid"));
+        }
+        if(levels[level][column][row] === "b") {
+            blocks.push(new bounceBlock((row-20)* (width/20),column * (height /20), width/20,height/20, "bounce"));
+        }
+        if(levels[level][column][row] === "c") {
+            cannons.push(new cannon((row - 20)* (width/20),column * (height /20)));
+        }
+        if(levels[level][column][row] === "f") {
+            blocks.push(new breakBlock((row - 20)* (width/20),column * (height /20), width/20,height/20, "fall"));
+        }
+        if(levels[level][column][row] === "d") {
+            doors.push(new door((row - 20)* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "D") {
+            fallBlocks.push(new fakeDoor((row - 20)* (width/20),column * (height /20), width/20,height/20,true));
+        }
+        if(levels[level][column][row] === "k" && used === 2) {
+            keys2.push(new yellowKey((row - 20)* (width/20),column * (height /20), width/20,height/50));
+        }
+        if(levels[level][column][row] === "m" && used === 1) {
+            moneys.push(new money(row* (width/20),column * (height /20), width/20,height/50));
+        }
+        if(levels[level][column][row] === "^") {
+            spikes.push(new spike((row - 20)* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "v") {
+            spikes.push(new spike2(row* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "g") {
+            blocks.push(new glassBlock((row - 20)* (width/20),column * (height /20), width/20,height/20));
+        }
+        if(levels[level][column][row] === "!") {
+            blocks.push(new smashBlock((row - 20)* (width/20),column * (height /20), width/20,height/20,"smash"));
+        }
+    }
+}
+used += 1;
+};
+button.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && clicked === true && this.locked === false){
+        if(this.t === "level"){
+            if(this.txt === "PLAY" && platform[0][1] === ""){
+                scene = "platform";
+            }
+            else if(this.txt === "PLAY"){
+                scene = "game";
+            level = currentLevel;
+            setPos = true;
+            keys = [];
+            for(var m = 0; m < moneys.length; m++){
+                if(moneys[m].collected === true){
+                    cash -= 100;
+                }
+            }
+            moneys = [];
+            keys2 = [];
+            used = 1;
+            loadLevel();
+            }
+            else{
+            scene = "game";
+            level = this.goto;
+            setPos = true;
+            keys = [];
+            for(var m = 0; m < moneys.length; m++){
+                if(moneys[m].collected === true){
+                    cash -= 100;
+                }
+            }
+            moneys = [];
+            keys2 = [];
+            used = 1;
+            loadLevel();
+            }
+        } else {
+            keys = [];
+            for(var m = 0; m < moneys.length; m++){
+                if(moneys[m].collected === true){
+                    cash -= 100;
+                }
+            }
+            moneys = [];
+            keys2 = [];
+            used = 1;
+            scene = this.goto;
+            level = 1;
+            player1.reset(player1config);
+        }
+    }
+};
+var numChanges = 0;
+var button2 = function(x,y,w,h,txt,i){
+    this.x = x;
+    this.y = y;
+    this.width = w;
+    this.height = h;
+    this.txt = txt;
+    this.txts = 25;
+    this.i = floor(i/2);
+};
+button2.prototype.draw = function() {
+     var o;
+     stroke(0);
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        o = 210;
+        
+        
+    } else {
+        o = 145;
+        
+    }
+     rectMode(CENTER);
+     fill(0,0,0,130);
+     rect(this.x,this.y,this.width,this.height,15);
+     if(this.txt === "For"){
+        fill(21, 0, 255,o);
+     }
+     else{
+         fill(255,0,0,o);
+     }
+     rect(this.x,this.y,this.width-10,this.height-10,10);
+     textAlign(CENTER,CENTER);
+     fill(10);
+     textSize(this.txts);
+     text(this.txt,this.x,this.y);
+     
+};
+button2.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && clicked === true){
+        if(this.txt === "For" && platform[this.i][1] !== true){
+            platform[this.i][1] = true;
+            if(currentLevel !== 0){
+                numChanges += 1;
+            }
+        }
+        else if(this.txt === "Against" && platform[this.i][1] !== false){
+            platform[this.i][1] = false;
+            if(currentLevel !== 0){
+                numChanges += 1;
+            }
+        }
+    }
+};
+var button3 = function(x,y,w,h,txt,i){
+    this.x = x;
+    this.y = y;
+    this.width = w;
+    this.height = h;
+    this.txt = txt;
+    this.txts = 25;
+    this.i = floor(i/2);
+};
+button3.prototype.draw = function() {
+     var o;
+     stroke(0);
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        o = 210;
+        
+        
+    } else {
+        o = 145;
+        
+    }
+     rectMode(CENTER);
+     fill(0,0,0,130);
+     rect(this.x,this.y,this.width,this.height,15);
+     if(this.txt === "Accept"){
+        fill(30, 148, 30,o);
+     }
+     else{
+         fill(255,0,0,o);
+     }
+     rect(this.x,this.y,this.width-10,this.height-10,10);
+     textAlign(CENTER,CENTER);
+     fill(10);
+     textSize(this.txts);
+     text(this.txt,this.x,this.y);
+     
+};
+button3.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && clicked === true){
+        if(this.txt === "Decline"){
+            scene = "game";
+            keys = [];
+            moneys = [];
+            keys2 = [];
+            used = 1;
+            loadLevel();
+        }
+        else if(this.txt === "Accept"){
+            if(platform[offer][1]){
+                platform[offer][1] = false;
+            }
+            if(!platform[offer][1]){
+                platform[offer][1] = true;
+            }
+            numChanges += 1;
+            if(cash < 10000){
+            scene = "game";
+            keys = [];
+            moneys = [];
+            keys2 = [];
+            used = 1;
+            cash += 1000;
+            loadLevel();
+            }
+            else{
+                scene = "win";
+            }
+        }
+    }
+};
+loadLevel();
+var keyCount = 0;
+var levelButtonList = [];
+var butns = [];
+for(var i = 0; i < 8; i++){
+    var txt = "";
+    if(i%2 === 0){
+        txt = "For";
+    }
+    else{
+        txt = "Against";    
+    }
+    butns.push(new button2(i%2 * 150 + 100,floor(i/2)*140 + 120,120,60,txt,i));
+}
+var draw = function() {
+    if(scene === "offer"){
+        var butn1 = new button3(200,450,120,60,"Accept",0);
+        var butn2 = new button3(400,450,120,60,"Decline",0);
+        background(94, 64, 34);
+        textSize(50);
+        textAlign(LEFT,TOP);
+        var party = "";
+        if(!platform[offer][1]){
+            party = "Democratic";
+        }
+        else{
+            party = "Republican";
+        }
+        text("The " + party + " party has offered to back your campaign if you switch your stance on " + platform[offer][0] + ".",50,50,500,500);
+        butn1.draw();
+        butn1.clicked();
+        butn2.draw();
+        butn2.clicked();
+    }
+    if(scene === "platform"){
+        
+        
+        background(94, 64, 34);
+        textAlign(LEFT,TOP);
+        textSize(35);
+        fill(0, 0, 0);
+        var num = 0;
+        for(var i = 0; i < platform.length; i++){
+            text(platform[i][0] + ":",20,i*140 + 20);
+            if(platform[i][1]){
+                num += 1;
+                text("For",420,i*140 + 60);
+            }
+            else if(platform[i][1] === false){
+                num += 1;
+                text("Against",420,i*140 + 60);
+            }
+        }
+        for(var i = 0; i < butns.length; i++){
+            butns[i].draw();
+            butns[i].clicked();
+        }
+        if(num === 4){
+            menuButton.draw();
+            menuButton.clicked();
+        }
+        
+    }
+    if(scene === "home"){
+        noStroke();
+        background(0, 0, 0);
+        playButton.draw();
+        playButton.clicked();
+        howToButton.draw();
+        howToButton.clicked();
+        recordButton.draw();
+        recordButton.clicked();
+        textSize(70);
+        textAlign(CENTER,CENTER);
+        fill(22, 89, 10);
+        text("The Campaign",300,100);
+        text("Finance Game",300,170);
+        textSize(30);
+        textAlign(RIGHT,TOP);
+        fill(73, 112, 66);
+        text("$" + cash,595,-3);
+        rectMode(LEFT);
+        textAlign(CENTER,CENTER);
+        fill(125, 168, 125);
+        stroke(112, 143, 110);
+        rectMode(CENTER);
+        strokeWeight(10);
+        rect(300,320, 230,120);
+        noStroke();
+        fill(122, 150, 120);
+        ellipse(300,320,100,100);
+        fill(77, 112, 71);
+        textSize(100);
+        text("$",300,317);
+        noStroke();
+        strokeWeight(1);
+    }
+    if(scene === "lvlselect" || scene === "lvlselect2"){
+        if(scene === "lvlselect"){
+            levelButtonList = [];
+            var startX = 40;
+            var startY = 40;
+            var locked;
+            for(var i = 0; i <= levels.length - 2; i++){
+    if(i % 7 === 0){
+        startX = 57.5;
+        startY += 80;
+    } else {
+        startX += 80;
+    }
+    if(i > currentLevel){
+        locked = true;
+    } else {
+        locked = false;
+    }
+    levelButtonList.push(new button({
+    x: startX, 
+    y: startY,
+    width: 75,
+    height: 75,
+    r: 117, 
+    g:58,
+    b:26,
+    goto: i,
+    txt: i + 1,
+    t: "level",
+    locked: locked
+    }));
+}
+        scene = "lvlselect2";
+        }
+        background(0);
+        textSize(70);
+        fill(22, 89, 10);
+        text("Levels",300,40);
+        for(var i = 0; i < levelButtonList.length; i++){
+            levelButtonList[i].draw();   
+            levelButtonList[i].clicked(); 
+        }
+        fill(140, 140, 140);
+        textSize(30);
+        menuButton.draw();
+        menuButton.clicked();
+    }
+    if(scene === "game"){
+    background(102, 87, 65);
+    for(var i = 0;i < doors.length; i++) {
+        doors[i].draw();
+        if(collision(doors[i],player1) && doors[i].l === false){
+            level += 1;
+            used = 1;
+            levelSide = 1;
+            keys = [];
+            for(var m = 0; m < moneys.length; m++){
+                if(moneys[m].collected){
+                    var s = "";
+                    var q = levels[level-1][(moneys[m].y+4)/30-2];
+                    for(var j = 0; j < q.length; j++){
+                        if(j !== moneys[m].x/30){
+                            s += q[j];
+                        }
+                        else{
+                            s += " ";
+                        }
+                    }
+                    
+                    levels[level-1][(moneys[m].y + 4)/30-2] = s;
+                }
+            }
+            moneys = [];
+            keys2 = [];
+            if(cash >= 10000){
+                scene = "win";
+            }
+            if(cash >= 2500 && !donations[0][1]){
+                    scene = "offer";
+                    offer = 0;
+                    donations[0][1] = true;
+            }
+            else if(cash >= 4500 && !donations[1][1]){
+                    scene = "offer";
+                    offer = 1;
+                    donations[1][1] = true;
+            }
+            else if(cash >= 6500 && !donations[2][1]){
+                scene = "offer";
+                offer = 2;
+                donations[2][1] = true;
+            }
+            else if(cash >= 9000 && !donations[3][1]){
+                scene = "offer";
+                offer = 3;
+                donations[3][1] = true;
+            }
+            setPos = true;
+            loadLevel();
+            player1.reset(player1config);
+            
+        }
+    } 
+    //stops 
+    if(level > currentLevel){
+        currentLevel = level;
+    }
+    for(var i = 0;i < blocks.length; i++) {
+        blocks[i].draw();
+        if(blocks[i].t === "smash"){
+            blocks[i].smash();
+        }
+        if(blocks[i].t === "fall"){
+            blocks[i].fall();    
+        }
+        if(blocks[i].t === "bounce"){
+            if(collision(blocks[i],player1) && player1.y + player1.h <= blocks[i].y){
+                player1.gforce = -player1.lastgforce - 0.5;
+            }
+        }
+    } 
+    for(var i = 0;i < fallBlocks.length; i++) {
+        fallBlocks[i].draw();
+    } 
+    for(var i = 0;i < spikes.length; i++) {
+        spikes[i].draw();
+        spikes[i].collide();
+    }
+    keyCount = 0;
+    for(var i = 0;i < moneys.length; i++) {
+        moneys[i].draw();
+        moneys[i].collide();
+    } 
+    if(levelSide === 1){
+    for(var i = 0;i < keys.length; i++) {
+        keys[i].draw();
+        keys[i].collide();
+    } 
+    }
+    if(levelSide === 2){
+        for(var i = 0;i < keys2.length; i++) {
+            keys2[i].draw();
+            keys2[i].collide();
+        } 
+    }
+    for(var i = 0;i < keys.length; i++) {
+        if(keys[i].collected){
+            keyCount += 1;
+        }
+    } 
+    for(var i = 0;i < keys2.length; i++) {
+        if(keys2[i].collected){
+            keyCount += 1;    
+        }
+    } 
+    if(keyCount === keys.length + keys2.length && doors.length > 0){
+        doors[0].l = false;
+    }
+    player1.draw();
+    player1.move();
+    textSize(30);
+    textAlign(RIGHT,TOP);
+    fill(73, 112, 66);
+    text("$" + cash,595,-3);
+    textAlign(CENTER,CENTER);
+    textSize(20);
+    fill(148, 148, 148);
+    text(lvltxt[level],300,50);
+    for(var i = 0;i < cannons.length; i++) {
+        cannons[i].draw();
+        cannons[i].shoot();
+    } 
+    if(player1.x + player1.w > width){
+        player1.x = 1;
+        player1.y -= 1;
+        loadLevel2();
+    }
+    
+    if(player1.x < 0){
+        player1.y -= 1;
+        player1.x = width - player1.w - 1;
+        setPos = false;
+        loadLevel();
+    }
+    for(var i = 0; i < player1.lives; i++){
+        heart(21*(i)+ 7,width/10000 + 7,20,20);
+        noStroke();
+    }
+    if(input.R || player1.lives <= 0){
+        setPos = true;
+        levelSide = 1;
+        keys = [];
+        for(var m = 0; m < moneys.length; m++){
+            if(moneys[m].collected === true){
+                cash -= 100;
+            }
+        }
+        moneys = [];
+        keys2 = [];
+        used = 1;
+        loadLevel();
+        player1.reset(player1config);
+    }
+    fill(88, 232, 227);
+    textSize(30);
+    textAlign(LEFT,TOP);
+    menuButton.draw();
+    menuButton.clicked();
+    platformButton.draw();
+    platformButton.clicked();
+    if(level >= levels.length - 1){
+        scene = "win";
+    }
+}
+if(scene === "win"){
+    if(cash >= 10000){
+        angleMode = "radians";
+    background(0);
+    fill(140);
+    textSize(40);
+    textAlign(LEFT,TOP);
+    text("You collected enough money to run in the presidential election! You changed your platform " + numChanges + " times.",40,30,550,600);
+    fill(214, 217, 39);
+    strokeWeight(1);
+    pushMatrix();
+    translate(0,75);
+    stroke(214, 217, 39);
+    arc(300,300,100,100,0,radians(180));
+    rectMode(CENTER);
+    rect(300,250,100,100);
+    strokeWeight(20);
+    fill(0);
+    arc(350,250,60,60,radians(-90),radians(90));
+    arc(250,250,60,60,radians(90),radians(270));
+    strokeWeight(1);
+    fill(214, 217, 39);
+    rect(300,350,40,100);
+    arc(300,420,80,80,radians(-180),0);
+    popMatrix();
+    }
+    else{
+        background(0);
+    fill(140);
+    textSize(40);
+    textAlign(LEFT,TOP);
+    text("You beat all of the levels but haven't collected enough money to run in the election yet. Try going back and redoing levels to collect more money.",40,30,550,500);
+    menuButton.draw();
+    menuButton.clicked();
+    }
+}
+if(scene === "howto"){
+    background(0);
+        textAlign(CENTER,CENTER);
+        fill(140);
+        textSize(70);
+        fill(22, 89, 10);
+        text("Instructions",300,70);
+        textFont(createFont("arial"));
+        textAlign(LEFT,TOP);
+        fill(117, 58,26);
+        textSize(30);
+        text("      You are a politician and you have recently decided to run for president, only to realize you have no money. Complete the levels by getting to the door into the next room and collect as much money as you can! Once you have $10,000, you have gained enough money to run for president!",50,150,500,700);
+    menuButton.draw();
+    menuButton.clicked();
+    }
+clicked = false;
+};
+}};
+
+    // Get the canvas that Processing-js will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
+    var processingInstance = new Processing(canvas, sketchProc); 
+ </script>
+
+</html>
+ // Get the canvas that ProcessingJS will use
+  var canvas = document.getElementById("mycanvas"); 
+  // Pass the function to ProcessingJS constructor
+  var processingInstance = new Processing(canvas, programCode); 
+  </script>
+	<h2><a href="index.html">Home</a> <a class="rightalign" href="https://goo.gl/forms/z1pawqkxHrCbVw3f2">Rate This Game!</a></h2>
+</html>
+
