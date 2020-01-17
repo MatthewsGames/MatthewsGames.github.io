@@ -11,7 +11,7 @@
 
   gtag('config', 'UA-155237539-1');
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js"></script>
     <meta charset="utf-8">
     <title>Matthew's Games</title>
     <meta name="google-site-verification" content="b6iz-nfz_dAgUcsjsg3sbWgvDCvQkG4Tth59s6aeqS4" />
@@ -46,6 +46,19 @@
     </style>
 </head>
 <body>
+    window.cookieconsent.initialise({
+  container: document.getElementById("cookieconsent"),
+  palette:{
+    popup: { background: "#1aa3ff" },
+    button: { background: "#e0e0e0" },
+  },
+  revokable: true,
+  onStatusChange: function(status) {
+    console.log(this.hasConsented() ?
+    'enable cookies' : 'disable cookies');
+  },
+  "theme": "edgeless"
+});
     <center>
         <h1><b>Featured Game</b></h1>
         <h2><a href = "https://stabbyblock.matthewsheppard.repl.co/">Stabby Block</a></h2>
