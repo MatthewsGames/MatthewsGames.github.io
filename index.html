@@ -30,6 +30,9 @@
         h1 {
             color: rgb(18, 32, 232);
         }
+        a {
+            color: rgb(103, 4, 184);
+        }
         h2 {
             color: rgb(103, 4, 184);
         }
@@ -39,26 +42,42 @@
         p {
             color: rgb(142, 232, 237);
         }
-        a {
-            color: rgb(103, 4, 184);
-        }
         
     </style>
 </head>
 <body>
-    window.cookieconsent.initialise({
-  container: document.getElementById("cookieconsent"),
-  palette:{
-    popup: { background: "#1aa3ff" },
-    button: { background: "#e0e0e0" },
-  },
-  revokable: true,
-  onStatusChange: function(status) {
-    console.log(this.hasConsented() ?
-    'enable cookies' : 'disable cookies');
-  },
-  "theme": "edgeless"
-});
+<script src="https://cdn.jsdelivr.net/npm/cookieconsent@3/build/cookieconsent.min.js"></script>
+<script>
+  window.cookieconsent.initialise({
+    container: document.getElementById("cookieconsent"),
+    palette:{
+     popup: {background: "#1aa3ff"},
+     button: {background: "#e0e0e0"},
+    },
+    revokable: true,
+    onStatusChange: function(status) {
+     console.log(this.hasConsented() ?
+      'enable cookies' : 'disable cookies');
+    },
+    "position": "bottom-left",
+    "theme": "classic",
+    "domain": "https://i71n4.csb.app/",
+    "secure": true,
+    "content": {
+      "header": 'Cookies used on the website!',
+      "message": 'This website uses cookies to improve your experience.',
+      "dismiss": 'Got it!',
+      "allow": 'Allow cookies',
+      "deny": 'Decline',
+      "link": 'Learn more',
+      "href": 'https://www.cookiesandyou.com',
+      "close": '&#x274c;',
+      "policy": 'Cookie Policy',
+      "target": '_blank',
+      }
+   });
+
+</script>
     <center>
         <h1><b>Featured Game</b></h1>
         <h2><a href = "https://stabbyblock.matthewsheppard.repl.co/">Stabby Block</a></h2>
