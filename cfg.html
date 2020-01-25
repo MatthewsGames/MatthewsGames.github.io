@@ -60,7 +60,7 @@
  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
  
  <script>
- 	var mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+ 	var mobile2 = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     var sketchProc = function(processingInstance) {
      with (processingInstance) {
         size(600, 600); 
@@ -103,8 +103,6 @@ var movingUp = false;
 var movingRight = false;
 var movingLeft = false;
 var movingDown = false;
-mobile = !mobile;
-//println(mobile);
 var levels = [
     ["ssssssssssssssssssss",
     "s                  s",
@@ -1738,7 +1736,7 @@ var draw = function() {
     menuButton.clicked();
     platformButton.draw();
     platformButton.clicked();
-    if(mobile){
+    if(mobile2){
     upButton.draw();
     upButton.clicked();
     leftButton.draw();
