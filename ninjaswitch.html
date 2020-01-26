@@ -62,6 +62,7 @@ https://github.com/Team-Code/KA_Offline -->
  <script>
     var sketchProc = function(processingInstance) {
      with (processingInstance) {
+     var mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         size(600, 600); 
 	     frameRate(95);
 var gravity = 0.02;
@@ -85,10 +86,205 @@ var player1config = {
     color: color(255)
     
 };
+var upb = {
+    x: 95,
+    y: 520,
+    width: 60,
+    height:50,
+    dir: "up"
+};
+var downb = {
+    x: 95,
+    y: 570,
+    width: 60,
+    height:50,
+    dir: "down"
+};
+var rightb = {
+    x: 155,
+    y: 570,
+    width: 60,
+    height:50,
+    dir: "right"
+};
+var leftb = {
+    x: 35,
+    y: 570,
+    width: 60,
+    height:50,
+    dir: "left"
+};
+var b1 = {
+    x: 410,
+    y: 25,
+    width: 40,
+    height: 40,
+    dir: 1
+};
+var b2 = {
+    x: 450,
+    y: 25,
+    width: 40,
+    height: 40,
+    dir: 2
+};
+var b3 = {
+    x: 490,
+    y: 25,
+    width: 40,
+    height: 40,
+    dir: 3
+};
+var b4 = {
+    x: 530,
+    y: 25,
+    width: 40,
+    height: 40,
+    dir: 4
+};
+var b5 = {
+    x: 570,
+    y: 25,
+    width: 40,
+    height: 40,
+    dir: 5
+};
+var movingUp = false;
+var movingRight = false;
+var movingLeft = false;
+var movingDown = false;
+var mouseIsPressed = false;
+var ab1 = false;
+var ab2 = false;
+var ab3 = false;
+var ab4 = false;
+var ab5 = false;
 var currentLevel;
 if(currentLevel === undefined){
     currentLevel = 0;
 }
+var mousePressed = function(){
+    mouseIsPressed = true;
+};
+var mouseReleased = function(){
+    mouseIsPressed = false;
+};
+var dirbutton = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.width = config.width;
+    this.height = config.height;
+    this.dir = config.dir;
+};
+var upButton = new dirbutton(upb);
+var downButton = new dirbutton(downb);
+var rightButton = new dirbutton(rightb);
+var leftButton = new dirbutton(leftb);
+var bu1 = new dirbutton(b1);
+var bu2 = new dirbutton(b2);
+var bu3 = new dirbutton(b3);
+var bu4 = new dirbutton(b4);
+var bu5 = new dirbutton(b5);
+dirbutton.prototype.draw = function() {
+     var o;
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        o = 210;
+    } else {
+        o = 145;
+        
+    }
+     rectMode(CENTER);
+     fill(0,0,0,130);
+     rect(this.x,this.y,this.width,this.height,15);
+     fill(150,150,150,o);
+     rect(this.x,this.y,this.width-10,this.height-10,10);
+     
+     if(this.dir === "right"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x - 10,this.y + 13,this.x - 10,this.y - 13, this.x + 15,this.y);
+     }
+     else if(this.dir === "left"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x + 10,this.y + 13,this.x + 10,this.y - 13, this.x - 15,this.y);
+     }
+     else if(this.dir === "down"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x +13,this.y - 11,this.x - 13,this.y - 11, this.x ,this.y + 14);
+     }
+     else if(this.dir === "up"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x +13,this.y + 11,this.x - 13,this.y + 11, this.x ,this.y - 14);
+     }
+     else{
+     	textSize(20);
+        text(this.dir,this.x ,this.y);
+     }
+     
+};
+dirbutton.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && mouseIsPressed){
+        if(this.dir === "up"){
+            movingUp = true;
+        }
+        if(this.dir === "down"){
+            movingDown = true;
+        }
+        if(this.dir === "right"){
+            movingRight = true;
+        }
+        if(this.dir === "left"){
+            movingLeft = true;
+        }
+        if(this.dir === 1){
+            ab1 = true;
+        }
+        if(this.dir === 2){
+            ab2 = true;
+        }
+        if(this.dir === 3){
+            ab3 = true;
+        }
+        if(this.dir === 4){
+            ab4 = true;
+        }
+        if(this.dir === 5){
+            ab5 = true;
+        }
+    }
+    else{
+        if(this.dir === "up"){
+            movingUp = false;
+        }
+        if(this.dir === "down"){
+            movingDown = false;
+        }
+        if(this.dir === "right"){
+            movingRight = false;
+        }
+        if(this.dir === "left"){
+            movingLeft = false;
+        }
+        if(this.dir === 1){
+            ab1 = false;
+        }
+        if(this.dir === 2){
+            ab2 = false;
+        }
+        if(this.dir === 3){
+            ab3 = false;
+        }
+        if(this.dir === 4){
+            ab4 = false;
+        }
+        if(this.dir === 5){
+            ab5 = false;
+        }
+    }
+};
 var levelSide = 1;
 var input = [];
 var blocks = [];
@@ -449,6 +645,7 @@ var level = 0;
 var used = 1;
 var scene = "home";
 var clicked ;
+mobile = true;
 var btn1 = {
     x: 300,
     y: 500,
@@ -753,28 +950,28 @@ player.prototype.draw = function() {
     }
 };
 player.prototype.abilities = function(config){
-    if(input[this.jumpAbility] && this.ability !== "jump" && this.onground === true && this.speed === this.origSpeed){
+    if(input[this.jumpAbility] && this.ability !== "jump" && this.onground === true && this.speed === this.origSpeed || ab2 && this.ability !== "jump" && this.onground === true && this.speed === this.origSpeed){
         this.jumpHeight = config.jumpHeight*1.5;
         this.ability = "jump";
         this.velocity = config.velocity;
     }
-    if(input[this.speedAbility] && this.ability !== "speed"  && this.onground === true && this.speed === this.origSpeed){
+    if(input[this.speedAbility] && this.ability !== "speed"  && this.onground === true && this.speed === this.origSpeed || ab3 && this.ability !== "speed"  && this.onground === true && this.speed === this.origSpeed){
         this.velocity = config.velocity * 5;
         this.ability = "speed";
         this.jumpHeight = config.jumpHeight/2;
     }
-    if(input[this.noAbility] && this.ability !== "nothing"  && this.onground === true && this.speed === this.origSpeed){
+    if(input[this.noAbility] && this.ability !== "nothing"  && this.onground === true && this.speed === this.origSpeed || ab1 && this.ability !== "nothing"  && this.onground === true && this.speed === this.origSpeed){
         this.velocity = config.velocity;
         this.ability = "nothing";
         this.jumpHeight = config.jumpHeight;
     }
-    if(input[this.phaseAbility] && this.ability !== "phase"  && this.onground === true && this.speed === this.origSpeed){
+    if(input[this.phaseAbility] && this.ability !== "phase"  && this.onground === true && this.speed === this.origSpeed || ab4 && this.ability !== "phase"  && this.onground === true && this.speed === this.origSpeed){
         this.velocity = config.velocity;
         this.ability = "phase";
         this.jumpHeight = config.jumpHeight;
         
     }
-    if(input[this.stealthAbility] && this.ability !== "stealth"  && this.onground === true && this.speed === this.origSpeed){
+    if(input[this.stealthAbility] && this.ability !== "stealth"  && this.onground === true && this.speed === this.origSpeed || ab5 && this.ability !== "stealth"  && this.onground === true && this.speed === this.origSpeed){
         this.velocity = config.velocity/4;
         this.ability = "stealth";
         this.jumpHeight = config.jumpHeight/4;
@@ -785,22 +982,22 @@ player.prototype.abilities = function(config){
 player.prototype.move = function(){
     if(this.ability === "phase"){
         if(this.phases < phases[level]){
-        if(input[this.left] && this.timer >= 45){
+        if(input[this.left] && this.timer >= 45 || movingLeft && this.timer >= 45){
             this.x -= width/20 * 3;
             this.timer = 0;
             this.phases += 1;
         }
-        if(input[this.right] && this.timer >= 45){
+        if(input[this.right] && this.timer >= 45 || movingRight && this.timer >= 45){
             this.x += width/20 * 3;
             this.timer = 0;
             this.phases += 1;
         }
-        if(input[this.up] && this.timer >= 45){
+        if(input[this.up] && this.timer >= 45 || movingUp && this.timer >= 45){
             this.y -= height/20 * 3;
             this.timer = 0;
             this.phases += 1;
         }
-        if(input[this.down] && this.timer >= 45){
+        if(input[this.down] && this.timer >= 45 || movingDown && this.timer >= 45){
             this.y += height/20 * 3;
             this.timer = 0;
             this.phases += 1;
@@ -810,14 +1007,14 @@ player.prototype.move = function(){
     }
     else{
         this.timer = 0;
-    if(input[this.up] && this.usedJumps < this.jumps && this.onground === true){
+    if(input[this.up] && this.usedJumps < this.jumps && this.onground === true || movingUp && this.usedJumps < this.jumps && this.onground === true){
         this.gforce = -this.jumpHeight;
         this.usedJumps += 1;
     }
-    if(input[this.down] && this.onground === false){
+    if(input[this.down] && this.onground === false || movingDown && this.onground === false){
         this.gforce += gravity;
     }
-    if(input[this.right] && this.past !== "left"){
+    if(input[this.right] && this.past !== "left" || movingRight && this.past !== "left"){
         this.x += this.speed;
         this.speed += this.velocity;
         this.past = "right";
@@ -837,7 +1034,7 @@ player.prototype.move = function(){
         this.speed = this.origSpeed;
         this.past = "";
     }
-    if(input[this.left] && this.past !== "right"){
+    if(input[this.left] && this.past !== "right" || movingLeft && this.past !== "right"){
         this.x -= this.speed;
         this.speed += this.velocity;
         this.past = "left";
@@ -1546,6 +1743,26 @@ var draw = function() {
     text(player1.phases + "/" + phases[level],1,25);
     menuButton.draw();
     menuButton.clicked();
+    if(mobile){
+    upButton.draw();
+    upButton.clicked();
+    leftButton.draw();
+    leftButton.clicked();
+    rightButton.draw();
+    rightButton.clicked();
+    downButton.draw();
+    downButton.clicked();
+    bu1.draw();
+    bu1.clicked();
+    bu2.draw();
+    bu2.clicked();
+    bu3.draw();
+    bu3.clicked();
+    bu4.draw();
+    bu4.clicked();
+    bu5.draw();
+    bu5.clicked();
+    }
     if(level >= levels.length - 1){
         scene = "win";
     }
