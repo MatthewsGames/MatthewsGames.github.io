@@ -92,7 +92,129 @@ function checkCookie() {
 checkCookie();
         size(400, 400); 
         frameRate(55);
+        var mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        var upb = {
+    x: 95,
+    y: 320,
+    width: 60,
+    height:50,
+    dir: "up"
+};
+var downb = {
+    x: 95,
+    y: 370,
+    width: 60,
+    height:50,
+    dir: "down"
+};
+var rightb = {
+    x: 155,
+    y: 370,
+    width: 60,
+    height:50,
+    dir: "right"
+};
+var leftb = {
+    x: 35,
+    y: 370,
+    width: 60,
+    height:50,
+    dir: "left"
+};
+var movingUp = false;
+var movingRight = false;
+var movingLeft = false;
+var movingDown = false;
+var mouseIsPressed = false;
+var mousePressed = function(){
+    mouseIsPressed = true;
+};
+var mouseReleased = function(){
+    mouseIsPressed = false;
+};
+var dirbutton = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.width = config.width;
+    this.height = config.height;
+    this.dir = config.dir;
+};
+var upButton = new dirbutton(upb);
+var downButton = new dirbutton(downb);
+var rightButton = new dirbutton(rightb);
+var leftButton = new dirbutton(leftb);
+dirbutton.prototype.draw = function() {
+     var o;
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        o = 210;
+    } else {
+        o = 145;
+        
+    }
+     rectMode(CENTER);
+     fill(0,0,0,130);
+     rect(this.x,this.y,this.width,this.height,15);
+     fill(150,150,150,o);
+     rect(this.x,this.y,this.width-10,this.height-10,10);
+     
+     if(this.dir === "right"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x - 10,this.y + 13,this.x - 10,this.y - 13, this.x + 15,this.y);
+     }
+     else if(this.dir === "left"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x + 10,this.y + 13,this.x + 10,this.y - 13, this.x - 15,this.y);
+     }
+     else if(this.dir === "down"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x +13,this.y - 11,this.x - 13,this.y - 11, this.x ,this.y + 14);
+     }
+     else if(this.dir === "up"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x +13,this.y + 11,this.x - 13,this.y + 11, this.x ,this.y - 14);
+     }
+     else{
+     	textSize(20);
+        text(this.dir,this.x ,this.y);
+     }
+     
+};
+dirbutton.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && mouseIsPressed){
+        if(this.dir === "up"){
+            movingUp = true;
+        }
+        if(this.dir === "down"){
+            movingDown = true;
+        }
+        if(this.dir === "right"){
+            movingRight = true;
+        }
+        if(this.dir === "left"){
+            movingLeft = true;
+        }
+    }
+    else{
+        if(this.dir === "up"){
+            movingUp = false;
+        }
+        if(this.dir === "down"){
+            movingDown = false;
+        }
+        if(this.dir === "right"){
+            movingRight = false;
+        }
+        if(this.dir === "left"){
+            movingLeft = false;
+        }
+    }
+};
 		noStroke();
+        
 var collision = function(obj1,obj2){
     if(obj1.y + obj1.h >= obj2.y && obj1.y + obj1.h <= obj2.y + obj2.h && obj1.x <= obj2.x + obj2.w  && obj1.x + obj1.w >= obj2.x || obj1.y <= obj2.y + obj2.h && obj1.y >= obj2.y && obj1.x <= obj2.x + obj2.w && obj1.x + obj1.w >= obj2.x){
         return true;    
@@ -121,6 +243,7 @@ var pixel = function(){
     this.y = floor(random(0,-400));
 };
 pixel.prototype.draw = function(){
+	rectMode(LEFT);
     fill(194, 19, 19);
     rect(this.x,this.y,2,2);
 };
@@ -143,6 +266,7 @@ var goldenPixel = function(){
     this.y = floor(random(0,-400));
 };
 goldenPixel.prototype.draw = function(){
+rectMode(LEFT);
     fill(237, 182, 0);
     rect(this.x,this.y,2,2);
     fill(179, 146, 27,30);
@@ -166,6 +290,7 @@ var magnetPixel = function(){
     this.y = floor(random(0,-400));
 };
 magnetPixel.prototype.draw = function(){
+rectMode(LEFT);
     fill(0, 0, 255);
     rect(this.x,this.y,2,2);
     fill(0, 0, 255,30);
@@ -186,6 +311,7 @@ var pixel2 = function(){
     this.y = floor(random(0,-400));
 };
 pixel2.prototype.draw = function(){
+rectMode(LEFT);
     fill(42, 194, 19);
     rect(this.x,this.y,2,2);
 };
@@ -229,25 +355,25 @@ player.prototype.draw = function(){
     
 };
 player.prototype.move = function(){
-    if(input[UP] && this.y > 0){
+    if(input[UP] && this.y > 0 || movingUp && this.y > 0){
         this.y -= this.speed;
     }
     else if(this.y < 0){
         this.y = 0;
     }
-    if(input[DOWN] && this.y < 398){
+    if(input[DOWN] && this.y < 398 || movingDown && this.y < 398){
         this.y += this.speed;
     }
     else if(this.y > 398){
         this.y = 398;
     }
-    if(input[LEFT] && this.x > 0){
+    if(input[LEFT] && this.x > 0 || movingLeft && this.x > 0){
         this.x -= this.speed;
     }
     else if(this.x < 0){
         this.x = 0;
     }
-    if(input[RIGHT] && this.x < 398){
+    if(input[RIGHT] && this.x < 398 || movingRight && this.x < 398){
         this.x += this.speed;
     }
     else if(this.x > 398){
@@ -315,6 +441,16 @@ var draw = function() {
     }
     score++;
 	setCookie("username", highScore, 365);
+    if(mobile){
+    upButton.draw();
+    upButton.clicked();
+    leftButton.draw();
+    leftButton.clicked();
+    rightButton.draw();
+    rightButton.clicked();
+    downButton.draw();
+    downButton.clicked();
+    }
 };
 }};
     // Get the canvas that Processing-js will use
