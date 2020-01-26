@@ -60,11 +60,10 @@
  <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
  
  <script>
- 	var mobile2 = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     var sketchProc = function(processingInstance) {
      with (processingInstance) {
         size(600, 600); 
-frameRate(95);
+  var mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 frameRate(95);
 var gravity = 0.02;
 var setPos = true;
@@ -532,7 +531,7 @@ var leftb = {
     dir: "left"
 };
 
-
+var mouseIsPressed = false;
 var collision = function(obj1,obj2){
     if(obj1.y + obj1.h >= obj2.y && obj1.y + obj1.h <= obj2.y + obj2.h && obj1.x <= obj2.x + obj2.w - 1 && obj1.x + obj1.w -1 >= obj2.x || obj1.y <= obj2.y + obj2.h && obj1.y >= obj2.y && obj1.x <= obj2.x + obj2.w -1 && obj1.x + obj1.w -1 >= obj2.x){
         return true;    
@@ -554,9 +553,17 @@ var keyReleased = function() {
     input[keyCode] = false;
     input[key.toString().toUpperCase()] = false;
 };
-mouseClicked = function(){
+var mouseClicked = function(){
     clicked = true;
 };
+
+var mousePressed = function(){
+    mouseIsPressed = true;
+};
+var mouseReleased = function(){
+    mouseIsPressed = false;
+};
+
 var heart = function(x,y,w,h){
     stroke(255, 0, 0);
     fill(255, 0, 0);
@@ -643,8 +650,6 @@ dirbutton.prototype.draw = function() {
      var o;
      if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
         o = 210;
-        
-        
     } else {
         o = 145;
         
@@ -1736,7 +1741,7 @@ var draw = function() {
     menuButton.clicked();
     platformButton.draw();
     platformButton.clicked();
-    if(mobile2){
+    if(mobile){
     upButton.draw();
     upButton.clicked();
     leftButton.draw();
@@ -1803,6 +1808,7 @@ if(scene === "howto"){
     }
 clicked = false;
 };
+
 
 
 }};
