@@ -32,9 +32,11 @@ https://github.com/Team-Code/KA_Offline -->
  <script>
     var sketchProc = function(processingInstance) {
      with (processingInstance) {
-        size(900, 900); 
+        size(400, 400); 
         var input = [];
 var scene = "home";
+var zoom = 20;
+frameRate(10);
 var snake11 = {
     x: zoom * 15,
     y: zoom * 15,
@@ -86,7 +88,7 @@ var btn2 = {
     locked: false
 };
 var berry1;
-frameRate(10);
+frameRate(5);
 var keyPressed = function() {
     input[keyCode] = true;
     input[key.toString().toUpperCase()] = true;
@@ -254,7 +256,7 @@ fill(255,0,0);
 rect(200,200,200,200);
 scene = "home";
 var draw = function() {
-    frameRate(10);
+    frameRate(7);
     if(scene === "home"){
         background(255);
         fill(0);
@@ -265,16 +267,16 @@ var draw = function() {
         rect(width - zoom/2,0,zoom/2,height);
         playButton.draw();
         playButton.clicked();
-        textSize(70);
+        textSize(40);
         text("Two Player Snake",width/2,height*1/8);
         noStroke();
         fill(150, 232, 106);
-        rect(width/4,height/2,180,30);
-        rect(width/2 - zoom * 1.5,height/2 - zoom,90,30);
+        rect(width/4 + 18,height/2,140,30);
+        rect(width/2,height/2 - 30,90,30);
         fill(106, 168, 230);
         pushMatrix();
         translate(zoom * 8,zoom * 4);
-        rect(width/4,height/2,180,30);
+        rect(width/4 ,height/2 - 20,180,30);
         rect(width/2 - zoom * 8.5,height/2 - zoom,90,30);
         popMatrix();
     }
@@ -342,7 +344,7 @@ var draw = function() {
         rect(0,height - zoom/2,width,zoom/2);
         rect(width - zoom/2,0,zoom/2,height);
         snake2.dead = true;
-        textSize(50);
+        textSize(30);
         textAlign(CENTER,CENTER);
         fill(0, 47, 255);
         text("The blue snake wins!",width/2,height/10);
@@ -361,7 +363,7 @@ var draw = function() {
         rect(0,height - zoom/2,width,zoom/2);
         rect(width - zoom/2,0,zoom/2,height);
         snake3.dead = true;
-        textSize(50);
+        textSize(30);
         textAlign(CENTER,CENTER);
         fill(9, 255, 0);
         text("The green snake wins!",width/2,height/10);
