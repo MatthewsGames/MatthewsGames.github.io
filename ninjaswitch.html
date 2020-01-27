@@ -226,7 +226,7 @@ dirbutton.prototype.draw = function() {
      
 };
 dirbutton.prototype.clicked = function(){
-    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && mouseIsPressed){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
         if(this.dir === "up"){
             movingUp = true;
         }
