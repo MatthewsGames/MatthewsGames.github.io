@@ -115,6 +115,134 @@ checkCookie();
 
         size(900, 900); 
         frameRate(55);
+var mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+var upb = {
+    x: 95,
+    y: 520,
+    width: 60,
+    height:50,
+    dir: "up"
+};
+var downb = {
+    x: 95,
+    y: 570,
+    width: 60,
+    height:50,
+    dir: "down"
+};
+var rightb = {
+    x: 155,
+    y: 570,
+    width: 60,
+    height:50,
+    dir: "right"
+};
+var leftb = {
+    x: 35,
+    y: 570,
+    width: 60,
+    height:50,
+    dir: "left"
+};
+var movingUp = false;
+var movingRight = false;
+var movingLeft = false;
+var movingDown = false;
+var mouseIsPressed = false;
+var currentLevel;
+if(currentLevel === undefined){
+    currentLevel = 0;
+}
+var mousePressed = function(){
+    mouseIsPressed = true;
+};
+var mouseReleased = function(){
+    mouseIsPressed = false;
+};
+var dirbutton = function(config){
+    this.x = config.x;
+    this.y = config.y;
+    this.width = config.width;
+    this.height = config.height;
+    this.dir = config.dir;
+};
+var upButton = new dirbutton(upb);
+var downButton = new dirbutton(downb);
+var rightButton = new dirbutton(rightb);
+var leftButton = new dirbutton(leftb);
+var clicked;
+dirbutton.prototype.draw = function() {
+     var o;
+     if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2){
+        o = 210;
+    } else {
+        o = 145;
+        
+    }
+     rectMode(CENTER);
+     fill(0,0,0,130);
+     rect(this.x,this.y,this.width,this.height,15);
+     fill(150,150,150,o);
+     rect(this.x,this.y,this.width-10,this.height-10,10);
+     
+     if(this.dir === "right"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x - 10,this.y + 13,this.x - 10,this.y - 13, this.x + 15,this.y);
+     }
+     else if(this.dir === "left"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x + 10,this.y + 13,this.x + 10,this.y - 13, this.x - 15,this.y);
+     }
+     else if(this.dir === "down"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x +13,this.y - 11,this.x - 13,this.y - 11, this.x ,this.y + 14);
+     }
+     else if(this.dir === "up"){
+         noStroke();
+         fill(200,200,200,o);
+         triangle(this.x +13,this.y + 11,this.x - 13,this.y + 11, this.x ,this.y - 14);
+     }
+     else{
+     	textSize(20);
+        text(this.dir,this.x ,this.y);
+     }
+     
+};
+dirbutton.prototype.clicked = function(){
+    if(mouseX <= this.x + this.width/2 && mouseX >= this.x - this.width/2 && mouseY <= this.y + this.height/2 && mouseY >= this.y - this.height/2 && clicked){
+        if(this.dir === "up"){
+            movingUp = true;
+        }
+        if(this.dir === "down"){
+            movingDown = true;
+        }
+        if(this.dir === "right"){
+            movingRight = true;
+        }
+        if(this.dir === "left"){
+            movingLeft = true;
+        }
+    }
+    else{
+        if(this.dir === "up"){
+            movingUp = false;
+        }
+        if(this.dir === "down"){
+            movingDown = false;
+        }
+        if(this.dir === "right"){
+            movingRight = false;
+        }
+        if(this.dir === "left"){
+            movingLeft = false;
+        }
+    }
+};
+	     
+	     
 	var scene = "home";
 var levels = [ 
     ["ssssssssssssssssssss",
@@ -1675,6 +1803,16 @@ var draw = function() {
         }
         menuButton.draw();
         menuButton.clicked();
+	    if(mobile){
+    upButton.draw();
+    upButton.clicked();
+    leftButton.draw();
+    leftButton.clicked();
+    rightButton.draw();
+    rightButton.clicked();
+    downButton.draw();
+    downButton.clicked();
+    }
     }
     else if(scene === "home" || scene === "home2"){
         if(scene === "home"){
@@ -1697,6 +1835,7 @@ var draw = function() {
         recordButton.clicked();
         howToButton.draw();
         howToButton.clicked();
+	
         for(var i = 0;i < blocks.length; i++) {
             if(blocks[i].disappeared !== true){
                 blocks[i].draw();
