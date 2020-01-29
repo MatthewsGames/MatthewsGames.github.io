@@ -1512,19 +1512,19 @@ playerBlock.prototype.draw = function() {
     ellipse(this.x + this.w * 0.3,this.y-this.h * 0.1,this.w/75,this.h/75);
 };
 playerBlock.prototype.move = function(){
-    if(input.W && this.canMove || input[UP] && this.canMove){
+    if(input.W && this.canMove || input[UP] && this.canMove || movingUp && this.canMove){
         this.moving = "up";
         this.canMove = false;
     }
-    if(input.S && this.canMove || input[DOWN] && this.canMove){
+    if(input.S && this.canMove || input[DOWN] && this.canMove || movingDown && this.canMove){
         this.moving = "down";
         this.canMove = false;
     }
-    if(input.A && this.canMove || input[LEFT] && this.canMove){
+    if(input.A && this.canMove || input[LEFT] && this.canMove || movingLeft && this.canMove){
         this.moving = "left";
         this.canMove = false;
     }
-    if(input.D && this.canMove || input[RIGHT] && this.canMove){
+    if(input.D && this.canMove || input[RIGHT] && this.canMove || movingRight && this.canMove){
         this.moving = "right";
         this.canMove = false;
     }
