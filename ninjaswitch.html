@@ -1401,6 +1401,7 @@ cannons = [];
 doors = [];
 spikes = [];
 levelSide = 1;
+fallBlocks = []
 for(var column = 0;column < 20;column++) {
         for(var row = 0;row < 20;row++) {
         if(levels[level][column][row] === "s") {
@@ -1448,6 +1449,7 @@ cannons = [];
 doors = [];
 spikes = [];
 levelSide = 2;
+fallBlocks = [];
 for(var column = 0;column < levels[level].length;column++) {
         for(var row = 20;row < levels[level][column].length;row++) {
         if(levels[level][column][row] === "s") {
