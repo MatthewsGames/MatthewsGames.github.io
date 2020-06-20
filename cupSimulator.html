@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<!-- This is based on DillingerLee's great template here:
+https://github.com/Team-Code/KA_Offline -->
+<html> 
+ <head>
+    <title>Snake!</title> 
+	 <meta name="description" content="The original version of Snake by Matthew Sheppard.">
+<meta name="keywords" content="Matthew's Games, games, game, slidey block, ninja switch, matthews games, sheppard">
+</head>
+	 <link rel="icon" 
+      type="image/png" 
+      href="logo2.png">
+	 <style>
+		 body {
+			 background-color: rgb(0,0,0);
+		 }
+		 h1 {
+			color: rgb(103, 4, 184); 
+		 }
+		 h2 {
+			 color: rgb(129, 230, 230);
+		 }
+		 p {
+            color: rgb(142, 232, 237);
+        }
+	 </style>
+</head>
+ <body>
+    <<script data-ad-client="ca-pub-5384957578428879" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <p align="center"> 
+	    
+	    <center>
+	 <h1>Snake!</h1>
+	<!--This draws the Canvas on the webpage -->
+       <!-- Vertical banner -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:600px;float:left;padding:30px"
+     data-ad-client="ca-pub-5384957578428879"
+     data-ad-slot="8109716625"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>      
+			    <canvas id="mycanvas"></canvas> 
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Vertical banner -->
+<ins class="adsbygoogle"
+     style="display:inline-block;width:300px;height:600px;float:right;padding:30px"
+     data-ad-client="ca-pub-5384957578428879"
+     data-ad-slot="8109716625"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+	 </center>
+    </p>
+ </body>
+ <script src="https://cdn.jsdelivr.net/processing.js/1.4.8/processing.min.js"></script> 
+ 
+ <script>
+    var sketchProc = function(processingInstance) {
+     with (processingInstance) {
+        size(400, 400); 
+        frameRate(30);
+        var cup = function(x,y,w,h,f){
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.f = f;
+};
+cup.prototype.draw = function() {
+    fill(71, 143, 237);
+    noStroke();
+    quad(this.x - this.w/3 - (0.11067*this.f),this.y + this.h/2 - this.f,this.x + this.w/3 + (0.11067*this.f), this.y + this.h/2 - this.f, this.x + this.w/3, this.y + this.h/2,this.x - this.w/3,this.y + this.h/2);
+    fill(196, 196, 196,100);
+    stroke(140, 136, 136);
+    quad(this.x - this.w/2,this.y - this.h/2,this.x + this.w/2, this.y - this.h/2, this.x + this.w/3, this.y + this.h/2,this.x - this.w/3,this.y + this.h/2);
+};
+cup.prototype.updatePosition = function(){
+    this.x = mouseX;
+    this.y = mouseY;
+};
+var water = function(x,y,s,speed){
+    this.x = x;
+    this.y = y;
+    this.s = s;
+    this.speed = speed;
+    this.inCup = false;
+
+};
+water.prototype.draw = function() {
+    noStroke();
+    fill(71, 143, 237);
+    ellipse(this.x,this.y,this.s,this.s);
+    
+};
+water.prototype.fall = function(){
+    this.y += this.speed;
+    this.speed += 0.01;
+    if(this.y >= 400 + this.s/2){
+        this.y = -this.s/2; 
+        this.speed = random(3,6);
+        this.s = random(10,20);
+        this.x = random(10,390);
+    }
+};
+water.prototype.collideWithCup = function(cup){
+    if(this.y + this.s/2 >= cup.y - cup.h/2 && this.y + this.s/2 <= cup.y - cup.h/2 + cup.h/10 && this.x <= cup.x + cup.w/2 && this.x >= cup.x - cup.w/2){
+        this.inCup = true;
+    }
+    if(this.y + this.s/2 < cup.y - cup.h/2){
+        this.inCup = false;    
+    }
+    if(this.x - this.s/2 <= cup.x - cup.w/2 && this.inCup === true){
+        this.x = cup.x - cup.w/3 + this.s/2;
+    }
+    if(this.x + this.s/2 >= cup.x + cup.w/2 && this.inCup === true){
+        this.x = cup.x + cup.w/3 - this.s/2;
+    }
+    if(this.x - this.s/2 >= cup.x - cup.w/2 && cup.x > this.x && this.inCup === false && this.y + this.s/2 >= cup.y - cup.h/2 && this.y + this.s/2 <= cup.y + cup.h/2){
+        this.x = cup.x - cup.w/1.5 + this.s/2;
+    }
+    if(this.x + this.s/2 <= cup.x + cup.w/2 && cup.x < this.x && this.inCup === false && this.y + this.s/2 >= cup.y - cup.h/2 && this.y + this.s/2 <= cup.y + cup.h/2){
+        this.x = cup.x + cup.w/1.5 - this.s/2;
+    }
+    if(this.y + this.s/2 >= cup.y + cup.h/2 - cup.f && this.inCup === true){
+        cup.f += this.s/10;
+        this.y = -this.s;
+        this.y = -this.s/2; 
+        this.speed = random(3,6);
+        this.s = random(10,20);
+        this.x = random(10,390);
+    }
+};
+var Cup = new cup(mouseX,mouseY,50,75,0);
+var waterList = [];
+for(var i = 0; i < 21; i++){
+    waterList.push(new water(random(10,390),-10,random(10,20),random(3,6)));
+}
+var draw = function() {
+    fill(255,255,255,80);
+    rect(0,0,width,height);
+    Cup.draw();
+    Cup.updatePosition();
+    for(var i = 0;i < waterList.length - 1;i++){
+        waterList[i].draw();
+        waterList[i].fall();
+        waterList[i].collideWithCup(Cup);
+    }
+    if(Cup.f >= 75){
+        Cup.f = 0;
+    }
+};
+
+    }};
+
+    // Get the canvas that Processing-js will use
+    var canvas = document.getElementById("mycanvas"); 
+    // Pass the function sketchProc (defined in myCode.js) to Processing's constructor.
+    var processingInstance = new Processing(canvas, sketchProc); 
+ </script>
+<center>
+	<p>
+		Use the arrow keys to move and avoid crashing into yourself or the walls!
+	</p>
+</center>
+	<h2><a href="index.html">Home</a></h2>
+</html>
